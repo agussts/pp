@@ -8,5 +8,6 @@ end
 love.draw = function ()
     love.graphics.print("hhfgh")
     --sholoingby
+    --isduehfiudrfuidhfkjhdn
     --ef
 end
