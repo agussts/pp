@@ -1,7 +1,11 @@
 love.load = function ()
-    player = require("player")
-    sprite = love.graphics.newImage("ballininsanty.png")
-    player = player.new(sprite)
+    PlayerModule = require("player")
+    ColliderModule = require("collider")
+
+    Sprite = love.graphics.newImage("ballininsanty.png")
+    Player = PlayerModule.new(Sprite)
+
+    Collider = ColliderModule.newBox()
     love.window.setMode(1280, 720, {
         resizable = false,
         vsync = true,
@@ -18,9 +22,18 @@ love.keypressed = function (key)
 end
 
 love.update = function (dt)
-    player:UpdateInput()
+    Player:UpdateInput(dt)
+     if Player.x < 0 then Player.x = 0 end
+        if Player.y < 0 then Player.y = 0 end
+        if Player.x > love.graphics.getWidth() - Player.sprite:getWidth() then
+            Player.x = love.graphics.getWidth() - Player.sprite:getWidth()
+        end
+        if Player.y > love.graphics.getHeight() - Player.sprite:getHeight() then
+            Player.y = love.graphics.getHeight() - Player.sprite:getHeight()
+        end
 end
 
 love.draw = function ()
-    love.graphics.draw(sprite, player.x, player.y)
+    love.graphics.draw(Sprite, Player.x, Player.y)
+    love.graphics.print("Player Position: (" .. Player.x .. ", " .. Player.y .. ")", 10, 10)
 end

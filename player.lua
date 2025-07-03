@@ -14,18 +14,18 @@ module.new = function (sprite)
 
     self.x = 0
     self.y = 0
-    self.speed = 5
+    self.speed = 300
     self.sprite = sprite
 
     return self
 end
 
-function module:UpdateInput()
+function module:UpdateInput(dt)
    local input = {}
 
    for i, v in pairs(self.controls) do
        if love.keyboard.isDown(v) then
-            self[i[1]] = self[i[1]] + self.speed * i[2]
+            self[i[1]] = self[i[1]] + (self.speed * i[2]*dt)
        end
    end
    return input
