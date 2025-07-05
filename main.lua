@@ -2,8 +2,7 @@ love.load = function ()
     PlayerModule = require("player")
     ColliderModule = require("collisions")
 
-    Sprite = love.graphics.newImage("ballininsanty.png")
-    Player = PlayerModule.new(Sprite)
+    Player = PlayerModule.new("ballininsanty.png")
 
     Collider = ColliderModule.new("box", 0,80, 100, 100)
     Collider2 = ColliderModule.new("box", 200,80, 100, 100)
@@ -30,7 +29,7 @@ love.update = function (dt)
 
     for i,v in pairs(ColliderModule.getCollisions()) do
         v:UpdateSpeed(dt)
-        v:check()
+        v:check(dt)
     end
 
     Player:UpdateInput()
@@ -45,7 +44,7 @@ love.update = function (dt)
 end
 
 love.draw = function ()
-    love.graphics.draw(Sprite, Player.collision.x, Player.collision.y)
+    love.graphics.draw(Player.sprite, Player.collision.x, Player.collision.y)
     love.graphics.print(tostring(Touching), 10, 30)
     love.graphics.rectangle("line", Collider.x, Collider.y, Collider.width, Collider.height)
     love.graphics.rectangle("line", Collider2.x, Collider2.y, Collider2.width, Collider2.height)
