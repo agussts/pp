@@ -3,7 +3,6 @@ local collisions = {}
 local addedCollisions = {}
 local types = {
     "box",
-    "circle",
     "hitbox"
 }
 
@@ -36,6 +35,9 @@ collisions.getCollisions = function()
 end
 
 function collisions:UpdateSpeed(dt)
+    if self.player then
+        print("speedX: "..tostring(self.speedX))
+    end
     self.x = self.x + self.speedX * dt
     self.y = self.y + self.speedY  * dt
 end
@@ -51,10 +53,10 @@ function collisions:check()
         and self.y + self.height >= otherCollider.y then
             table.insert(hitting, otherCollider)
             if self.type == "box" and otherCollider.type == "box" then
-                self.x = self.x + self.speedX * -1
+                --[[self.x = self.x + self.speedX * -1
                 self.y = self.y + self.speedY * -1
                 self.speedX = 0
-                self.speedY = 0
+                self.speedY = 0]]
             end
         end
         ::continue::

@@ -3,12 +3,11 @@ local module = {}
 local collisions = require("collisions")
 
 module.name = "player"
-module.version = "0.1.0"
 module.controls = {
-    [{"x", -1}] = "a",
-    [{"x", 1}] = "d",
-    [{"y", -1}] = "w",
-    [{"y", 1}] = "s"
+    [{"X", -1}] = "a",
+    [{"X", 1}] = "d",
+    [{"Y", -1}] = "w",
+    [{"Y", 1}] = "s"
 }
 
 module.new = function(sprite)
@@ -16,6 +15,7 @@ module.new = function(sprite)
 
     self.sprite = sprite
     self.collision = collisions.new("box", 0,0, sprite:getWidth(), sprite:getHeight())
+    self.collision.player = true
     self.speed = 500
 
     self.collision.visualized = true
@@ -24,15 +24,15 @@ module.new = function(sprite)
 end
 
 function module:UpdateInput()
-   local input = {}
-
-   for i, v in pairs(self.controls) do
+    self.collision.speedX = 0
+    self.collision.speedY = 0
+    for i, v in pairs(module.controls) do
        if love.keyboard.isDown(v) then
-        self.collision["speed"..string.upper(i[1])] = i[2] * self.speed 
+        print(tostring(v).. " is down")
+        self.collision["speed"..i[1]] = i[2] * self.speed 
         print(self.collision.speedX, self.collision.speedY)
        end
    end
-   return input
 end
 
 return module
