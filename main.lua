@@ -29,18 +29,11 @@ love.update = function (dt)
 
     for i,v in pairs(ColliderModule.getCollisions()) do
         v:UpdateSpeed(dt)
-        v:check(dt)
-    end
-
-    Player:UpdateInput()
-    --[[ if Player.x < 0 then Player.x = 0 end
-        if Player.y < 0 then Player.y = 0 end
-        if Player.x > love.graphics.getWidth() - Player.sprite:getWidth() then
-            Player.x = love.graphics.getWidth() - Player.sprite:getWidth()
+        if v.type == "box" then
+            v:check(dt)
         end
-        if Player.y > love.graphics.getHeight() - Player.sprite:getHeight() then
-            Player.y = love.graphics.getHeight() - Player.sprite:getHeight()
-        end]]
+    end
+    Player:UpdateInput()
 end
 
 love.draw = function ()
