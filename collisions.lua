@@ -1,17 +1,12 @@
 local collisions = {}
 
-local Vector2 = require("Vector2")
-
 local addedCollisions = {}
 local types = {
     "box",
     "hitbox"
 }
-local function samesign(a, b)
-    return (a >= 0 and b >= 0) or (a < 0 and b < 0)
-end
 
-collisions.new = function(type, x, y, width, height)
+collisions.new = function(type, x, y, width, height, enabled, onHit)
     local self = setmetatable({}, { __index = collisions })
 
     self.x = x
@@ -21,17 +16,26 @@ collisions.new = function(type, x, y, width, height)
     self.speedX = 0
     self.speedY = 0
     self.visualized = false
-    self.colliding = false
+    self.enabled = enabled or true
+    self.onHit = onHit or function () end
+    self.color = {1, 1, 1, 1}
 
     self.tags = {}
-    for i,v in pairs(types) do
-        if v == type then
-            self.type = type
-            table.insert(addedCollisions, self)
-            print("addedCollisions")
-            return self
-        end
+    local typeFound = false
+    if type == "hitbox" then
+        self.color = {1, 0, 0, 1} 
+        typeFound = true
+    elseif type == "box" then
+        self.color = {1, 1, 1, 1} 
+        typeFound = true
     end
+
+    if typeFound then
+        self.type = type
+        table.insert(addedCollisions, self)
+        return self
+    end
+
     error("Invalid collision type: " .. tostring(type) .. ". Valid types are: " .. table.concat(types, ", "))
 end
 
@@ -44,7 +48,26 @@ function collisions:UpdateSpeed(dt)
     self.y = self.y + self.speedY * dt
 end
 
-function collisions:check(dt)
+function collisions:getDirection()
+    return self.speedX, self.speedY
+end
+
+function collisions:Destroy()
+    for i,v in pairs(addedCollisions) do
+        if v == self then
+            table.remove(addedCollisions, i)
+            break
+        end
+    end
+    for _,v in pairs(self) do
+        v = nil
+    end
+    self = nil
+    return
+end
+
+function collisions:check()
+    if not self.enabled then return end
     local hitting = {}
     for _, otherCollider in pairs(addedCollisions) do
         if otherCollider == self then goto continue end
@@ -54,6 +77,7 @@ function collisions:check(dt)
         and self.y <= otherCollider.y + otherCollider.height 
         and self.y + self.height >= otherCollider.y then
             table.insert(hitting, otherCollider)
+            self.onHit(otherCollider)
             if self.type == "box" and otherCollider.type == "box" then
                 local dx = math.min(self.x + self.width, otherCollider.x + otherCollider.width) - math.max(self.x, otherCollider.x)
                 local dy = math.min(self.y + self.height, otherCollider.y + otherCollider.height) - math.max(self.y, otherCollider.y)

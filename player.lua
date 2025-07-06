@@ -15,10 +15,8 @@ module.new = function(spriteName)
 
     self.sprite = love.graphics.newImage(spriteName)
     self.collision = collisions.new("box", 0,0, self.sprite:getWidth(), self.sprite:getHeight())
+    self.collision.tags = { "player" }
     self.speed = 500
-
-    self.collision.visualized = true
-
     return self
 end
 
