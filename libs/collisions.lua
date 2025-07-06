@@ -19,14 +19,17 @@ collisions.new = function(type, x, y, width, height, enabled, onHit)
     self.enabled = enabled or true
     self.onHit = onHit or function () end
     self.color = {1, 1, 1, 1}
+    self.link = nil
 
     self.tags = {}
     local typeFound = false
     if type == "hitbox" then
         self.color = {1, 0, 0, 1} 
+        table.insert(self.tags, "hitbox")
         typeFound = true
     elseif type == "box" then
         self.color = {1, 1, 1, 1} 
+        table.insert(self.tags, "boxcollider")
         typeFound = true
     end
 

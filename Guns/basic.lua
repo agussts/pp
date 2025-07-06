@@ -1,7 +1,6 @@
 local gun = {}
 local collisions = require("libs.collisions")
 local timer      = require("libs.timer")
-
 function gun.new()
     local self = setmetatable({}, { __index = gun })
     self.name = "Basic Gun"
@@ -32,6 +31,12 @@ function gun:Fire(x, y)
     collider = collisions.new("hitbox", 0, 0, 50, 50, false, function (otherCollider)
         for i,v in pairs(otherCollider.tags) do
             if v == "player" or v == "projectile" then return end
+            if v == "boxcollider" then
+                love.audio.newSource("assets/sfx/blip.wav", "static"):play()
+            elseif v == "enemy" then
+                love.audio.newSource("assets/sfx/hitHurt.wav", "static"):play()
+                otherCollider.link.health = otherCollider.link.health - self.damage
+            end
         end
         collider:Destroy()
     end)
@@ -46,6 +51,8 @@ function gun:Fire(x, y)
     collider.speedX = (dx / distance) * self.speed
     collider.enabled = true
     self.lastFireTime = self.fireRate
+    love.audio.newSource("assets/sfx/shoot.wav", "static"):play()
+
     timer.after(8, function()
         collider:Destroy()
     end)
