@@ -4,11 +4,11 @@ local basic = require("Guns.basic")
 
 gun.new = function()
     local self = basic.new()
-    self.name = "Spam Gun"
+    self.name = "dev g"
     self.fireRate = .1
-    self.damage = 3
-    self.ammo = 50
-    self.maxAmmo = 50
+    self.damage = 10
+    self.ammo = math.huge
+    self.maxAmmo = math.huge
 
     gun.__index = basic
 

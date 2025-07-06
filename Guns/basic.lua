@@ -1,5 +1,6 @@
 local gun = {}
-local collisions = require("collisions")
+local collisions = require("libs.collisions")
+local timer      = require("libs.timer")
 
 function gun.new()
     local self = setmetatable({}, { __index = gun })
@@ -22,10 +23,8 @@ function gun:Fire(x, y)
         return
     end
     if self.ammo <= 0 then
-        print("Out of ammo!")
         self.lastFireTime = self.rechargeTime
         self.ammo = self.maxAmmo
-        print("Reloading... Ammo refilled to " .. self.ammo)
         return
     end
     self.ammo = self.ammo - 1
@@ -34,11 +33,9 @@ function gun:Fire(x, y)
         for i,v in pairs(otherCollider.tags) do
             if v == "player" or v == "projectile" then return end
         end
-        print("Gun hit collider at:".. otherCollider.type)
         collider:Destroy()
     end)
     collider.tags = self.tags
-    print("firing")
     local mouseX, mouseY = love.mouse.getPosition()
     local dx = mouseX - x
     local dy = mouseY - y
@@ -47,9 +44,11 @@ function gun:Fire(x, y)
     local distance = math.sqrt(dx*dx + dy*dy)
     collider.speedY = (dy / distance) * self.speed
     collider.speedX = (dx / distance) * self.speed
-    print("Collider speed: (" .. collider.speedX .. ", " .. collider.speedY .. ")")
     collider.enabled = true
     self.lastFireTime = self.fireRate
+    timer.after(8, function()
+        collider:Destroy()
+    end)
     return
 end
 return gun

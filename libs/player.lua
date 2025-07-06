@@ -1,6 +1,6 @@
 local module = {}
 
-local collisions = require("collisions")
+local collisions = require("libs.collisions")
 
 module.name = "player"
 module.controls = {

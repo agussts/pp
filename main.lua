@@ -1,14 +1,18 @@
 love.load = function ()
-    PlayerModule = require("player")
-    ColliderModule = require("collisions")
-    GunModule = require("Guns/spam")
+    PlayerModule = require("libs.player")
+    ColliderModule = require("libs.collisions")
+    GunModule = require("Guns.inf")
     Gun = GunModule.new()
+    Timer = require("libs.timer")
 
     Player = PlayerModule.new("ballininsanty.png")
 
     Collider = ColliderModule.new("box", 500,80, 100, 100)
     --local collidersHit = {}
     Projectile = ColliderModule.new("hitbox", 0, 80, 50, 50, true, function(collider)
+        for i,v in pairs(collider.tags) do
+            if v == "projectile" then return end
+        end
         --for i,v in pairs(collidersHit) do
         --    if v == collider then return end
         --end
@@ -16,6 +20,7 @@ love.load = function ()
         print("Hit collider at: (" .. collider.x .. ", " .. collider.y .. ")")
         Projectile:Destroy()
     end)
+    Projectile.tags = {"projectile"}
     Projectile.speedX = 200
     Touching = false
 
@@ -36,6 +41,7 @@ love.keypressed = function (key)
 end
 
 love.update = function (dt)
+    Timer.update(dt)
     for _,v in pairs(ColliderModule.getCollisions()) do
         v.visualized = true
         v:UpdateSpeed(dt)
@@ -61,6 +67,7 @@ love.draw = function ()
     love.graphics.print(tostring(Touching), 10, 30)
     love.graphics.print("Collider Position: (" .. Collider.x .. ", " .. Collider.y .. ")", 10, 70)
     love.graphics.print("Player Position: (" .. Player.collision.x .. ", " .. Player.collision.y .. ")", 10, 10)
+    love.graphics.print("Gun Ammo: " .. Gun.ammo, 10, 50)
     for i,v in pairs(ColliderModule.getCollisions()) do
         if v.visualized then
             love.graphics.setColor(v.color)
