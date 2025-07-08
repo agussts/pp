@@ -43,13 +43,13 @@ love.load = function ()
         end
         ConfigTable[i] = v
     end
-    Player = PlayerModule.new("assets/sprites/ballininsanty.png", 40, 40)
+    Player = PlayerModule.new("assets/sprites/maxresdefault.png", 40, 40)
     Enemy = EnemyModule.new("assets/sprites/slungus.png", 40, 40)
     Enemy.collision.x = 500
     Enemy.collision.y = 100
 
     Collider = ColliderModule.new("box", 250, 40, 50, 50)
-    Projectile = ColliderModule.new("hitbox", 0, 40, 25, 25, true, function(collider)
+    Projectile = ColliderModule.new("hitbox", 0, 80, 25, 25, true, function(collider)
         for i,v in pairs(collider.tags) do
             if v == "projectile" then return end
         end
