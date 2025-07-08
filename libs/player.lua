@@ -22,7 +22,7 @@ module.new = function(spriteName, width, height)
     self.collision.tags = { "player" }
     self.health = 100
     self.collision.link = self
-    self.speed = 500
+    self.speed = 250
     return self
 end
 
