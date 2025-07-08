@@ -2,7 +2,7 @@ love.load = function ()
     PlayerModule = require("libs.player")
     EnemyModule = require("libs.enemy")
     ColliderModule = require("libs.collisions")
-    GunModule = require("Guns.dev")
+    GunModule = require("guns.dev")
     Gun = GunModule.new()
     Timer = require("libs.timer")
     Guis = require("libs.guis.gui")
@@ -53,10 +53,9 @@ love.load = function ()
         for i,v in pairs(collider.tags) do
             if v == "projectile" then return end
         end
-        print("Hit collider at: (" .. collider.x .. ", " .. collider.y .. ")")
         Projectile:Destroy()
     end)
-    Projectile.tags = {"projectile"}
+    Projectile:AddTag("projectile")
     Projectile.speedX = 200
     
     love.audio.setVolume(ConfigTable.VOLUME)
@@ -99,9 +98,16 @@ love.keypressed = function (key)
         UpdateWindow()
     elseif key == Player.otherControls.dash then
         Player.speed = Player.speed * 3
-        Player.dashing = true
-        Timer.after(0.5, function()
+        Player.collision:ChangeType("hitbox")
+        Player.collision.onHit = function (otherCollider)
+            if otherCollider.link ~= nil and otherCollider.link.health ~= nil then
+                otherCollider.link.health = otherCollider.link.health - 1
+            end
+        end
+        Timer.after(0.2, function()
             Player.speed = Player.speed / 3
+            Player.collision.onHit = function () end
+            Player.collision:ChangeType("box")
         end)
     end
 end

@@ -19,12 +19,13 @@ module.new = function(spriteName, width, height)
 
     self.sprite = love.graphics.newImage(spriteName)
     self.collision = collisions.new("box", 0,0, width, height)
-    self.collision.tags = { "player" }
+    self.collision:AddTag("player")
     self.health = 100
     self.collision.link = self
     self.speed = 250
     return self
 end
+
 
 function module:UpdateInput()
     self.collision.speedX = 0

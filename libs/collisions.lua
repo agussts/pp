@@ -22,6 +22,7 @@ collisions.new = function(type, x, y, width, height, enabled, onHit)
     self.link = nil
 
     self.tags = {}
+
     local typeFound = false
     if type == "hitbox" then
         self.color = {1, 0, 0, 1} 
@@ -29,7 +30,7 @@ collisions.new = function(type, x, y, width, height, enabled, onHit)
         typeFound = true
     elseif type == "box" then
         self.color = {1, 1, 1, 1} 
-        table.insert(self.tags, "boxcollider")
+        table.insert(self.tags, "box")
         typeFound = true
     end
 
@@ -37,6 +38,42 @@ collisions.new = function(type, x, y, width, height, enabled, onHit)
         self.type = type
         table.insert(addedCollisions, self)
         return self
+    end
+
+    error("Invalid collision type: " .. tostring(type) .. ". Valid types are: " .. table.concat(types, ", "))
+end
+
+function collisions:AddTag(tagName)
+    table.insert(self.tags, tagName)
+end
+
+function collisions:RemoveTag(tagName)
+    for i,v in pairs(self.tags) do
+        if v == tagName then
+            table.remove(self.tags, i)
+            break
+        end
+    end
+end
+
+function collisions:ReplaceTag(tagToReplace, replacement)
+    self:RemoveTag(tagToReplace)
+    self:AddTag(replacement)
+end
+
+function collisions:ChangeType(typeName) 
+    local typeFound = false
+    if typeName == "hitbox" then
+        self.color = {1, 0, 0, 1} 
+        typeFound = true
+    elseif typeName == "box" then
+        self.color = {1, 1, 1, 1} 
+        typeFound = true
+    end
+    if typeFound then
+        self:ReplaceTag(self.type, typeName)
+        self.type = typeName
+        return
     end
 
     error("Invalid collision type: " .. tostring(type) .. ". Valid types are: " .. table.concat(types, ", "))

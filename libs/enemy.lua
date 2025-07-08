@@ -16,6 +16,9 @@ enemy.new = function(spritePath, width, height)
     self.timer = timer.new(self.cd)
     self.collision.onHit = (function (collider)
         if not self.timer:check() then return end
+        for i,v in pairs(collider.tags) do
+            if v == "hitbox" then return end
+        end
         for _,v in pairs(collider.tags) do
             if v == "player" then
                 self.timer:reset()
@@ -24,11 +27,13 @@ enemy.new = function(spritePath, width, height)
             end
         end
     end)
-    self.collision.tags = {"enemy"}
+    self.collision:AddTag("enemy")
     self.health = 100
     self.damage = 10
     table.insert(addedEnemies, self)
     return self
 end
+
+
 
 return enemy
