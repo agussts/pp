@@ -5,16 +5,31 @@ love.load = function ()
     GunModule = require("Guns.dev")
     Gun = GunModule.new()
     Timer = require("libs.timer")
+    Guis = require("libs.guis.gui")
+
+
+    local configDefaultData = {
+        BORDERLESS = false,
+        VSYNC = true,
+        RESOLUTION = 4,
+        VOLUME = 1,
+    }
 
     Resolutions = {
-        {width = 640, height = 360},
-        {width = 1280, height = 720},
-        {width = 1920, height = 1080},
-        {width = 2560, height = 1440}
+        {width = 16, height = 9, scale = 0.025},
+        {width = 320, height = 180, scale = 0.5},
+        {width = 640, height = 360, scale = 1},
+        {width = 1280, height = 720, scale = 2},
+        {width = 1920, height = 1080, scale = 3},
     }
-    if love.filesystem.getInfo("%APPDATA%/LOVE/pp/config.ini") == nil then
-        love.filesystem.newFile("config.ini")
+    if love.filesystem.getInfo("config.ini") == nil then
+        local data = ""
+        for i,v in pairs(configDefaultData) do
+            data = data..tostring(i).." = "..tostring(v).."\n"
+        end
+        love.filesystem.write("config.ini", data)
     end
+
     Config = love.filesystem.lines("config.ini")
     ConfigTable = {}
     for line in Config do
@@ -28,13 +43,13 @@ love.load = function ()
         end
         ConfigTable[i] = v
     end
-    Player = PlayerModule.new("assets/sprites/ballininsanty.png", 80, 80)
-    Enemy = EnemyModule.new("assets/sprites/slungus.png", 80, 80)
+    Player = PlayerModule.new("assets/sprites/maxresdefault.png", 40, 40)
+    Enemy = EnemyModule.new("assets/sprites/slungus.png", 40, 40)
     Enemy.collision.x = 500
     Enemy.collision.y = 100
 
-    Collider = ColliderModule.new("box", 500,80, 100, 100)
-    Projectile = ColliderModule.new("hitbox", 0, 80, 50, 50, true, function(collider)
+    Collider = ColliderModule.new("box", 250, 40, 50, 50)
+    Projectile = ColliderModule.new("hitbox", 0, 80, 25, 25, true, function(collider)
         for i,v in pairs(collider.tags) do
             if v == "projectile" then return end
         end
@@ -45,12 +60,15 @@ love.load = function ()
     Projectile.speedX = 200
     
     love.audio.setVolume(ConfigTable.VOLUME)
-    local resolution = Resolutions[ConfigTable.RESOLUTION]
-    love.window.setMode(resolution.width, resolution.height, {
-        borderless = ConfigTable.BORDERLESS,
-        resizable = false,
-        vsync = ConfigTable.VSYNC,
-    })
+    function UpdateWindow()
+        TrueResolution = Resolutions[ConfigTable.RESOLUTION]
+        love.window.setMode(TrueResolution.width, TrueResolution.height, {
+            borderless = ConfigTable.BORDERLESS,
+            resizable = false,
+            vsync = ConfigTable.VSYNC,
+        })
+    end
+    UpdateWindow()
 end
 
 
@@ -66,11 +84,19 @@ love.keypressed = function (key)
         love.event.quit()
     elseif key == "f11" then
         ConfigTable.BORDERLESS = not ConfigTable.BORDERLESS
-        love.window.setMode(1280, 720, {
-            borderless = ConfigTable.BORDERLESS,
-            resizable = false,
-            vsync = ConfigTable.VSYNC
-        })
+        UpdateWindow()
+    elseif key == "up" then
+        ConfigTable.RESOLUTION = ConfigTable.RESOLUTION + 1
+        if ConfigTable.RESOLUTION > #Resolutions then
+            ConfigTable.RESOLUTION = 1
+        end
+        UpdateWindow()
+    elseif key == "down" then
+        ConfigTable.RESOLUTION = ConfigTable.RESOLUTION - 1
+        if ConfigTable.RESOLUTION < 1 then
+            ConfigTable.RESOLUTION = #Resolutions
+        end
+        UpdateWindow()
     elseif key == Player.otherControls.dash then
         Player.speed = Player.speed * 3
         Player.dashing = true
@@ -96,22 +122,33 @@ love.update = function (dt)
         Gun.lastFireTime = 0
     end
     if love.mouse.isDown(1) then
-        Gun:Fire(Player.collision.x, Player.collision.y)
+        Gun:Fire(Player.collision.x, Player.collision.y, TrueResolution.scale)
     end
 
     Player:UpdateInput()
 end
 
 love.draw = function ()
+    love.graphics.setDefaultFilter("nearest")
+    love.graphics.scale(TrueResolution.scale)
     love.graphics.draw(Player.sprite, Player.collision.x, Player.collision.y, 0 , Player.collision.width / Player.sprite:getWidth(), Player.collision.height / Player.sprite:getHeight())
+   
     for _,v in pairs(EnemyModule.getEnemies()) do
         love.graphics.draw(v.sprite, v.collision.x, v.collision.y, 0, v.collision.width / v.sprite:getWidth(), v.collision.height / v.sprite:getHeight())
     end
-    love.graphics.print("Player Health: " .. Player.health, 10, 110)
-    love.graphics.print("Enemy Health: " .. Enemy.health, 10, 90)
-    love.graphics.print("Collider Position: (" .. Collider.x .. ", " .. Collider.y .. ")", 10, 70)
-    love.graphics.print("Player Position: (" .. Player.collision.x .. ", " .. Player.collision.y .. ")", 10, 10)
-    love.graphics.print("Gun Ammo: " .. Gun.ammo, 10, 50)
+
+    for i,self in pairs(Guis.getAll()) do
+        if self.type == "button" then
+            love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+            love.graphics.print(self.text, self.x, self. y)
+        end
+    end
+
+    love.graphics.print("Player Health: " .. Player.health, 5, 15, 0, .5, .5)
+    love.graphics.print("Enemy Health: " .. Enemy.health, 5, 45, 0, .5, .5)
+    love.graphics.print("Collider Position: (" .. Collider.x .. ", " .. Collider.y .. ")", 5, 35, 0, .5, .5)
+    love.graphics.print("Player Position: (" .. Player.collision.x .. ", " .. Player.collision.y .. ")", 5, 5, 0, .5, .5)
+    love.graphics.print("Gun Ammo: " .. Gun.ammo, 5, 25, 0, .5, .5)
     for i,v in pairs(ColliderModule.getCollisions()) do
         if v.visualized then
             love.graphics.setColor(v.color)

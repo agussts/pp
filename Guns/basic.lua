@@ -17,7 +17,7 @@ function gun.new()
     return self
 end
 
-function gun:Fire(x, y)
+function gun:Fire(x, y, scale)
     if self.lastFireTime > 0 then
         return
     end
@@ -28,7 +28,7 @@ function gun:Fire(x, y)
     end
     self.ammo = self.ammo - 1
     local collider
-    collider = collisions.new("hitbox", 0, 0, 50, 50, false, function (otherCollider)
+    collider = collisions.new("hitbox", 0, 0, 25, 25, false, function (otherCollider)
         for i,v in pairs(otherCollider.tags) do
             if v == "player" or v == "projectile" then return end
             if v == "boxcollider" then
@@ -42,6 +42,8 @@ function gun:Fire(x, y)
     end)
     collider.tags = self.tags
     local mouseX, mouseY = love.mouse.getPosition()
+    mouseX = mouseX / scale
+    mouseY = mouseY / scale
     local dx = mouseX - x
     local dy = mouseY - y
     collider.x = x
