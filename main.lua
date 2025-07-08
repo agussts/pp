@@ -12,15 +12,19 @@ love.load = function ()
         {width = 1920, height = 1080},
         {width = 2560, height = 1440}
     }
-
+    if love.filesystem.getInfo("%APPDATA%/LOVE/pp/config.ini") == nil then
+        love.filesystem.newFile("config.ini")
+    end
     Config = love.filesystem.lines("config.ini")
     ConfigTable = {}
     for line in Config do
         local i, v = line:match("^(%S+) = (%S+)$") 
-        if v == "true" then
+        if v == "true" then 
             v = true
         elseif v == "false" then
             v = false
+        elseif tonumber(v) ~= nil then
+            v = tonumber(v)
         end
         ConfigTable[i] = v
     end

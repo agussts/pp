@@ -51,7 +51,7 @@ function timer.update(dt)
     timer.passedTime = timer.passedTime + dt
     for i,v in pairs(timersAfter) do
         if timer.passedTime >= v.time + v._currTime then
-            v.callback(unpack(v.args))
+            v.callback(table.unpack(v.args))
             v:Destroy()
         end
     end
