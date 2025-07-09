@@ -14,7 +14,7 @@ love.load = function ()
         RESOLUTION = 4,
         VOLUME = 1,
     }
-
+--comentario
     Resolutions = {
         {width = 16, height = 9, scale = 0.025},
         {width = 320, height = 180, scale = 0.5},
@@ -100,6 +100,7 @@ love.keypressed = function (key)
         Player.speed = Player.speed * 3
         Player.collision:ChangeType("hitbox")
         Player.collision.onHit = function (otherCollider)
+            --ubybybybybybybtcbtvyby
             if otherCollider.link ~= nil and otherCollider.link.health ~= nil then
                 otherCollider.link.health = otherCollider.link.health - 1
             end
