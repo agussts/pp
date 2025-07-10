@@ -2,7 +2,7 @@ local gui = {}
 
 local addedGuis = {}
 
-function gui.new(x, y, width, height)
+function gui.new(x, y, width, height, scale)
     local self = setmetatable({}, { __index = gui })
     self.x = x or 0
     self.y = y or 0

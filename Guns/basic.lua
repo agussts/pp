@@ -31,7 +31,9 @@ function gun:Fire(x, y, scale)
     collider = collisions.new("hitbox", 0, 0, 25, 25, false, function (otherCollider)
         for i,v in pairs(otherCollider.tags) do
             if v == "player" or v == "projectile" then return end
-            if v == "boxcollider" then
+        end
+        for i,v in pairs(otherCollider.tags) do
+            if v == "box" then
                 love.audio.newSource("assets/sfx/blip.wav", "static"):play()
             elseif v == "enemy" then
                 love.audio.newSource("assets/sfx/hitHurt.wav", "static"):play()
