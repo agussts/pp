@@ -1,19 +1,18 @@
 local gui = {}
 
 local addedGuis = {}
-
-function gui.new(x, y, width, height, scale)
+local udim2 = require("guis.udim2")
+--Crea un nuevo gui
+function gui.new()
     local self = setmetatable({}, { __index = gui })
-    self.x = x or 0
-    self.y = y or 0
-    self.width = width or 100
-    self.height = height or 100
+    self.position = udim2.new(0,0,0,0)
+    self.size = udim2.new(0,0,0,0)
     self.visible = true
     table.insert(addedGuis, self)
     return self
-    
 end
 
+--Da todos los guis añadidos
 function gui.getAll()
     return addedGuis
 end

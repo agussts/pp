@@ -1,3 +1,4 @@
+local udim2 = require "guis.udim2"
 local collisions = {}
 
 local addedCollisions = {}
@@ -6,13 +7,11 @@ local types = {
     "hitbox"
 }
 
-collisions.new = function(type, x, y, width, height, enabled, onHit)
+collisions.new = function(type, enabled, onHit)
     local self = setmetatable({}, { __index = collisions })
 
-    self.x = x
-    self.y = y
-    self.width = width
-    self.height = height
+    self.position = udim2.new(0, 0, 0, 0)
+    self.size = udim2.new(0, 0, 0, 0)
     self.speedX = 0
     self.speedY = 0
     self.visualized = false
@@ -84,8 +83,14 @@ collisions.getCollisions = function()
 end
 
 function collisions:UpdateSpeed(dt)
-    self.x = self.x + self.speedX * dt
-    self.y = self.y + self.speedY * dt
+    local x, y = self.position:transformToPixels()
+    local screenWidth, screenHeight = love.graphics.getPixelDimensions()
+    screenWidth = screenWidth / 640
+    screenHeight = screenHeight / 360
+    x = x + self.speedX * screenWidth * dt
+    y = y + self.speedY * screenHeight * dt
+    self.position = udim2.new(0, x, 0, y)
+    self.position:offsetToScale()
 end
 
 function collisions:getDirection()
@@ -112,33 +117,39 @@ function collisions:check()
     for _, otherCollider in pairs(addedCollisions) do
         if otherCollider == self then goto continue end
 
-        if self.x <= otherCollider.x + otherCollider.width 
-        and self.x + self.width >= otherCollider.x
-        and self.y <= otherCollider.y + otherCollider.height 
-        and self.y + self.height >= otherCollider.y then
+        local x, y = self.position:transformToPixels()
+        local width, height = self.size:transformToPixels()
+        local otherX, otherY = otherCollider.position:transformToPixels()
+        local otherWidth, otherHeight = otherCollider.size:transformToPixels()
+        if x <= otherX + otherWidth
+        and x + width >= otherX
+        and y <= otherY + otherHeight
+        and y + height >= otherY then
             table.insert(hitting, otherCollider)
             self.onHit(otherCollider)
             if self.type == "box" and otherCollider.type == "box" then
-                local dx = math.min(self.x + self.width, otherCollider.x + otherCollider.width) - math.max(self.x, otherCollider.x)
-                local dy = math.min(self.y + self.height, otherCollider.y + otherCollider.height) - math.max(self.y, otherCollider.y)
+                local dx = math.min(x + width, otherX + otherWidth) - math.max(x, otherX)
+                local dy = math.min(y + height, otherY + otherHeight) - math.max(y, otherY)
                 if dx <= 0 or dy <= 0 then goto continue end
 
                 if dx < dy then
-                    if self.x < otherCollider.x then
-                        self.x = otherCollider.x - self.width
+                    if x < otherX then
+                        x = otherX - width
                     else
-                        self.x = otherCollider.x + otherCollider.width
+                        x = otherX + otherWidth
                     end
                 else
-                    if self.y < otherCollider.y then
-                        self.y = otherCollider.y - self.height
+                    if y < otherY then
+                        y = otherY - height
                     else
-                        self.y = otherCollider.y + otherCollider.height
+                        y = otherY + otherHeight
                     end
                     self.speedY = 0 
                 end
             end
         end
+        self.position = udim2.new(0, x, 0, y)
+        self.position:offsetToScale()
         ::continue::
     end
     return hitting

@@ -1,6 +1,7 @@
 local enemy = {}
 local collisions = require("libs.collisions")
 local timer      = require("libs.timer")
+local udim2      = require("guis.udim2")
 
 local addedEnemies = {}
 
@@ -10,7 +11,9 @@ end
 enemy.new = function(spritePath, width, height)
     local self = setmetatable({}, { __index = enemy })
     self.sprite = love.graphics.newImage(spritePath)
-    self.collision = collisions.new("box", 0, 0, width, height)
+    self.collision = collisions.new("box")
+    self.collision.position = udim2.new(0, 0, 0, 0)
+    self.collision.size = udim2.new(0, width, 0, height)
     self.collision.link = self
     self.cd = 1
     self.timer = timer.new(self.cd)

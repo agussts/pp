@@ -6,6 +6,7 @@ love.load = function ()
     GunModule = require("guns.dev")
     Gun = GunModule.new()
     Timer = require("libs.timer")
+    UDim2 = require("guis.udim2")
     Guis = require("guis.gui")
     Button = require("guis.button")
 
@@ -52,19 +53,29 @@ love.load = function ()
     Player = PlayerModule.new("assets/sprites/maxresdefault.png", 40, 40)
     Enemy = EnemyModule.new("assets/sprites/slungus.png", 40, 40)
     --Posicion del enemigo
-    Enemy.collision.x = 500
-    Enemy.collision.y = 100
+    Enemy.collision.position = UDim2.new(0, 500, 0, 100)
+    Enemy.collision.size = UDim2.new(0, 50, 0, 50)
+    Enemy.collision.position:offsetToScale()
+    Enemy.collision.size:offsetToScale()
 
     --Crea un colider de caja
-    Collider = ColliderModule.new("box", 250, 40, 50, 50)
+    Collider = ColliderModule.new("box")
+    Collider.position = UDim2.new(0,250,0,40)
+    Collider.size = UDim2.new(0,50,0,50)
+    Collider.position:offsetToScale()
+    Collider.size:offsetToScale()
 
     --TEMPORAL: Añade un Projectil
-    Projectile = ColliderModule.new("hitbox", 0, 80, 25, 25, true, function(collider)
+    Projectile = ColliderModule.new("hitbox", true, function(collider)
         for i,v in pairs(collider.tags) do
             if v == "projectile" then return end
         end
         Projectile:Destroy()
     end)
+    Projectile.position = UDim2.new(0,0, 0, 80)
+    Projectile.size = UDim2.new(0,25,0,25)
+    Projectile.position:offsetToScale()
+    Projectile.size:offsetToScale()
     Projectile:AddTag("projectile")
     Projectile.speedX = 200
     
@@ -80,11 +91,12 @@ love.load = function ()
     end
     UpdateWindow()
     --Crea boton
-    local width, height = love.graphics.getPixelDimensions()
-    ButtonClick = Button.new("hi", width / ( 2 * TrueResolution.scale), height / ( 2 * TrueResolution.scale), 100, 100, function ()
+    ButtonClick = Button.new("hi", function ()
         print("!!")
     end)
     ButtonClick.textColor = {1,0,0,1}
+    ButtonClick.position = UDim2.new(.5, 0, .5, 0)
+    ButtonClick.size = UDim2.new(.1,0, .1, 0)
 end
 
 
@@ -156,7 +168,8 @@ love.update = function (dt)
         Gun.lastFireTime = 0
     end
     if love.mouse.isDown(1) then
-        Gun:Fire(Player.collision.x, Player.collision.y, TrueResolution.scale)
+        local x,y = Player.collision.position:transformToPixels()
+        Gun:Fire(x, y)
     end
 
     --Actualiza el movimiento del jugador
@@ -166,41 +179,56 @@ end
 love.draw = function ()
     --Ajustes antes de empezar renderizacion
     love.graphics.setDefaultFilter("nearest")
-    love.graphics.scale(TrueResolution.scale)
+    --love.graphics.scale(TrueResolution.scale)
 
     --Dibuja el jugador
-    love.graphics.draw(Player.sprite, Player.collision.x, Player.collision.y, 0 , Player.collision.width / Player.sprite:getWidth(), Player.collision.height / Player.sprite:getHeight())
+    local x,y = Player.collision.position:transformToPixels()
+    local width, height = Player.collision.size:transformToPixels()
+    love.graphics.draw(Player.sprite, x, y, 0 , width / Player.sprite:getWidth(), height / Player.sprite:getHeight())
    
     --Dibuja a los enemigos
     for _,v in pairs(EnemyModule.getEnemies()) do
-        love.graphics.draw(v.sprite, v.collision.x, v.collision.y, 0, v.collision.width / v.sprite:getWidth(), v.collision.height / v.sprite:getHeight())
+        local x,y = v.collision.position:transformToPixels()
+        local width, height = v.collision.size:transformToPixels()
+        love.graphics.draw(v.sprite, x, y, 0, width / v.sprite:getWidth(), height / v.sprite:getHeight())
     end
 
    --TEMPORAL: Dice informacion extra
     love.graphics.print("Player Health: " .. Player.health, 5, 15, 0, .5, .5)
     love.graphics.print("Enemy Health: " .. Enemy.health, 5, 45, 0, .5, .5)
-    love.graphics.print("Collider Position: (" .. Collider.x .. ", " .. Collider.y .. ")", 5, 35, 0, .5, .5)
-    love.graphics.print("Player Position: (" .. Player.collision.x .. ", " .. Player.collision.y .. ")", 5, 5, 0, .5, .5)
+    love.graphics.print("Collider Position: (" .. Collider.position.x.offset .. ", " .. Collider.position.y.offset .. ")", 5, 35, 0, .5, .5)
+    love.graphics.print("Player Position: (" .. Player.collision.position.x.offset .. ", " .. Player.collision.position.y.offset .. ")", 5, 5, 0, .5, .5)
     love.graphics.print("Gun Ammo: " .. Gun.ammo, 5, 25, 0, .5, .5)
+    --ove.graphics.print("Player speed: " .. Player.collision.x + Player.collision.speedX.. ", " .. Player.collision.y + Player.collision.speedY, 5, 55, 0, .5, .5)
 
 
     --Dibuja a los coliders que son visibles
     for i,v in pairs(ColliderModule.getCollisions()) do
         if v.visualized then
             love.graphics.setColor(v.color)
-            love.graphics.rectangle("line", v.x, v.y, v.width, v.height)
+            local x,y = v.position:transformToPixels()
+            local width, height = v.size:transformToPixels()
+            love.graphics.rectangle("line", x, y, width, height)
             love.graphics.setColor(1,1,1,1)
         end
     end
 
     --Dibuja interfaz, tiene que ser al final de la funcion para que se renderize sobre todo
      for _,self in pairs(Guis.getAll()) do
-        if self.type == "button" then
-            love.graphics.setColor(self.bgColor)
-            love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
-            love.graphics.setColor(self.textColor)
-            love.graphics.print(self.text, self.x, self. y)
-            love.graphics.setColor(1,1,1,1)
+      --  print(love.graphics.getWidth(), love.graphics.getHeight())
+        if not self.visible then return end
+      --  print("Drawing GUI: " .. tostring(self))
+        --Dibuja el fondo del gui
+        local x, y = self.position:transformToPixels()
+        local width, height = self.size:transformToPixels()
+        love.graphics.setColor(self.bgColor or {1,1,1,1})
+        love.graphics.rectangle("fill", x, y, width, height)
+       -- print("Drawing GUI background at: " .. x .. ", " .. y .. " with size: " .. width .. "x" .. height)
+        --Dibuja el texto del gui
+        if self.text then
+            love.graphics.setColor(self.textColor or {0,0,0,1})
+            love.graphics.print(self.text, x + 5, y + 5)
         end
+        love.graphics.setColor(1,1,1,1)
     end
 end

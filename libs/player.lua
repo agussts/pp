@@ -2,6 +2,7 @@ local module = {}
 
 local collisions = require("libs.collisions")
 local timer      = require("libs.timer")
+local udim2      = require("guis.udim2")
 
 module.name = "player"
 module.controlsMovement = {
@@ -18,7 +19,10 @@ module.new = function(spriteName, width, height)
     local self = setmetatable({}, { __index = module })
 
     self.sprite = love.graphics.newImage(spriteName)
-    self.collision = collisions.new("box", 0,0, width, height)
+    self.collision = collisions.new("box")
+    self.collision.position = udim2.new(0, 0, 0, 0)
+    self.collision.size = udim2.new(0, width, 0, height)
+    self.collision.size:offsetToScale()
     self.collision:AddTag("player")
     self.health = 100
     self.collision.link = self

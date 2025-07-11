@@ -1,16 +1,106 @@
 local udim2 = {}
 
 udim2.__index = udim2
-udim2.__add = function ()
-    
+--Suma de dos udim2
+udim2.__add = function (self, other)
+    return udim2.new(
+        self.x.scale + other.x.scale,
+        self.x.offset + other.x.offset,
+        self.y.scale + other.y.scale,
+        self.y.offset + other.y.offset
+    )
+end
+--Resta de dos udim2
+udim2.__sub = function (self, other)
+    return udim2.new(
+        self.x.scale - other.x.scale,
+        self.x.offset - other.x.offset,
+        self.y.scale - other.y.scale,
+        self.y.offset - other.y.offset
+    )
+end
+--Multiplicacion de un udim2 por un escalar
+udim2.__mul = function (self, scalar)
+    return udim2.new(
+        self.x.scale * scalar,
+        self.x.offset * scalar,
+        self.y.scale * scalar,
+        self.y.offset * scalar
+    )
+end
+--Division de un escalar por un udim2
+udim2.__div = function (self, scalar)
+    if scalar == 0 then
+        error("Division by zero is not allowed.")
+    end
+    return udim2.new(
+        self.x.scale / scalar,
+        self.x.offset / scalar,
+        self.y.scale / scalar,
+        self.y.offset / scalar
+    )
 end
 
 function udim2.new(xScale, xOffset, yScale, yOffset)
     local self = setmetatable({}, udim2)
+    self.x = {}
+    self.y = {}
     self.x.scale = xScale
     self.x.offset = xOffset
     self.y.scale = yScale
     self.y.offset = yOffset
+    return self
+end
+
+--Transforma la posicion de udim2 a pixeles en la pantalla
+function udim2:transformToPixels()
+    local screenWidth = love.graphics.getWidth()
+    local screenHeight = love.graphics.getHeight()
+    local x = self.x.scale * screenWidth + self.x.offset
+    local y = self.y.scale * screenHeight + self.y.offset
+    return x, y
+end
+
+--Lo mismo que udim2.new(xScale, 0, yScale, 0)
+function udim2.fromScale(xScale, yScale)
+    return udim2.new(xScale, 0, yScale, 0)
+end
+
+--Lo mismo que udim2.new(0, xOffset, 0, yOffset)
+function udim2.fromOffset(xOffset, yOffset)
+    return udim2.new(0, xOffset, 0, yOffset)
+end
+
+function udim2:offsetToScale()
+    local screenWidth = love.graphics.getWidth()
+    local screenHeight = love.graphics.getHeight()
+    self.x.scale = self.x.offset / screenWidth
+    self.y.scale = self.y.offset / screenHeight
+    self.x.offset = 0
+    self.y.offset = 0
+    return self
+end
+
+function udim2:scaleToOffset()
+    local screenWidth = love.graphics.getWidth()
+    local screenHeight = love.graphics.getHeight()
+    self.x.offset = self.x.scale * screenWidth
+    self.y.offset = self.y.scale * screenHeight
+    self.x.scale = 0
+    self.y.scale = 0
+    return self
+end
+
+--Interpolacion entre dos udim2
+--alpha es un valor entre 0 y 1, donde 0 es el inicio y 1 es el final
+--Lerp es una abreviacion de Linear Interpolation
+function udim2:Lerp(goal, alpha)
+    return udim2.new(
+        self.x.scale + (goal.x.scale - self.x.scale) * alpha,
+        self.x.offset + (goal.x.offset - self.x.offset) * alpha,
+        self.y.scale + (goal.y.scale - self.y.scale) * alpha,
+        self.y.offset + (goal.y.offset - self.y.offset) * alpha
+    )
 end
 
 return udim2

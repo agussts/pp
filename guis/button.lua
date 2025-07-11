@@ -2,8 +2,8 @@ local button = {}
 
 local gui = require("guis.gui")
 
-function button.new(text, x, y, width, height, callback)
-    local self = gui.new(x, y, width, height)
+function button.new(text, callback)
+    local self = gui.new()
     self.text = text
     self.textColor = {1,1,1,1}
     self.callback = callback
