@@ -9,6 +9,7 @@ love.load = function ()
     UDim2 = require("guis.udim2")
     Guis = require("guis.gui")
     Button = require("guis.button")
+    Textlabel = require("guis.textlabel")
 
     --Configuracion Predeterminada
     local configDefaultData = {
@@ -82,12 +83,22 @@ love.load = function ()
     Projectile:AddTag("projectile")
     Projectile.speedX = 200
     --Crea boton
-    ButtonClick = Button.new("hi", function ()
+    ButtonClick = Button.new(function ()
         print("!!")
     end)
     ButtonClick.textColor = {1,0,0,1}
     ButtonClick.position = UDim2.new(.5, 0, .5, 0)
     ButtonClick.size = UDim2.new(.1,0, .1, 0)
+    ButtonClick.anchorPoint = {0.5, 0.5}
+    --Crea otro boton
+    Button2 = Button.new(function ()
+        print("button 2 click")
+    end)
+    Button2.parent = ButtonClick
+    Button2.position = UDim2.new(.5, 0, .5, 0)
+    Button2.size = UDim2.new(.5, 0, .5, 0)
+    Button2.anchorPoint = {0.5, 0.5}
+    Button2.bgColor = {0, 1, 0, 1}
 end
 
 
@@ -190,7 +201,6 @@ love.draw = function ()
     love.graphics.print("Collider Position: (" .. Collider.position.x.offset .. ", " .. Collider.position.y.offset .. ")", 5, 35, 0, .5, .5)
     love.graphics.print("Player Position: (" .. Player.collision.position.x.offset .. ", " .. Player.collision.position.y.offset .. ")", 5, 5, 0, .5, .5)
     love.graphics.print("Gun Ammo: " .. Gun.ammo, 5, 25, 0, .5, .5)
-    --ove.graphics.print("Player speed: " .. Player.collision.x + Player.collision.speedX.. ", " .. Player.collision.y + Player.collision.speedY, 5, 55, 0, .5, .5)
 
 
     --Dibuja a los coliders que son visibles
@@ -206,12 +216,10 @@ love.draw = function ()
 
     --Dibuja interfaz, tiene que ser al final de la funcion para que se renderize sobre todo
      for _,self in pairs(Guis.getAll()) do
-      --  print(love.graphics.getWidth(), love.graphics.getHeight())
         if not self.visible then return end
-      --  print("Drawing GUI: " .. tostring(self))
         --Dibuja el fondo del gui
-        local x, y = self.position:transformToPixels()
-        local width, height = self.size:transformToPixels()
+        local x, y = self:getRenderPosition()
+        local width, height = self:getRenderSize()
         love.graphics.setColor(self.bgColor or {1,1,1,1})
         love.graphics.rectangle("fill", x, y, width, height)
        -- print("Drawing GUI background at: " .. x .. ", " .. y .. " with size: " .. width .. "x" .. height)

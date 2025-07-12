@@ -52,13 +52,20 @@ function udim2.new(xScale, xOffset, yScale, yOffset)
     return self
 end
 
+function udim2:toPixels(parentWidth, parentHeight)
+    --Transforma la posicion de udim2 a pixeles propocionalmente al tamaño del padre
+    if not parentWidth or not parentHeight then
+        parentWidth = love.graphics.getWidth()
+        parentHeight = love.graphics.getHeight()
+    end
+    local x = self.x.scale * parentWidth + self.x.offset
+    local y = self.y.scale * parentHeight + self.y.offset
+    return x, y
+end
+
 --Transforma la posicion de udim2 a pixeles en la pantalla
 function udim2:transformToPixels()
-    local screenWidth = love.graphics.getWidth()
-    local screenHeight = love.graphics.getHeight()
-    local x = self.x.scale * screenWidth + self.x.offset
-    local y = self.y.scale * screenHeight + self.y.offset
-    return x, y
+    return self:toPixels()
 end
 
 --Lo mismo que udim2.new(xScale, 0, yScale, 0)
@@ -74,8 +81,8 @@ end
 function udim2:offsetToScale()
     local screenWidth = love.graphics.getWidth()
     local screenHeight = love.graphics.getHeight()
-    self.x.scale = self.x.offset / screenWidth
-    self.y.scale = self.y.offset / screenHeight
+    self.x.scale = self.x.scale + self.x.offset / screenWidth
+    self.y.scale = self.y.scale + self.y.offset / screenHeight
     self.x.offset = 0
     self.y.offset = 0
     return self
@@ -89,6 +96,10 @@ function udim2:scaleToOffset()
     self.x.scale = 0
     self.y.scale = 0
     return self
+end
+
+function udim2:Clone()
+    return udim2.new(self.x.scale, self.x.offset, self.y.scale, self.y.offset)
 end
 
 --Interpolacion entre dos udim2
