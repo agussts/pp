@@ -49,38 +49,8 @@ love.load = function ()
         end
         ConfigTable[i] = v
     end
-    --Crea a el jugador y el enemigo
-    Player = PlayerModule.new("assets/sprites/maxresdefault.png", 40, 40)
-    Enemy = EnemyModule.new("assets/sprites/slungus.png", 40, 40)
-    --Posicion del enemigo
-    Enemy.collision.position = UDim2.new(0, 500, 0, 100)
-    Enemy.collision.size = UDim2.new(0, 50, 0, 50)
-    Enemy.collision.position:offsetToScale()
-    Enemy.collision.size:offsetToScale()
-
-    --Crea un colider de caja
-    Collider = ColliderModule.new("box")
-    Collider.position = UDim2.new(0,250,0,40)
-    Collider.size = UDim2.new(0,50,0,50)
-    Collider.position:offsetToScale()
-    Collider.size:offsetToScale()
-
-    --TEMPORAL: Añade un Projectil
-    Projectile = ColliderModule.new("hitbox", true, function(collider)
-        for i,v in pairs(collider.tags) do
-            if v == "projectile" then return end
-        end
-        Projectile:Destroy()
-    end)
-    Projectile.position = UDim2.new(0,0, 0, 80)
-    Projectile.size = UDim2.new(0,25,0,25)
-    Projectile.position:offsetToScale()
-    Projectile.size:offsetToScale()
-    Projectile:AddTag("projectile")
-    Projectile.speedX = 200
-    
-    love.audio.setVolume(ConfigTable.VOLUME)
     --Actualiza la ventana a los ajustes actuales
+    love.audio.setVolume(ConfigTable.VOLUME)
     function UpdateWindow()
         TrueResolution = Resolutions[ConfigTable.RESOLUTION]
         love.window.setMode(TrueResolution.width, TrueResolution.height, {
@@ -90,6 +60,27 @@ love.load = function ()
         })
     end
     UpdateWindow()
+    --Crea a el jugador y el enemigo
+    Player = PlayerModule.new("assets/sprites/maxresdefault.png", 0.0625, 0.11)
+    Enemy = EnemyModule.new("assets/sprites/slungus.png", 0.0625, 0.11)
+    Enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
+
+    --Crea un colider de caja
+    Collider = ColliderModule.new("box")
+    Collider.position = UDim2.new(0.2, 0, 0.13, 0)
+    Collider.size = UDim2.new(0.08, 0, 0.13, 0)
+
+    --TEMPORAL: Añade un Projectil
+    Projectile = ColliderModule.new("hitbox", true, function(collider)
+        for i,v in pairs(collider.tags) do
+            if v == "projectile" then return end
+        end
+        Projectile:Destroy()
+    end)
+    Projectile.position = UDim2.new(0, 0, .11, 0)
+    Projectile.size = UDim2.new(0.02, 0, 0.034, 0)
+    Projectile:AddTag("projectile")
+    Projectile.speedX = 200
     --Crea boton
     ButtonClick = Button.new("hi", function ()
         print("!!")

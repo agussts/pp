@@ -21,8 +21,7 @@ module.new = function(spriteName, width, height)
     self.sprite = love.graphics.newImage(spriteName)
     self.collision = collisions.new("box")
     self.collision.position = udim2.new(0, 0, 0, 0)
-    self.collision.size = udim2.new(0, width, 0, height)
-    self.collision.size:offsetToScale()
+    self.collision.size = udim2.new(width, 0, height, 0)
     self.collision:AddTag("player")
     self.health = 100
     self.collision.link = self

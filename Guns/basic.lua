@@ -44,16 +44,17 @@ function gun:Fire(x, y)
         end
         collider:Destroy()
     end)
-    collider.tags = self.tags
+    for i,v in pairs(self.tags) do
+        collider:AddTag(v)
+    end
     local mouseX, mouseY = love.mouse.getPosition()
     mouseX = mouseX
     mouseY = mouseY
     local dx = mouseX - x
     local dy = mouseY - y
     collider.position = udim2.new(0, x, 0, y)
-    collider.size = udim2.new(0, 50, 0, 50)
-    collider.size:offsetToScale()
     collider.position:offsetToScale()
+    collider.size = udim2.new(0.04, 0, 0.07, 0)
     local distance = math.sqrt(dx*dx + dy*dy)
     collider.speedY = (dy / distance) * self.speed
     collider.speedX = (dx / distance) * self.speed
