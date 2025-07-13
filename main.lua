@@ -1,15 +1,8 @@
 love.load = function ()
-    --Requiere modulos
-    PlayerModule = require("libs.player")
-    EnemyModule = require("libs.enemy")
-    ColliderModule = require("libs.collisions")
-    GunModule = require("guns.dev")
-    Gun = GunModule.new()
-    Timer = require("libs.timer")
-    UDim2 = require("guis.udim2")
-    Guis = require("guis.gui")
-    Button = require("guis.button")
-    Textlabel = require("guis.textlabel")
+    --Requiere funciones
+    require("src.pausemenu")
+    --Requiere todos los modulos
+    require("src.require")
 
     --Configuracion Predeterminada
     local configDefaultData = {
@@ -70,42 +63,13 @@ love.load = function ()
     Collider = ColliderModule.new("box")
     Collider.position = UDim2.new(0.2, 0, 0.13, 0)
     Collider.size = UDim2.new(0.08, 0, 0.13, 0)
-
-    --TEMPORAL: Añade un Projectil
-    Projectile = ColliderModule.new("hitbox", true, function(collider)
-        for i,v in pairs(collider.tags) do
-            if v == "projectile" then return end
-        end
-        Projectile:Destroy()
-    end)
-    Projectile.position = UDim2.new(0, 0, .11, 0)
-    Projectile.size = UDim2.new(0.02, 0, 0.034, 0)
-    Projectile:AddTag("projectile")
-    Projectile.speedX = 200
-    --Crea boton
-    ButtonClick = Button.new(function ()
-        print("!!")
-    end)
-    ButtonClick.textColor = {1,0,0,1}
-    ButtonClick.position = UDim2.new(.5, 0, .5, 0)
-    ButtonClick.size = UDim2.new(.1,0, .1, 0)
-    ButtonClick.anchorPoint = {0.5, 0.5}
-    --Crea otro boton
-    Button2 = Button.new(function ()
-        print("button 2 click")
-    end)
-    Button2.parent = ButtonClick
-    Button2.position = UDim2.new(.5, 0, .5, 0)
-    Button2.size = UDim2.new(.5, 0, .5, 0)
-    Button2.anchorPoint = {0.5, 0.5}
-    Button2.bgColor = {0, 1, 0, 1}
 end
-
 
 love.keypressed = function (key)
     if key == "escape" then
+        PauseMenu()
         --Cierra el juego y actualiza los ajustes
-        local lines = {}
+    --[[local lines = {}
         for i,v in pairs(ConfigTable) do
             table.insert(lines, i .. " = " .. tostring(v))
         end
@@ -130,7 +94,7 @@ love.keypressed = function (key)
         if ConfigTable.RESOLUTION < 1 then
             ConfigTable.RESOLUTION = #Resolutions
         end
-        UpdateWindow()
+        UpdateWindow()]]
     elseif key == Player.otherControls.dash then
         --Funcionamiento de dash
         Player.speed = Player.speed * 3
@@ -150,32 +114,50 @@ love.keypressed = function (key)
     end
 end
 
-love.update = function (dt)
-    --Actualiza modulo de timer
-    Timer.update(dt)
-
-    --Fisicas de coliders
-    for _,v in pairs(ColliderModule.getCollisions()) do
-        v.visualized = true
-        v:UpdateSpeed(dt)
-        if v.enabled then
-            v:check()
+love.mousepressed = function (x, y, button)
+    if button == 1 then
+        --Si se hace click izquierdo, chequea si se hace click en el boton
+        for _,self in pairs(Guis.getAll()) do
+            if not self.visible then goto continue end
+            if self.type == "button" then
+                self:check(x, y)
+            end
+            ::continue::
         end
     end
+end
 
-    --Funcionamiento de la pistola
-    if Gun.lastFireTime > 0 then
-        Gun.lastFireTime = Gun.lastFireTime - dt
-    else
-        Gun.lastFireTime = 0
-    end
-    if love.mouse.isDown(1) then
-        local x,y = Player.collision.position:transformToPixels()
-        Gun:Fire(x, y)
-    end
+love.update = function (dt)
+    if Gamestate == "playing" then
+        --Actualiza modulo de timer
+        Timer.update(dt)
 
-    --Actualiza el movimiento del jugador
-    Player:UpdateInput()
+
+        if love.mouse.isDown(1) then
+            local x,y = Player.collision.position:transformToPixels()
+            Gun:Fire(x, y)
+        end
+
+        --Fisicas de coliders
+        for _,v in pairs(ColliderModule.getCollisions()) do
+            v.visualized = true
+            v:UpdateSpeed(dt)
+            if v.enabled then
+                v:check()
+            end
+        end
+
+        --Funcionamiento de la pistola
+        if Gun.lastFireTime > 0 then
+            Gun.lastFireTime = Gun.lastFireTime - dt
+        else
+            Gun.lastFireTime = 0
+        end
+        
+
+        --Actualiza el movimiento del jugador
+        Player:UpdateInput()
+    end
 end
 
 love.draw = function ()
@@ -214,20 +196,33 @@ love.draw = function ()
         end
     end
 
+    -- Ordena por zIndex, si son iguales, ordena por el orden de insercion
+    local sortedGuis = Guis.getAll()
+    
+    table.sort(sortedGuis, function(a, b)
+        local aZIndex = a.zIndex or 0
+        local bZIndex = b.zIndex or 0
+        if a.parent ~= nil then aZIndex = a.parent.zIndex + aZIndex end
+        if b.parent ~= nil then bZIndex = b.parent.zIndex + bZIndex end
+        return aZIndex < bZIndex
+    end)
+
     --Dibuja interfaz, tiene que ser al final de la funcion para que se renderize sobre todo
-     for _,self in pairs(Guis.getAll()) do
-        if not self.visible then return end
-        --Dibuja el fondo del gui
+    for _,self in pairs(sortedGuis) do
+        if not self.visible then goto continue end
         local x, y = self:getRenderPosition()
         local width, height = self:getRenderSize()
-        love.graphics.setColor(self.bgColor or {1,1,1,1})
-        love.graphics.rectangle("fill", x, y, width, height)
-       -- print("Drawing GUI background at: " .. x .. ", " .. y .. " with size: " .. width .. "x" .. height)
-        --Dibuja el texto del gui
         if self.text then
             love.graphics.setColor(self.textColor or {0,0,0,1})
-            love.graphics.print(self.text, x + 5, y + 5)
+            local text = love.graphics.newText(self.font or love.graphics.getFont(), self.text)
+            love.graphics.draw(text, x + width / 2 - text:getWidth() / 2, y + height / 2 - text:getHeight() / 2)
+            love.graphics.setColor(1,1,1,1)
+            goto continue
         end
+        --Dibuja el fondo del gui
+        love.graphics.setColor(self.bgColor or {1,1,1,1})
+        love.graphics.rectangle("fill", x, y, width, height)
         love.graphics.setColor(1,1,1,1)
+        ::continue::
     end
 end

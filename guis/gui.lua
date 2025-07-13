@@ -10,6 +10,7 @@ function gui.new()
     self.visible = true
     self.anchorPoint = {0, 0}
     self.parent = nil
+    self.zIndex = 0
     table.insert(addedGuis, self)
     return self
 end
@@ -54,6 +55,15 @@ end
 --Da todos los guis añadidos
 function gui.getAll()
     return addedGuis
+end
+
+function gui:Destroy()
+    for i, v in ipairs(addedGuis) do
+        if v == self then
+            table.remove(addedGuis, i)
+            break
+        end
+    end
 end
 
 

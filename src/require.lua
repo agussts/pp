@@ -1,0 +1,12 @@
+--Requiere modulos
+PlayerModule = require("libs.player")
+EnemyModule = require("libs.enemy")
+ColliderModule = require("libs.collisions")
+GunModule = require("guns.dev")
+Gun = GunModule.new()
+Timer = require("libs.timer")
+UDim2 = require("guis.udim2")
+Guis = require("guis.gui")
+Button = require("guis.button")
+Textlabel = require("guis.textlabel")
+Frame = require("guis.frame")
