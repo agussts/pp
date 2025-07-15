@@ -1,59 +1,15 @@
 love.load = function ()
+    
+    --Requiere todos los modulos
+    require("src.require")  
+    Config.init()
+
     --Requiere funciones
     require("src.pausemenu")
-    --Requiere todos los modulos
-    require("src.require")
 
-    --Configuracion Predeterminada
-    local configDefaultData = {
-        BORDERLESS = false,
-        VSYNC = true,
-        RESOLUTION = 4,
-        VOLUME = 1,
-    }
-    --Resoluciones que se pueden elijir
-    Resolutions = {
-        {width = 16, height = 9, scale = 0.025},
-        {width = 320, height = 180, scale = 0.5},
-        {width = 640, height = 360, scale = 1},
-        {width = 1280, height = 720, scale = 2},
-        {width = 1920, height = 1080, scale = 3},
-    }
-    --Crea config.ini si no existe
-    if love.filesystem.getInfo("config.ini") == nil then
-        local data = ""
-        for i,v in pairs(configDefaultData) do
-            data = data..tostring(i).." = "..tostring(v).."\n"
-        end
-        love.filesystem.write("config.ini", data)
-    end
+    --Carga la configuracion
+    --Si no existe, crea el archivo config.ini con los valores por defecto
 
-    --Saca las lineas de config.ini
-    Config = love.filesystem.lines("config.ini")
-    ConfigTable = {}
-    --Escribe los datos del archivo config.ini a la tabla ConifgTable
-    for line in Config do
-        local i, v = line:match("^(%S+) = (%S+)$") 
-        if v == "true" then 
-            v = true
-        elseif v == "false" then
-            v = false
-        elseif tonumber(v) ~= nil then
-            v = tonumber(v)
-        end
-        ConfigTable[i] = v
-    end
-    --Actualiza la ventana a los ajustes actuales
-    love.audio.setVolume(ConfigTable.VOLUME)
-    function UpdateWindow()
-        TrueResolution = Resolutions[ConfigTable.RESOLUTION]
-        love.window.setMode(TrueResolution.width, TrueResolution.height, {
-            borderless = ConfigTable.BORDERLESS,
-            resizable = false,
-            vsync = ConfigTable.VSYNC,
-        })
-    end
-    UpdateWindow()
     --Crea a el jugador y el enemigo
     Player = PlayerModule.new("assets/sprites/maxresdefault.png", 0.0625, 0.11)
     Enemy = EnemyModule.new("assets/sprites/slungus.png", 0.0625, 0.11)
@@ -68,33 +24,6 @@ end
 love.keypressed = function (key)
     if key == "escape" then
         PauseMenu()
-        --Cierra el juego y actualiza los ajustes
-    --[[local lines = {}
-        for i,v in pairs(ConfigTable) do
-            table.insert(lines, i .. " = " .. tostring(v))
-        end
-        love.filesystem.write("config.ini", table.concat(lines, "\n"))
-        love.audio.stop()
-        love.timer.sleep(.1)
-        love.event.quit()
-    elseif key == "f11" then
-        --Activa borderless
-        ConfigTable.BORDERLESS = not ConfigTable.BORDERLESS
-        UpdateWindow()
-    elseif key == "up" then
-        --Sube la resolucion
-        ConfigTable.RESOLUTION = ConfigTable.RESOLUTION + 1
-        if ConfigTable.RESOLUTION > #Resolutions then
-            ConfigTable.RESOLUTION = 1
-        end
-        UpdateWindow()
-    elseif key == "down" then
-        --Baja la resolucion
-        ConfigTable.RESOLUTION = ConfigTable.RESOLUTION - 1
-        if ConfigTable.RESOLUTION < 1 then
-            ConfigTable.RESOLUTION = #Resolutions
-        end
-        UpdateWindow()]]
     elseif key == Player.otherControls.dash then
         --Funcionamiento de dash
         Player.speed = Player.speed * 3
@@ -181,7 +110,7 @@ love.draw = function ()
     love.graphics.print("Player Health: " .. Player.health, 5, 15, 0, .5, .5)
     love.graphics.print("Enemy Health: " .. Enemy.health, 5, 45, 0, .5, .5)
     love.graphics.print("Collider Position: (" .. Collider.position.x.offset .. ", " .. Collider.position.y.offset .. ")", 5, 35, 0, .5, .5)
-    love.graphics.print("Player Position: (" .. Player.collision.position.x.offset .. ", " .. Player.collision.position.y.offset .. ")", 5, 5, 0, .5, .5)
+    love.graphics.print("Player Position: (" .. x .. ", " .. y .. ")", 5, 5, 0, .5, .5)
     love.graphics.print("Gun Ammo: " .. Gun.ammo, 5, 25, 0, .5, .5)
 
 
@@ -212,10 +141,18 @@ love.draw = function ()
         if not self.visible then goto continue end
         local x, y = self:getRenderPosition()
         local width, height = self:getRenderSize()
+        --Dibuja el texto si es que tiene
         if self.text then
             love.graphics.setColor(self.textColor or {0,0,0,1})
             local text = love.graphics.newText(self.font or love.graphics.getFont(), self.text)
             love.graphics.draw(text, x + width / 2 - text:getWidth() / 2, y + height / 2 - text:getHeight() / 2)
+            love.graphics.setColor(1,1,1,1)
+            goto continue
+        end
+        --Dibuja la imagen si es que tiene
+        if self.image then
+            love.graphics.setColor(self.imageColor or {1,1,1,1})
+            love.graphics.draw(self.image, x, y, 0, width / self.image:getWidth(), height / self.image:getHeight())
             love.graphics.setColor(1,1,1,1)
             goto continue
         end
