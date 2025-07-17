@@ -57,6 +57,11 @@ love.mousepressed = function (x, y, button)
 end
 
 love.update = function (dt)
+
+    for _, rootGui in pairs(Guis.getTopLevelGuis()) do
+        rootGui:calculateRenderProperties()
+    end
+
     if Gamestate == "playing" then
         --Actualiza modulo de timer
         Timer.update(dt)
@@ -141,6 +146,7 @@ love.draw = function ()
         if not self.visible then goto continue end
         local x, y = self:getRenderPosition()
         local width, height = self:getRenderSize()
+
         --Dibuja el texto si es que tiene
         if self.text then
             love.graphics.setColor(self.textColor or {0,0,0,1})

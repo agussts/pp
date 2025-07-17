@@ -25,7 +25,7 @@ Resume = Button.new(function ()
     PauseMenu()
 end)
 
-Resume.parent = ListThing
+Resume:setParent(ListThing)
 Resume.bgColor = {0.3, 0.3, 0.3, 1}
 Resume.position = UDim2.fromScale(0.5, 0.1)
 Resume.size = UDim2.fromScale(0.8, 0.1)
@@ -35,7 +35,7 @@ table.insert(pauseMenuUi, Resume)
 ResumeText = Textlabel.new()
 ResumeText.text = "Resume"
 ResumeText.textColor = {1, 1, 1, 1}
-ResumeText.parent = ListThing
+ResumeText:setParent(ListThing)
 ResumeText.position = Resume.position
 ResumeText.zIndex = 1
 table.insert(pauseMenuUi, ResumeText)
@@ -44,7 +44,7 @@ table.insert(pauseMenuUi, ResumeText)
 Quit = Button.new(function ()
     love.event.quit()
 end)
-Quit.parent = ListThing
+Quit:setParent(ListThing)
 Quit.bgColor = {0.3, 0.3, 0.3, 1}
 Quit.position = UDim2.fromScale(0.5, .9)
 Quit.size = UDim2.fromScale(0.8, 0.1)
@@ -54,7 +54,7 @@ table.insert(pauseMenuUi, Quit)
 QuitText = Textlabel.new()
 QuitText.text = "Quit"
 QuitText.textColor = {1, 1, 1, 1}
-QuitText.parent = ListThing
+QuitText:setParent(ListThing)
 QuitText.position = Quit.position
 QuitText.zIndex = 1
 table.insert(pauseMenuUi, QuitText)
@@ -64,7 +64,7 @@ local settingsUI = {}
 
 local function createCheckBox(pos, text, marked, callback)
     local self = Button.new()
-    self.parent = ListThing
+    self:setParent(ListThing)
     self.bgColor = {0,0,0,0}
     self.position = pos
     self.size = UDim2.fromScale(0.15, .1)
@@ -80,7 +80,7 @@ local function createCheckBox(pos, text, marked, callback)
         selfImg.image = love.graphics.newImage("assets/sprites/cbunmark.png")
     end
 
-    selfImg.parent = ListThing
+    selfImg:setParent(ListThing)
     selfImg.position = self.position
     selfImg.size = self.size * 1.5
     selfImg.anchorPoint = {0, 0.35}
@@ -91,14 +91,14 @@ local function createCheckBox(pos, text, marked, callback)
     local selfText = Textlabel.new()
     selfText.text = text
     selfText.textColor = {1, 1, 1, 1}
-    selfText.parent = ListThing
+    selfText:setParent(ListThing)
     selfText.position = self.position + UDim2.fromScale(.2,0)
     selfText.size = self.size
     selfText.zIndex = 1
     table.insert(settingsUI, selfText)
 
     local selfFrame = Frame.new()
-    selfFrame.parent = ListThing
+    selfFrame:setParent(ListThing)
     selfFrame.position = selfText.position
     selfFrame.size = self.size + UDim2.fromScale(0.25, 0)
     selfFrame.bgColor = {.5,.5,.5,1}
@@ -136,7 +136,7 @@ Apply = Button.new(function ()
         ::continue::
     end
 end)
-Apply.parent = ListThing
+Apply:setParent(ListThing)
 Apply.position = UDim2.fromScale(1, 0.9)
 Apply.size = UDim2.fromScale(0.7, 0.1)
 Apply.anchorPoint = {0.5, 0.5}
@@ -145,11 +145,41 @@ table.insert(settingsUI, Apply)
 ApplyText = Textlabel.new()
 ApplyText.text = "Apply"
 ApplyText.textColor = {1, 1, 1, 1}
-ApplyText.parent = ListThing
+ApplyText:setParent(ListThing)
 ApplyText.position = Apply.position
 ApplyText.zIndex = 1
 table.insert(settingsUI, ApplyText)
 
+ResolutionL = Button.new(function ()
+    Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION - 1
+    if Config.ConfigTable.RESOLUTION < 1 then
+        Config.ConfigTable.RESOLUTION = #Config.Resolutions
+    end
+    print("Resolution changed to: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION])
+end)
+ResolutionR = Button.new(function ()
+    Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION + 1
+    if Config.ConfigTable.RESOLUTION > #Config.Resolutions then
+        Config.ConfigTable.RESOLUTION = 1
+    end
+    print("Resolution changed to: " .. table.concat(Config.Resolutions[Config.ConfigTable.RESOLUTION], "x"))
+end)
+
+ResolutionText = Textlabel.new()
+ResolutionText.text = "Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height
+ResolutionText.textColor = {1, 1, 1, 1}
+ResolutionText:setParent(ListThing)
+ResolutionText.position = UDim2.fromScale(.2, .5)
+ResolutionText.size = UDim2.fromScale(.6, .1)
+ResolutionText.zIndex = 1
+table.insert(settingsUI, ResolutionText)
+
+ResolutionR:setParent(ResolutionText)
+ResolutionR.bgColor = {0.3, 0.3, 0.3, 1}
+ResolutionR.position = UDim2.fromScale(1, 0.5)
+ResolutionR.size = UDim2.fromScale(0.1, 0.5)
+ResolutionR.anchorPoint = {0.5, 0.5}
+table.insert(settingsUI, ResolutionR)
 Back = Button.new(function ()
     for _,v in pairs(settingsUI) do
         v.visible = false
@@ -160,7 +190,7 @@ Back = Button.new(function ()
         ::continue::
     end
 end)
-Back.parent = ListThing
+Back:setParent(ListThing)
 Back.position = UDim2.fromScale(0, 0.9)
 Back.size = UDim2.fromScale(0.7, 0.1)
 Back.anchorPoint = {0.5, 0.5}
@@ -169,7 +199,7 @@ table.insert(settingsUI, Back)
 BackText = Textlabel.new()
 BackText.text = "Back"
 BackText.textColor = {1, 1, 1, 1}
-BackText.parent = ListThing
+BackText:setParent(ListThing)
 BackText.position = Back.position
 BackText.zIndex = 1
 table.insert(settingsUI, BackText)
@@ -188,7 +218,7 @@ Settings = Button.new(function ()
         ::continue::
     end
 end)
-Settings.parent = ListThing
+Settings:setParent(ListThing)
 Settings.bgColor = {0.3, 0.3, 0.3, 1}
 Settings.position = UDim2.fromScale(0.5, 0.3)
 Settings.size = UDim2.fromScale(0.8, 0.1)
@@ -198,7 +228,7 @@ table.insert(pauseMenuUi, Settings)
 SettingsText = Textlabel.new()
 SettingsText.text = "Settings"
 SettingsText.textColor = {1, 1, 1, 1}
-SettingsText.parent = ListThing
+SettingsText:setParent(ListThing)
 SettingsText.position = Settings.position
 SettingsText.zIndex = 1
 table.insert(pauseMenuUi, SettingsText)
