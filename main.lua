@@ -43,6 +43,7 @@ love.keypressed = function (key)
     end
 end
 
+
 love.mousepressed = function (x, y, button)
     if button == 1 then
         --Si se hace click izquierdo, chequea si se hace click en el boton
@@ -57,6 +58,20 @@ love.mousepressed = function (x, y, button)
 end
 
 love.update = function (dt)
+    if love.mouse.isDown(1) then
+        --Activa funcion de cuando se presiona el boton
+        for _,self in pairs(Guis.getAll()) do
+            if not self.visible or self.type ~= "button" then goto continue end
+            local mouseX, mouseY = love.mouse.getPosition()
+            local mouseIn = self:check(mouseX, mouseY, false)
+            if mouseIn then
+                if self.whenPressing then
+                    self.whenPressing()
+                end
+            end
+            ::continue::
+        end
+    end
 
     for _, rootGui in pairs(Guis.getTopLevelGuis()) do
         rootGui:calculateRenderProperties()
@@ -97,7 +112,6 @@ end
 love.draw = function ()
     --Ajustes antes de empezar renderizacion
     love.graphics.setDefaultFilter("nearest")
-    --love.graphics.scale(TrueResolution.scale)
 
     --Dibuja el jugador
     local x,y = Player.collision.position:transformToPixels()
@@ -150,9 +164,13 @@ love.draw = function ()
         --Dibuja el texto si es que tiene
         if self.text then
             love.graphics.setColor(self.textColor or {0,0,0,1})
-            local text = love.graphics.newText(self.font or love.graphics.getFont(), self.text)
-            love.graphics.draw(text, x + width / 2 - text:getWidth() / 2, y + height / 2 - text:getHeight() / 2)
+            love.graphics.scale(TrueResolution.scale)
+            local font = self.font or love.graphics.getFont()
+            font:setFilter("nearest", "nearest")
+            local text = love.graphics.newText(font, self.text)
+            love.graphics.draw(text, (x + width / 2) / TrueResolution.scale - text:getWidth() / 2, (y + height / 2) / TrueResolution.scale - text:getHeight() / 2)
             love.graphics.setColor(1,1,1,1)
+            love.graphics.scale(1 / TrueResolution.scale)
             goto continue
         end
         --Dibuja la imagen si es que tiene
@@ -163,6 +181,11 @@ love.draw = function ()
             goto continue
         end
         --Dibuja el fondo del gui
+        if self.isSlider then
+            print("SLIDER:")
+            print(x, y, width, height)
+            print("------------------")
+        end
         love.graphics.setColor(self.bgColor or {1,1,1,1})
         love.graphics.rectangle("fill", x, y, width, height)
         love.graphics.setColor(1,1,1,1)

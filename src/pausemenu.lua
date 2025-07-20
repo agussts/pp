@@ -93,14 +93,14 @@ local function createCheckBox(pos, text, marked, callback)
     selfText.textColor = {1, 1, 1, 1}
     selfText:setParent(ListThing)
     selfText.position = self.position + UDim2.fromScale(.2,0)
-    selfText.size = self.size
+    selfText.size = self.size + UDim2.fromScale(0.25, 0)
     selfText.zIndex = 1
     table.insert(settingsUI, selfText)
 
     local selfFrame = Frame.new()
     selfFrame:setParent(ListThing)
     selfFrame.position = selfText.position
-    selfFrame.size = self.size + UDim2.fromScale(0.25, 0)
+    selfFrame.size = selfText.size
     selfFrame.bgColor = {.5,.5,.5,1}
     table.insert(settingsUI, selfFrame)
 
@@ -116,7 +116,6 @@ local function createCheckBox(pos, text, marked, callback)
 end
 
 createCheckBox(UDim2.fromScale(.2, .1), "Borderless", Config.ConfigTable.BORDERLESS, function ()
-    print(table.concat(Config.ConfigTable, "\n"))
     Config.ConfigTable.BORDERLESS = not Config.ConfigTable.BORDERLESS
 end)
 createCheckBox(UDim2.fromScale(.2, .3), "VSync", Config.ConfigTable.VSYNC, function ()
@@ -124,7 +123,6 @@ createCheckBox(UDim2.fromScale(.2, .3), "VSync", Config.ConfigTable.VSYNC, funct
 end)
 
 Apply = Button.new(function ()
-    print("Applying settings")
     Config.saveConfig()
     Config.updateWindow()
     for _,v in pairs(settingsUI) do
@@ -150,21 +148,6 @@ ApplyText.position = Apply.position
 ApplyText.zIndex = 1
 table.insert(settingsUI, ApplyText)
 
-ResolutionL = Button.new(function ()
-    Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION - 1
-    if Config.ConfigTable.RESOLUTION < 1 then
-        Config.ConfigTable.RESOLUTION = #Config.Resolutions
-    end
-    print("Resolution changed to: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION])
-end)
-ResolutionR = Button.new(function ()
-    Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION + 1
-    if Config.ConfigTable.RESOLUTION > #Config.Resolutions then
-        Config.ConfigTable.RESOLUTION = 1
-    end
-    print("Resolution changed to: " .. table.concat(Config.Resolutions[Config.ConfigTable.RESOLUTION], "x"))
-end)
-
 ResolutionText = Textlabel.new()
 ResolutionText.text = "Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height
 ResolutionText.textColor = {1, 1, 1, 1}
@@ -174,12 +157,77 @@ ResolutionText.size = UDim2.fromScale(.6, .1)
 ResolutionText.zIndex = 1
 table.insert(settingsUI, ResolutionText)
 
+local SliderFrame = Frame.new()
+SliderFrame:setParent(ListThing)
+SliderFrame.position = UDim2.fromScale(0.5, 0.7)
+SliderFrame.size = UDim2.fromScale(1, 0.05)
+SliderFrame.anchorPoint = {0.5, 0.5}
+SliderFrame.bgColor = {0.5, 0.5, 0.5, 1}
+table.insert(settingsUI, SliderFrame)
+
+Slider = Button.new(function ()
+    -- No action needed, just a visual element
+end)
+Slider:setParent(SliderFrame)
+Slider.position = UDim2.fromScale(0, 0)
+Slider.size = UDim2.fromScale(0.1, 1)
+Slider.anchorPoint = {0.5, 0.5}
+Slider.bgColor = {0.3, 0.3, 0.3, 1}
+Slider.zIndex = 2
+Slider.isSlider = true
+Slider.whenPressing = function ()
+    print("slider")
+    local sliderX, sliderY = SliderFrame:getRenderPosition()
+    local sliderWidth, sliderHeight = SliderFrame:getRenderSize()
+    local x = love.mouse.getX()
+    --[[if love.mouse.getX() > sliderX - sliderWidth / 2 and love.mouse.getX() < sliderX + sliderWidth / 2 then
+        x = love.mouse.getX()
+    elseif love.mouse.getX() > sliderX + sliderWidth / 2 then
+        x = sliderWidth
+    else
+        x = sliderX
+    end]]
+    --print(x)
+    Slider.position = UDim2.fromOffset(x, sliderY)
+    Slider.size = UDim2.fromScale(Slider.size.x.scale, 20)
+    --print(Slider:getRenderPosition())
+    --print(x, sliderY)
+    --print(sliderWidth, sliderHeight)
+    --Slider.position = UDim2.fromScale(Slider.position:toScale(sliderWidth, sliderHeight))
+    --print(Slider.position.x.scale, Slider.position.y.scale)
+    --print(Slider.position:toPixels())
+end
+table.insert(settingsUI, Slider)
+
+ResolutionL = Button.new(function ()
+    Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION - 1
+    if Config.ConfigTable.RESOLUTION < 1 then
+        Config.ConfigTable.RESOLUTION = #Config.Resolutions
+    end
+    ResolutionText.text = "Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height
+end)
+ResolutionR = Button.new(function ()
+    Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION + 1
+    if Config.ConfigTable.RESOLUTION > #Config.Resolutions then
+        Config.ConfigTable.RESOLUTION = 1
+    end
+    ResolutionText.text = "Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height
+end)
+
 ResolutionR:setParent(ResolutionText)
 ResolutionR.bgColor = {0.3, 0.3, 0.3, 1}
 ResolutionR.position = UDim2.fromScale(1, 0.5)
 ResolutionR.size = UDim2.fromScale(0.1, 0.5)
 ResolutionR.anchorPoint = {0.5, 0.5}
 table.insert(settingsUI, ResolutionR)
+
+ResolutionL:setParent(ResolutionText)
+ResolutionL.bgColor = {0.3, 0.3, 0.3, 1}
+ResolutionL.position = UDim2.fromScale(0, 0.5)
+ResolutionL.size = UDim2.fromScale(0.1, 0.5)
+ResolutionL.anchorPoint = {0.5, 0.5}
+table.insert(settingsUI, ResolutionL)
+
 Back = Button.new(function ()
     for _,v in pairs(settingsUI) do
         v.visible = false
