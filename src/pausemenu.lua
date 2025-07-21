@@ -169,33 +169,28 @@ Slider = Button.new(function ()
     -- No action needed, just a visual element
 end)
 Slider:setParent(SliderFrame)
-Slider.position = UDim2.fromScale(0, 0)
-Slider.size = UDim2.fromScale(0.1, 1)
+Slider.position = UDim2.fromScale(Config.ConfigTable.VOLUME, .5)
+Slider.size = UDim2.fromScale(0.1, 1.3)
 Slider.anchorPoint = {0.5, 0.5}
 Slider.bgColor = {0.3, 0.3, 0.3, 1}
 Slider.zIndex = 2
 Slider.isSlider = true
 Slider.whenPressing = function ()
     print("slider")
-    local sliderX, sliderY = SliderFrame:getRenderPosition()
+    local sliderX, _ = SliderFrame:getRenderPosition()
     local sliderWidth, sliderHeight = SliderFrame:getRenderSize()
     local x = love.mouse.getX()
-    --[[if love.mouse.getX() > sliderX - sliderWidth / 2 and love.mouse.getX() < sliderX + sliderWidth / 2 then
-        x = love.mouse.getX()
-    elseif love.mouse.getX() > sliderX + sliderWidth / 2 then
-        x = sliderWidth
-    else
+    if love.mouse.getX() > sliderX + sliderWidth then
+        print("TOO RIGHT")
+        x = sliderX + sliderWidth
+    elseif love.mouse.getX() < sliderX then
+        print("TOO LEFT")
         x = sliderX
-    end]]
-    --print(x)
-    Slider.position = UDim2.fromOffset(x, sliderY)
-    Slider.size = UDim2.fromScale(Slider.size.x.scale, 20)
-    --print(Slider:getRenderPosition())
-    --print(x, sliderY)
-    --print(sliderWidth, sliderHeight)
-    --Slider.position = UDim2.fromScale(Slider.position:toScale(sliderWidth, sliderHeight))
-    --print(Slider.position.x.scale, Slider.position.y.scale)
-    --print(Slider.position:toPixels())
+    end
+    local diff = x - sliderX
+    Slider.position = UDim2.new(0, diff, .5, 0)
+    Slider.position = UDim2.fromScale(Slider.position:toScale(sliderWidth, sliderHeight))
+    Config.ConfigTable.VOLUME = Slider.position.x.scale
 end
 table.insert(settingsUI, Slider)
 

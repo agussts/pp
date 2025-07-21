@@ -181,11 +181,6 @@ love.draw = function ()
             goto continue
         end
         --Dibuja el fondo del gui
-        if self.isSlider then
-            print("SLIDER:")
-            print(x, y, width, height)
-            print("------------------")
-        end
         love.graphics.setColor(self.bgColor or {1,1,1,1})
         love.graphics.rectangle("fill", x, y, width, height)
         love.graphics.setColor(1,1,1,1)
