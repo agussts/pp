@@ -62,6 +62,12 @@ table.insert(pauseMenuUi, QuitText)
 
 local settingsUI = {}
 
+SettingsText = Textlabel.new("Settings")
+SettingsText:setParent(ListThing)
+SettingsText.position = UDim2.fromScale(0, 0)
+SettingsText.size = UDim2.fromScale(1, .1)
+table.insert(settingsUI, SettingsText)
+
 local function createCheckBox(pos, text, marked, callback)
     local self = Button.new()
     self:setParent(ListThing)
@@ -115,10 +121,19 @@ local function createCheckBox(pos, text, marked, callback)
     end
 end
 
-createCheckBox(UDim2.fromScale(.2, .1), "Borderless", Config.ConfigTable.BORDERLESS, function ()
+local function createImg(gui, imgdir)
+    local img = ImageLabel.new(imgdir)
+    img:setParent(gui)
+    img.size = UDim2.fromScale(1,1)
+    img.zIndex = 2
+    return img
+end
+
+
+createCheckBox(UDim2.fromScale(.2, .2), "Borderless", Config.ConfigTable.BORDERLESS, function ()
     Config.ConfigTable.BORDERLESS = not Config.ConfigTable.BORDERLESS
 end)
-createCheckBox(UDim2.fromScale(.2, .3), "VSync", Config.ConfigTable.VSYNC, function ()
+createCheckBox(UDim2.fromScale(.2, .35), "VSync", Config.ConfigTable.VSYNC, function ()
     Config.ConfigTable.VSYNC = not Config.ConfigTable.VSYNC
 end)
 
@@ -170,21 +185,17 @@ Slider = Button.new(function ()
 end)
 Slider:setParent(SliderFrame)
 Slider.position = UDim2.fromScale(Config.ConfigTable.VOLUME, .5)
-Slider.size = UDim2.fromScale(0.1, 1.3)
+Slider.size = UDim2.fromScale(0.15, 2)
 Slider.anchorPoint = {0.5, 0.5}
-Slider.bgColor = {0.3, 0.3, 0.3, 1}
+Slider.bgColor = {1,1,1, 0}
 Slider.zIndex = 2
-Slider.isSlider = true
 Slider.whenPressing = function ()
-    print("slider")
     local sliderX, _ = SliderFrame:getRenderPosition()
     local sliderWidth, sliderHeight = SliderFrame:getRenderSize()
     local x = love.mouse.getX()
     if love.mouse.getX() > sliderX + sliderWidth then
-        print("TOO RIGHT")
         x = sliderX + sliderWidth
     elseif love.mouse.getX() < sliderX then
-        print("TOO LEFT")
         x = sliderX
     end
     local diff = x - sliderX
@@ -193,6 +204,9 @@ Slider.whenPressing = function ()
     Config.ConfigTable.VOLUME = Slider.position.x.scale
 end
 table.insert(settingsUI, Slider)
+
+local SliderImg = createImg(Slider, "assets/sprites/slider.png")
+table.insert(settingsUI, SliderImg)
 
 ResolutionL = Button.new(function ()
     Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION - 1
@@ -210,18 +224,24 @@ ResolutionR = Button.new(function ()
 end)
 
 ResolutionR:setParent(ResolutionText)
-ResolutionR.bgColor = {0.3, 0.3, 0.3, 1}
+ResolutionR.bgColor = {1,1,1, 0}
 ResolutionR.position = UDim2.fromScale(1, 0.5)
-ResolutionR.size = UDim2.fromScale(0.1, 0.5)
+ResolutionR.size = UDim2.fromScale(0.15, 0.8)
 ResolutionR.anchorPoint = {0.5, 0.5}
 table.insert(settingsUI, ResolutionR)
 
 ResolutionL:setParent(ResolutionText)
-ResolutionL.bgColor = {0.3, 0.3, 0.3, 1}
+ResolutionL.bgColor = {1,1,1, 0}
 ResolutionL.position = UDim2.fromScale(0, 0.5)
-ResolutionL.size = UDim2.fromScale(0.1, 0.5)
+ResolutionL.size = UDim2.fromScale(0.15, 0.8)
 ResolutionL.anchorPoint = {0.5, 0.5}
 table.insert(settingsUI, ResolutionL)
+
+ResolutionLImg = createImg(ResolutionL, "assets/sprites/leftarrow.png")
+table.insert(settingsUI, ResolutionLImg)
+
+ResolutionRImg = createImg(ResolutionR, "assets/sprites/rightarrow.png")
+table.insert(settingsUI, ResolutionRImg)
 
 Back = Button.new(function ()
     for _,v in pairs(settingsUI) do
