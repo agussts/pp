@@ -53,7 +53,7 @@ function gun:Fire(x, y)
     for i,v in pairs(self.tags) do
         collider:AddTag(v)
     end
-    local mouseX, mouseY = love.mouse.getPosition()
+    local mouseX, mouseY = Camera.screenToWorld(love.mouse:getPosition())
     mouseX = mouseX
     mouseY = mouseY
     local dx = mouseX - x

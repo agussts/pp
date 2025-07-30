@@ -12,6 +12,7 @@ love.load = function ()
 
     --Crea a el jugador y el enemigo
     Player = PlayerModule.new("assets/sprites/maxresdefault.png", 0.0625, 0.11)
+    Player.collision.position = UDim2.fromScale(.5, .5)
     Enemy = EnemyModule.new("assets/sprites/slungus.png", 0.0625, 0.11)
     Enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
 
@@ -81,7 +82,6 @@ love.update = function (dt)
         --Actualiza modulo de timer
         Timer.update(dt)
 
-
         if love.mouse.isDown(1) then
             local x,y = Player.collision.position:transformToPixels()
             Gun:Fire(x, y)
@@ -106,43 +106,42 @@ love.update = function (dt)
 
         --Actualiza el movimiento del jugador
         Player:UpdateInput()
+
+        --Actualiza la camara a la posicion del jugador
+        local playerX, playerY = Player.collision.position:toPixels()
+        Camera.update(playerX, playerY)
     end
 end
 
 love.draw = function ()
     --Ajustes antes de empezar renderizacion
     love.graphics.setDefaultFilter("nearest")
-
     --Dibuja el jugador
-    local x,y = Player.collision.position:transformToPixels()
+    
+    local playerX, playerY = Player.collision.position:transformToPixels()
     local width, height = Player.collision.size:transformToPixels()
-    love.graphics.draw(Player.sprite, x, y, 0 , width / Player.sprite:getWidth(), height / Player.sprite:getHeight())
-   
-    --Dibuja a los enemigos
-    for _,v in pairs(EnemyModule.getEnemies()) do
-        local x,y = v.collision.position:transformToPixels()
-        local width, height = v.collision.size:transformToPixels()
-        love.graphics.draw(v.sprite, x, y, 0, width / v.sprite:getWidth(), height / v.sprite:getHeight())
-    end
-
-   --TEMPORAL: Dice informacion extra
-    love.graphics.print("Player Health: " .. Player.health, 5, 15, 0, .5, .5)
-    love.graphics.print("Enemy Health: " .. Enemy.health, 5, 45, 0, .5, .5)
-    love.graphics.print("Collider Position: (" .. Collider.position.x.offset .. ", " .. Collider.position.y.offset .. ")", 5, 35, 0, .5, .5)
-    love.graphics.print("Player Position: (" .. x .. ", " .. y .. ")", 5, 5, 0, .5, .5)
-    love.graphics.print("Gun Ammo: " .. Gun.ammo, 5, 25, 0, .5, .5)
+    Camera.attach()
+        love.graphics.draw(Player.sprite, playerX, playerY, 0 , width / Player.sprite:getWidth(), height / Player.sprite:getHeight())
 
 
-    --Dibuja a los coliders que son visibles
-    for i,v in pairs(ColliderModule.getCollisions()) do
-        if v.visualized then
-            love.graphics.setColor(v.color)
-            local x,y = v.position:transformToPixels()
-            local width, height = v.size:transformToPixels()
-            love.graphics.rectangle("line", x, y, width, height)
-            love.graphics.setColor(1,1,1,1)
+        --Dibuja a los enemigos
+        for _,v in pairs(EnemyModule.getEnemies()) do
+            local x,y = v.collision.position:transformToPixels()
+            local width, height = v.collision.size:transformToPixels()
+            love.graphics.draw(v.sprite, x, y, 0, width / v.sprite:getWidth(), height / v.sprite:getHeight())
         end
-    end
+
+        --Dibuja a los coliders que son visibles
+        for i,v in pairs(ColliderModule.getCollisions()) do
+            if v.visualized then
+                love.graphics.setColor(v.color)
+                local x,y = v.position:transformToPixels()
+                local width, height = v.size:transformToPixels()
+                love.graphics.rectangle("line", x, y, width, height)
+                love.graphics.setColor(1,1,1,1)
+            end
+        end
+    Camera.detach()
 
     -- Ordena por zIndex, si son iguales, ordena por el orden de insercion
     local sortedGuis = Guis.getAll()
