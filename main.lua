@@ -23,6 +23,9 @@ love.load = function ()
 end
 
 love.keypressed = function (key)
+    if ListeningForInput then
+        SetPressedKey(key)
+    end
     if key == "escape" then
         PauseMenu()
     elseif key == Player.otherControls.dash then
@@ -59,6 +62,9 @@ love.mousepressed = function (x, y, button)
 end
 
 love.update = function (dt)
+    --Actualiza modulo de timer
+    Timer.update(dt)
+
     if love.mouse.isDown(1) then
         --Activa funcion de cuando se presiona el boton
         for _,self in pairs(Guis.getAll()) do
@@ -79,9 +85,6 @@ love.update = function (dt)
     end
 
     if Gamestate == "playing" then
-        --Actualiza modulo de timer
-        Timer.update(dt)
-
         if love.mouse.isDown(1) then
             local x,y = Player.collision.position:transformToPixels()
             Gun:Fire(x, y)
