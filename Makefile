@@ -1,2 +1,2 @@
 doc-site:
-		lua ldoc.lua -c config.ld .
+	lua ldoc.lua -c config.ld .
