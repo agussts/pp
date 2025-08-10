@@ -1,15 +1,12 @@
+--Requiere todos los modulos
+require("src.require")  
+Config.init()
+
+--Requiere funciones
+require("src.pausemenu")
+require("libs.connections")
+
 love.load = function ()
-    
-    --Requiere todos los modulos
-    require("src.require")  
-    Config.init()
-
-    --Requiere funciones
-    require("src.pausemenu")
-
-    --Carga la configuracion
-    --Si no existe, crea el archivo config.ini con los valores por defecto
-
     --Crea a el jugador y el enemigo
     Player = PlayerModule.new("assets/sprites/maxresdefault.png", 0.0625, 0.11)
     Player.collision.position = UDim2.fromScale(.5, .5)
@@ -22,7 +19,11 @@ love.load = function ()
     Collider.size = UDim2.new(0.08, 0, 0.13, 0)
 end
 
-love.keypressed = function (key)
+love.keypressed = function(key)
+    Fire("keyPressed", key)
+end
+
+Connect("keyPressed", function (key)
     if key == "escape" then
         PauseMenu()
     elseif key == Player.otherControls.dash then
@@ -42,8 +43,7 @@ love.keypressed = function (key)
             Player.collision:ChangeType("box")
         end)
     end
-end
-
+end)
 
 love.mousepressed = function (x, y, button)
     if button == 1 then
