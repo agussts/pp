@@ -1,316 +1,359 @@
-require("src.require")
+-- Estados del juego
+Gamestates = { "playing", "paused" }
+Gamestate = "playing"
 
-Gamestates = {
-        "playing",
-        "paused"
-    }
-Gamestate = Gamestates[1]
+-- Estados del menu de pausa
+PauseStates = { "menu", "settings", "keybinds" }
+PauseState = "menu"
 
-local pauseMenuUi = {}
+-- Creamos el contenedor principal de la interfaz
+local pauseMenuContainer = Frame.new()
+pauseMenuContainer.size = UDim2.fromScale(1, 1)
+pauseMenuContainer.bgColor = {0, 0, 0, 0.65}
+pauseMenuContainer.visible = false
+pauseMenuContainer.zIndex = -1
 
-Bg = Frame.new()
-Bg.size = UDim2.fromScale(1,1)
-Bg.bgColor = {0,0,0,0.65}
-Bg.visible = false
-Bg.zIndex = -1
-table.insert(pauseMenuUi, Bg)
-
-ListThing = Frame.new()
-ListThing.size = UDim2.fromScale(0.4, 1)
-ListThing.position = UDim2.fromScale(.5, .5)
-ListThing.anchorPoint = {.5, .5}
-ListThing.bgColor = {1,1,1,0}
-
-Resume = Button.new(function ()
-    PauseMenu()
-end)
-
-Resume:setParent(ListThing)
-Resume.bgColor = {0.3, 0.3, 0.3, 1}
-Resume.position = UDim2.fromScale(0.5, 0.1)
-Resume.size = UDim2.fromScale(0.8, 0.1)
-Resume.anchorPoint = {0.5, 0.5}
-table.insert(pauseMenuUi, Resume)
-
-ResumeText = Textlabel.new()
-ResumeText.text = "Resume"
-ResumeText.textColor = {1, 1, 1, 1}
-ResumeText:setParent(ListThing)
-ResumeText.position = Resume.position
-ResumeText.zIndex = 1
-table.insert(pauseMenuUi, ResumeText)
+local listThing = Frame.new()
+listThing.size = UDim2.fromScale(0.4, 1)
+listThing.position = UDim2.fromScale(0.5, 0.5)
+listThing.anchorPoint = {0.5, 0.5}
+listThing.bgColor = {1, 1, 1, 0}
+listThing:setParent(pauseMenuContainer)
 
 
-Quit = Button.new(function ()
-    love.event.quit()
-end)
-Quit:setParent(ListThing)
-Quit.bgColor = {0.3, 0.3, 0.3, 1}
-Quit.position = UDim2.fromScale(0.5, .9)
-Quit.size = UDim2.fromScale(0.8, 0.1)
-Quit.anchorPoint = {0.5, 0.5}
-table.insert(pauseMenuUi, Quit)
+-- -------------------------------------------
+-- -- Funciones de Gestion de Estado del Menu
+-- -------------------------------------------
 
-QuitText = Textlabel.new()
-QuitText.text = "Quit"
-QuitText.textColor = {1, 1, 1, 1}
-QuitText:setParent(ListThing)
-QuitText.position = Quit.position
-QuitText.zIndex = 1
-table.insert(pauseMenuUi, QuitText)
+local menus = {}
 
-
-local settingsUI = {}
-
-SettingsText = Textlabel.new("Settings")
-SettingsText:setParent(ListThing)
-SettingsText.position = UDim2.fromScale(0, 0)
-SettingsText.size = UDim2.fromScale(1, .1)
-table.insert(settingsUI, SettingsText)
-
-local function createCheckBox(pos, text, marked, callback)
-    local self = Button.new()
-    self:setParent(ListThing)
-    self.bgColor = {0,0,0,0}
-    self.position = pos
-    self.size = UDim2.fromScale(0.15, .1)
-    table.insert(settingsUI, self)
-
-
-    local pressed = marked
-    local selfImg = ImageLabel.new("assets/sprites/cbunmark.png")
-
-    if pressed then
-        selfImg.image = love.graphics.newImage("assets/sprites/cbmark.png")
-    else
-        selfImg.image = love.graphics.newImage("assets/sprites/cbunmark.png")
-    end
-
-    selfImg:setParent(ListThing)
-    selfImg.position = self.position
-    selfImg.size = self.size * 1.5
-    selfImg.anchorPoint = {0, 0.35}
-    selfImg.zIndex = 5
-    selfImg.visible = true
-    table.insert(settingsUI, selfImg)
-
-    local selfText = Textlabel.new()
-    selfText.text = text
-    selfText.textColor = {1, 1, 1, 1}
-    selfText:setParent(ListThing)
-    selfText.position = self.position + UDim2.fromScale(.2,0)
-    selfText.size = self.size + UDim2.fromScale(0.25, 0)
-    selfText.zIndex = 1
-    table.insert(settingsUI, selfText)
-
-    local selfFrame = Frame.new()
-    selfFrame:setParent(ListThing)
-    selfFrame.position = selfText.position
-    selfFrame.size = selfText.size
-    selfFrame.bgColor = {.5,.5,.5,1}
-    table.insert(settingsUI, selfFrame)
-
-    self.callback = function ()
-        pressed = not pressed        
-        if pressed then
-            selfImg.image = love.graphics.newImage("assets/sprites/cbmark.png")
-        else
-            selfImg.image = love.graphics.newImage("assets/sprites/cbunmark.png")
+local function showMenu(state)
+    for _, menu in pairs(menus) do
+        for _, gui in pairs(menu) do
+            gui.visible = false
         end
-        callback()
+    end
+    
+    local targetMenu = menus[state]
+    if targetMenu then
+        for _, gui in pairs(targetMenu) do
+            gui.visible = true
+        end
+        PauseState = state
     end
 end
 
-local function createImg(gui, imgdir)
-    local img = ImageLabel.new(imgdir)
-    img:setParent(gui)
-    img.size = UDim2.fromScale(1,1)
-    img.zIndex = 2
-    return img
+-- -------------------------------------------
+-- -- Funciones de Ayuda (Helpers)
+-- -------------------------------------------
+
+-- Helper para crear un boton con texto
+local function createTextButton(parent, position, size, text, callback)
+    local btn = Button.new(callback)
+    btn:setParent(parent)
+    btn.bgColor = {0.3, 0.3, 0.3, 1}
+    btn.position = position
+    btn.size = size
+    btn.anchorPoint = {0.5, 0.5}
+
+    local textlabel = Textlabel.new(text)
+    textlabel:setParent(btn)
+    textlabel.position = UDim2.fromScale(0.5, 0.5)
+    textlabel.size = UDim2.fromScale(1, 1)
+    textlabel.anchorPoint = {0.5, 0.5}
+    textlabel.textColor = {1, 1, 1, 1}
+    textlabel.zIndex = 1
+
+    return btn, textlabel
+end
+
+-- Helper para crear un boton con imagen
+local function createImageButton(parent, position, size, imagePath, callback)
+    local btn = Button.new(callback)
+    btn:setParent(parent)
+    btn.position = position
+    btn.size = size
+    btn.anchorPoint = {0.5, 0.5}
+    btn.bgColor = {0 , 0, 0, 0}
+
+    local image = ImageLabel.new(imagePath)
+    image:setParent(btn)
+    image.position = UDim2.fromScale(0, 0)
+    image.size = UDim2.fromScale(1, 1)
+
+    return btn, image
+end
+
+local function deepCopy(original)
+    local copy = {}
+    for i, v in pairs(original) do
+        if type(v) == "table" then
+            copy[i] = deepCopy(v)
+        else
+            copy[i] = v
+        end
+    end
+    return copy
 end
 
 
-createCheckBox(UDim2.fromScale(.2, .2), "Borderless", Config.ConfigTable.BORDERLESS, function ()
-    Config.ConfigTable.BORDERLESS = not Config.ConfigTable.BORDERLESS
-end)
-createCheckBox(UDim2.fromScale(.2, .35), "VSync", Config.ConfigTable.VSYNC, function ()
-    Config.ConfigTable.VSYNC = not Config.ConfigTable.VSYNC
-end)
+-- -------------------------------------------
+-- -- Menu Principal
+-- -------------------------------------------
 
-Apply = Button.new(function ()
-    Config.saveConfig()
-    Config.updateWindow()
-    for _,v in pairs(settingsUI) do
-        v.visible = false
-    end
-    for _,v in pairs(pauseMenuUi) do
-        if v == Bg or v == ListThing then goto continue end
-        v.visible = true
-        ::continue::
-    end
-end)
-Apply:setParent(ListThing)
-Apply.position = UDim2.fromScale(1, 0.9)
-Apply.size = UDim2.fromScale(0.7, 0.1)
-Apply.anchorPoint = {0.5, 0.5}
-table.insert(settingsUI, Apply)
+local function createMainMenu(parent)
+    local menu = {}
 
-ApplyText = Textlabel.new()
-ApplyText.text = "Apply"
-ApplyText.textColor = {1, 1, 1, 1}
-ApplyText:setParent(ListThing)
-ApplyText.position = Apply.position
-ApplyText.zIndex = 1
-table.insert(settingsUI, ApplyText)
+    local resumeBtn, resumeText = createTextButton(
+        parent,
+        UDim2.fromScale(0.5, 0.1),
+        UDim2.fromScale(0.8, 0.1),
+        "Resume",
+        function ()
+            PauseMenu()
+        end
+    )
+    table.insert(menu, resumeBtn)
+    table.insert(menu, resumeText)
 
-ResolutionText = Textlabel.new()
-ResolutionText.text = "Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height
-ResolutionText.textColor = {1, 1, 1, 1}
-ResolutionText:setParent(ListThing)
-ResolutionText.position = UDim2.fromScale(.2, .5)
-ResolutionText.size = UDim2.fromScale(.6, .1)
-ResolutionText.zIndex = 1
-table.insert(settingsUI, ResolutionText)
+    local settingsBtn, settingsText = createTextButton(
+        parent,
+        UDim2.fromScale(0.5, 0.3),
+        UDim2.fromScale(0.8, 0.1),
+        "Settings",
+        function ()
+            showMenu("settings")
+        end
+    )
+    table.insert(menu, settingsBtn)
+    table.insert(menu, settingsText)
 
-local SliderFrame = Frame.new()
-SliderFrame:setParent(ListThing)
-SliderFrame.position = UDim2.fromScale(0.5, 0.7)
-SliderFrame.size = UDim2.fromScale(1, 0.05)
-SliderFrame.anchorPoint = {0.5, 0.5}
-SliderFrame.bgColor = {0.5, 0.5, 0.5, 1}
-table.insert(settingsUI, SliderFrame)
+    local quitBtn, quitText = createTextButton(
+        parent,
+        UDim2.fromScale(0.5, 0.9),
+        UDim2.fromScale(0.8, 0.1),
+        "Quit",
+        love.event.quit
+    )
+    table.insert(menu, quitBtn)
+    table.insert(menu, quitText)
 
-Slider = Button.new(function ()
-    -- No action needed, just a visual element
-end)
-Slider:setParent(SliderFrame)
-Slider.position = UDim2.fromScale(Config.ConfigTable.VOLUME, .5)
-Slider.size = UDim2.fromScale(0.15, 2)
-Slider.anchorPoint = {0.5, 0.5}
-Slider.bgColor = {1,1,1, 0}
-Slider.zIndex = 2
-Slider.whenPressing = function ()
-    local sliderX, _ = SliderFrame:getRenderPosition()
-    local sliderWidth, sliderHeight = SliderFrame:getRenderSize()
-    local x = love.mouse.getX()
-    if love.mouse.getX() > sliderX + sliderWidth then
-        x = sliderX + sliderWidth
-    elseif love.mouse.getX() < sliderX then
-        x = sliderX
-    end
-    local diff = x - sliderX
-    Slider.position = UDim2.new(0, diff, .5, 0)
-    Slider.position = UDim2.fromScale(Slider.position:toScale(sliderWidth, sliderHeight))
-    Config.ConfigTable.VOLUME = Slider.position.x.scale
-end
-table.insert(settingsUI, Slider)
-
-local SliderImg = createImg(Slider, "assets/sprites/slider.png")
-table.insert(settingsUI, SliderImg)
-
-ResolutionL = Button.new(function ()
-    Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION - 1
-    if Config.ConfigTable.RESOLUTION < 1 then
-        Config.ConfigTable.RESOLUTION = #Config.Resolutions
-    end
-    ResolutionText.text = "Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height
-end)
-ResolutionR = Button.new(function ()
-    Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION + 1
-    if Config.ConfigTable.RESOLUTION > #Config.Resolutions then
-        Config.ConfigTable.RESOLUTION = 1
-    end
-    ResolutionText.text = "Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height
-end)
-
-ResolutionR:setParent(ResolutionText)
-ResolutionR.bgColor = {1,1,1, 0}
-ResolutionR.position = UDim2.fromScale(1, 0.5)
-ResolutionR.size = UDim2.fromScale(0.15, 0.8)
-ResolutionR.anchorPoint = {0.5, 0.5}
-table.insert(settingsUI, ResolutionR)
-
-ResolutionL:setParent(ResolutionText)
-ResolutionL.bgColor = {1,1,1, 0}
-ResolutionL.position = UDim2.fromScale(0, 0.5)
-ResolutionL.size = UDim2.fromScale(0.15, 0.8)
-ResolutionL.anchorPoint = {0.5, 0.5}
-table.insert(settingsUI, ResolutionL)
-
-ResolutionLImg = createImg(ResolutionL, "assets/sprites/leftarrow.png")
-table.insert(settingsUI, ResolutionLImg)
-
-ResolutionRImg = createImg(ResolutionR, "assets/sprites/rightarrow.png")
-table.insert(settingsUI, ResolutionRImg)
-
-Back = Button.new(function ()
-    for _,v in pairs(settingsUI) do
-        v.visible = false
-    end
-    for _,v in pairs(pauseMenuUi) do
-        if v == Bg or v == ListThing then goto continue end
-        v.visible = true
-        ::continue::
-    end
-end)
-Back:setParent(ListThing)
-Back.position = UDim2.fromScale(0, 0.9)
-Back.size = UDim2.fromScale(0.7, 0.1)
-Back.anchorPoint = {0.5, 0.5}
-table.insert(settingsUI, Back)
-
-BackText = Textlabel.new()
-BackText.text = "Back"
-BackText.textColor = {1, 1, 1, 1}
-BackText:setParent(ListThing)
-BackText.position = Back.position
-BackText.zIndex = 1
-table.insert(settingsUI, BackText)
-
-for _,v in pairs(settingsUI) do
-    v.visible = false
+    return menu
 end
 
-Settings = Button.new(function ()
-    for _,v in pairs(settingsUI) do
-        v.visible = true
-    end
-    for i,v in pairs(pauseMenuUi) do
-        if v == Bg or v == ListThing then goto continue end
-        v.visible = false
-        ::continue::
-    end
-end)
-Settings:setParent(ListThing)
-Settings.bgColor = {0.3, 0.3, 0.3, 1}
-Settings.position = UDim2.fromScale(0.5, 0.3)
-Settings.size = UDim2.fromScale(0.8, 0.1)
-Settings.anchorPoint = {0.5, 0.5}
-table.insert(pauseMenuUi, Settings)
 
-SettingsText = Textlabel.new()
-SettingsText.text = "Settings"
-SettingsText.textColor = {1, 1, 1, 1}
-SettingsText:setParent(ListThing)
-SettingsText.position = Settings.position
-SettingsText.zIndex = 1
-table.insert(pauseMenuUi, SettingsText)
+-- -------------------------------------------
+-- -- Menú de Ajustes
+-- -------------------------------------------
 
-for _,v in pairs(pauseMenuUi) do
-    v.visible = false
+local function createSettingsMenu(parent)
+    local menu = {}
+    local prevConfig = deepCopy(Config.ConfigTable)
+
+    local titleText = Textlabel.new("Settings")
+    titleText:setParent(parent)
+    titleText.position = UDim2.fromScale(0, 0)
+    titleText.size = UDim2.fromScale(1, 0.1)
+    titleText.textColor = {1, 1, 1, 1}
+    table.insert(menu, titleText)
+
+    -- Logica para Checkbox
+    local function createCheckBox(pos, text, name)
+        local btn
+        local btnImg
+        btn = Button.new(function ()
+            Config.ConfigTable[name] = not Config.ConfigTable[name]
+            local newImage = Config.ConfigTable[name] and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png"
+            btnImg.image = love.graphics.newImage(newImage)
+        end)
+        btn:setParent(parent)
+        btn.bgColor = {0, 0, 0, 0}
+        btn.position = pos
+        btn.size = UDim2.fromScale(0.15, 0.1)
+
+        btnImg = ImageLabel.new(Config.ConfigTable[name] and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+        btnImg:setParent(parent)
+        btnImg.position = btn.position
+        btnImg.size = btn.size * 1.5
+        btnImg.anchorPoint = {0, 0.35}
+        btnImg.zIndex = 5
+
+        local label = Textlabel.new(text)
+        label:setParent(btn)
+        label.position = UDim2.fromScale(1.2, 0)
+        label.size = UDim2.fromScale(2, 1)
+        label.anchorPoint = {0, 0}
+
+        return btn, label, btnImg
+    end
+
+    local borderlessCb, borderlessLabel, borderlessImg = createCheckBox(UDim2.fromScale(0.2, 0.25), "Borderless", "BORDERLESS")
+    table.insert(menu, borderlessCb)
+    table.insert(menu, borderlessLabel)
+    table.insert(menu, borderlessImg)
+
+    local vsyncCb, vsyncLabel, vsyncImg = createCheckBox(UDim2.fromScale(0.2, 0.4), "VSync", "VSYNC")
+    table.insert(menu, vsyncCb)
+    table.insert(menu, vsyncLabel)
+    table.insert(menu, vsyncImg)
+
+    --Logica para la Resolucion
+
+    local resolutionText = Textlabel.new("Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height)
+    resolutionText:setParent(parent)
+    resolutionText.position = UDim2.fromScale(0.2, 0.55)
+    resolutionText.size = UDim2.fromScale(0.6, 0.1)
+    resolutionText.textColor = {1, 1, 1, 1}
+    table.insert(menu, resolutionText)
+
+    local resLeft, resLeftImg = createImageButton(
+        parent,
+        UDim2.fromScale(0.15, 0.6),
+        UDim2.fromScale(0.075, 0.075),
+        "assets/sprites/arrow_left.png",
+        function ()
+            Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION - 1
+            if Config.ConfigTable.RESOLUTION < 1 then
+                Config.ConfigTable.RESOLUTION = #Config.Resolutions
+            end
+            resolutionText.text = "Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height
+        end
+    )
+    table.insert(menu, resLeft)
+    table.insert(menu, resLeftImg)
+
+    local resRight, resRightImg = createImageButton(
+        parent,
+        UDim2.fromScale(0.85, 0.6),
+        UDim2.fromScale(0.075, 0.075),
+        "assets/sprites/arrow_right.png",
+        function ()
+            Config.ConfigTable.RESOLUTION = Config.ConfigTable.RESOLUTION + 1
+            if Config.ConfigTable.RESOLUTION > #Config.Resolutions then
+                Config.ConfigTable.RESOLUTION = 1
+            end
+            resolutionText.text = "Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height
+        end
+    )
+    table.insert(menu, resRight)
+    table.insert(menu, resRightImg)
+
+    -- Logica para el Slider de Volumen
+    local sliderFrame = Frame.new()
+    sliderFrame:setParent(parent)
+    sliderFrame.position = UDim2.fromScale(0.5, 0.7)
+    sliderFrame.size = UDim2.fromScale(0.9, 0.05)
+    sliderFrame.anchorPoint = {0.5, 0.5}
+    sliderFrame.bgColor = {0.5, 0.5, 0.5, 1}
+    table.insert(menu, sliderFrame)
+
+    local sliderBtn = Button.new()
+    sliderBtn:setParent(sliderFrame)
+    sliderBtn.position = UDim2.fromScale(Config.ConfigTable.VOLUME, 0.5)
+    sliderBtn.size = UDim2.fromScale(0.15, 2)
+    sliderBtn.anchorPoint = {0.5, 0.5}
+    sliderBtn.bgColor = {1, 1, 1, 0}
+
+    local sliderImg = ImageLabel.new("assets/sprites/slider.png")
+    sliderImg:setParent(sliderBtn)
+    sliderImg.size = UDim2.fromScale(1, 1)
+    sliderImg.zIndex = 1
+    
+    sliderBtn.whenPressing = function ()
+        local sliderX, _ = sliderFrame:getRenderPosition()
+        local sliderWidth, _ = sliderFrame:getRenderSize()
+        local mouseX = love.mouse.getX()
+        local x = math.max(sliderX, math.min(mouseX, sliderX + sliderWidth))
+        local newScale = (x - sliderX) / sliderWidth
+        
+        sliderBtn.position = UDim2.fromScale(newScale, 0.5)
+        Config.ConfigTable.VOLUME = newScale
+    end
+    table.insert(menu, sliderBtn)
+    table.insert(menu, sliderImg)
+
+
+    local backBtn, backText = createTextButton(
+        parent,
+        UDim2.fromScale(.2, 0.925),
+        UDim2.fromScale(0.55, 0.1),
+        "Back",
+        function ()
+            showMenu("menu")
+        end
+    )
+    table.insert(menu, backBtn)
+    table.insert(menu, backText)
+
+    local applyBtn, applyText = createTextButton(
+        parent,
+        UDim2.fromScale(0.8, 0.925),
+        UDim2.fromScale(0.55, 0.1),
+        "Apply",
+        function ()
+            Config.saveConfig()
+            Config.updateWindow()
+            prevConfig = deepCopy(Config.ConfigTable)
+            showMenu("menu")
+        end
+    )
+    table.insert(menu, applyBtn)
+    table.insert(menu, applyText)
+
+    local revertBtn, revertText = createTextButton(
+        parent,
+        UDim2.fromScale(0.2, .8),
+        UDim2.fromScale(0.55, 0.1),
+        "Revert Settings",
+        function ()
+            sliderBtn.position.x.scale = prevConfig.VOLUME
+            borderlessImg.image = love.graphics.newImage(prevConfig.BORDERLESS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            vsyncImg.image = love.graphics.newImage(prevConfig.VSYNC and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            resolutionText.text = "Resolution: " .. Config.Resolutions[prevConfig.RESOLUTION].width .. "x" .. Config.Resolutions[prevConfig.RESOLUTION].height
+            Config.ConfigTable = deepCopy(prevConfig)
+        end
+    )
+    table.insert(menu, revertBtn)
+    table.insert(menu, revertText)
+
+    local revertDefaultsBtn, revertDefaultsText = createTextButton(
+        parent,
+        UDim2.fromScale(0.8, .8),
+        UDim2.fromScale(0.55, 0.1),
+        "Reset to Default",
+        function ()
+            sliderBtn.position.x.scale = Config.DefaultConfigs.VOLUME
+            borderlessImg.image = love.graphics.newImage(Config.DefaultConfigs.BORDERLESS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            vsyncImg.image = love.graphics.newImage(Config.DefaultConfigs.VSYNC and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            resolutionText.text = "Resolution: " .. Config.Resolutions[Config.DefaultConfigs.RESOLUTION].width .. "x" .. Config.Resolutions[Config.DefaultConfigs.RESOLUTION].height
+            Config.ConfigTable = deepCopy(Config.DefaultConfigs)
+        end
+    )
+    table.insert(menu, revertDefaultsBtn)
+    table.insert(menu, revertDefaultsText)
+
+    return menu
 end
+
+-- Inicialización de los menus
+menus.menu = createMainMenu(listThing)
+menus.settings = createSettingsMenu(listThing)
+menus.keybinds = {} -- Aun no implementado
+showMenu("")
+
+-- -------------------------------------------
+-- -- Funciones Públicas
+-- -------------------------------------------
 
 function PauseMenu()
     if Gamestate == "playing" then
-        Gamestate = Gamestates[2]
-        for _,v in pairs(pauseMenuUi) do
-            v.visible = true
-        end
+        Gamestate = "paused"
+        pauseMenuContainer.visible = true
+        showMenu("menu")
     elseif Gamestate == "paused" then
-        Gamestate = Gamestates[1]
-        for _,v in pairs(pauseMenuUi) do
-            v.visible = false
-        end
+        print("resuming")
+        Gamestate = "playing"
+        pauseMenuContainer.visible = false
+        showMenu("") -- Oculta todos los sub-menus
     end
-
 end

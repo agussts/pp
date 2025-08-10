@@ -38,6 +38,7 @@ function timer:continue()
 end
 
 function timer:Destroy()
+    self:pause()
     for i,v in pairs(timers) do
         if v == self then
             table.remove(timers, i)
@@ -63,18 +64,16 @@ function timer:Destroy()
     return
 end
 
-function timer.after(time, callback, ...)
+function timer.after(time, callback)
     local self = timer.new(time)
     self.callback = callback
-    self.args = {...}
     table.insert(timersAfter, self)
     return self
 end
 
-function timer.every(time, callback, ...)
+function timer.every(time, callback)
     local self = timer.new(time)
     self.callback = callback
-    self.args = {...}
     table.insert(timersEvery, self)
     return self
 end
@@ -82,16 +81,15 @@ end
 
 function timer.update(dt)
     timer.passedTime = timer.passedTime + dt
-
     for i,v in pairs(timersEvery) do
         if timer.passedTime >= v.time + v._currTime then
-            v.callback(unpack(v.args))
+            v.callback()
             v:reset()
         end
     end
     for i,v in pairs(timersAfter) do
         if timer.passedTime >= v.time + v._currTime then
-            v.callback(unpack(v.args))
+            v.callback()
             v:Destroy()
         end
     end

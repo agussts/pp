@@ -23,9 +23,6 @@ love.load = function ()
 end
 
 love.keypressed = function (key)
-    if ListeningForInput then
-        SetPressedKey(key)
-    end
     if key == "escape" then
         PauseMenu()
     elseif key == Player.otherControls.dash then

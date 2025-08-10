@@ -4,27 +4,31 @@ local ConfigManager = {}
 
 ConfigManager.ConfigTable = {}
 ConfigManager.Resolutions = {
-    {width = 16, height = 9, scale = 0.025},
     {width = 320, height = 180, scale = 0.5},
     {width = 640, height = 360, scale = 1},
     {width = 1280, height = 720, scale = 2},
     {width = 1920, height = 1080, scale = 3},
 }
+ConfigManager.DefaultConfigs = {
+    BORDERLESS = false,
+    VSYNC = true,
+    RESOLUTION = 4,
+    VOLUME = 1,
+    PLEFT = "a",
+    PRIGHT = "d",
+    PUP = "w",
+    PDOWN = "s",
+    PDASH = "space",
+}
 
 function ConfigManager.init()
     --Configuracion Predeterminada
-    local configDefaultData = {
-        BORDERLESS = false,
-        VSYNC = true,
-        RESOLUTION = 4,
-        VOLUME = 1,
-    }
     --Resoluciones que se pueden elijir
     
     --Crea config.ini si no existe
     if love.filesystem.getInfo("config.ini") == nil then
         local data = ""
-        for i,v in pairs(configDefaultData) do
+        for i,v in pairs(ConfigManager.DefaultConfigs) do
             data = data..tostring(i).." = "..tostring(v).."\n"
         end
         love.filesystem.write("config.ini", data)
