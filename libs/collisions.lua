@@ -1,3 +1,7 @@
+---
+-- Modulo de colisiones para detectar choques entre objetos.
+--@module collisions
+
 local udim2 = require "guis.udim2"
 local collisions = {}
 
@@ -6,7 +10,12 @@ local types = {
     "box",
     "hitbox"
 }
-
+--- Crea una nueva colisión
+--@param type El tipo de colision, puede ser "box" o "hitbox"
+--@param enabled Si la colision empieza activada
+--@param onHit(otherCollider) La funcion que se llama cuando la colision ocurre
+--@usage local myCollision = collisions.new("box", true, function(otherCollider)
+--@return collider El collider creado
 collisions.new = function(type, enabled, onHit)
     local self = setmetatable({}, { __index = collisions })
 
@@ -42,10 +51,16 @@ collisions.new = function(type, enabled, onHit)
     error("Invalid collision type: " .. tostring(type) .. ". Valid types are: " .. table.concat(types, ", "))
 end
 
+---
+--Añade una etiqueta al collider
+--@param tagName Nombre de la etiqueta a añadir
 function collisions:AddTag(tagName)
     table.insert(self.tags, tagName)
 end
 
+---
+-- Elimina una etiqueta del collider
+--@param tagName Nombre de la etiqueta a quitar
 function collisions:RemoveTag(tagName)
     for i,v in pairs(self.tags) do
         if v == tagName then
@@ -55,11 +70,18 @@ function collisions:RemoveTag(tagName)
     end
 end
 
+---
+--Remplaza una etiqueta por otra
+--@param tagToReplace Nombre de la etiqueta a reemplazar
+--@param replacement Nombre de la nueva etiqueta
 function collisions:ReplaceTag(tagToReplace, replacement)
     self:RemoveTag(tagToReplace)
     self:AddTag(replacement)
 end
 
+---
+--Cambia el tipo de colision de un colider
+--@param typeName El nuevo tipo de colision, puede ser "box" o "hitbox"
 function collisions:ChangeType(typeName) 
     local typeFound = false
     if typeName == "hitbox" then
@@ -78,10 +100,16 @@ function collisions:ChangeType(typeName)
     error("Invalid collision type: " .. tostring(type) .. ". Valid types are: " .. table.concat(types, ", "))
 end
 
+---
+--Consigue todas las colisiones existentes
+--@return table Tabla de colisiones
 collisions.getCollisions = function()
     return addedCollisions
 end
 
+---
+--Actualiza la posicion del collider segun su velocidad
+--@param dt Delta time
 function collisions:UpdateSpeed(dt)
     local x, y = self.position:transformToPixels()
     local screenWidth, screenHeight = love.graphics.getPixelDimensions()
