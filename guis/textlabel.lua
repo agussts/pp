@@ -1,7 +1,6 @@
 ---
---@module textlabel
---@extends gui
 --@classmod textlabel
+--@extends gui
 
 local textlabel = {}
 

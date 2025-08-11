@@ -1,7 +1,7 @@
 ---
---@module frame
---@extends gui
 --@classmod frame
+--@extends gui
+
 local frame = {}
 
 local gui = require("guis.gui")

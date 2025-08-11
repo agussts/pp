@@ -1,7 +1,6 @@
 ---
---@module button
---@extends gui
 --@classmod button
+--@extends gui
 
 local button = {}
 

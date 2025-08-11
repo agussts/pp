@@ -1,7 +1,6 @@
 ---
---@module imagelabel
---@extends gui
 --@classmod imagelabel
+--@extends gui
 
 local imagelabel = {}
 

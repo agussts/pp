@@ -1,5 +1,4 @@
 ---
---@module connections
 --@classmod connections
 
 local connections = {}

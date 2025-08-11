@@ -1,5 +1,4 @@
 ---
---@module udim2
 --@classmod udim2
 local udim2 = {}
 

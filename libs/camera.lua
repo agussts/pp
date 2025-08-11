@@ -1,6 +1,5 @@
 ---
 -- Modulo de camara para gestionar la vista del juego
---@module camera
 --@classmod camera
 
 

@@ -1,5 +1,4 @@
 ---
---@module gui
 --@classmod gui
 
 local gui = {}

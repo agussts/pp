@@ -1,5 +1,4 @@
 ---
---@module basicGun
 --@classmod basicGun
 
 local gun = {}

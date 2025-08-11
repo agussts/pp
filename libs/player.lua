@@ -1,5 +1,4 @@
 ---
---@module player
 --@classmod player
 
 local module = {}

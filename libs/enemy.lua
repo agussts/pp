@@ -1,5 +1,4 @@
 ---
---@module enemy
 --@classmod enemy
 
 local enemy = {}

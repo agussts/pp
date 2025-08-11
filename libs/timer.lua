@@ -1,5 +1,4 @@
 ---
---@module timer
 --@classmod timer
 
 local timer = {}

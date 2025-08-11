@@ -1,7 +1,7 @@
 ---
---@module spamGun
---@extends basicGun
 --@classmod spamGun
+--@extends basicGun
+
 local gun = {}
 
 local basic = require("Guns.basic")
