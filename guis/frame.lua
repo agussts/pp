@@ -1,6 +1,6 @@
 ---
 --@classmod frame
---@extends gui
+--@see gui
 
 local frame = {}
 

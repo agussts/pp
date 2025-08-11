@@ -1,6 +1,6 @@
 ---
 --@classmod devGun
---@extends basicGun
+--@see basicGun
 
 local gun = {}
 

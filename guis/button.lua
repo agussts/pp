@@ -1,6 +1,6 @@
 ---
 --@classmod button
---@extends gui
+--@see gui
 
 local button = {}
 

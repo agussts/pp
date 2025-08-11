@@ -1,6 +1,6 @@
 ---
 --@classmod spamGun
---@extends basicGun
+--@see basicGun
 
 local gun = {}
 
