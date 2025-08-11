@@ -1,0 +1,238 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+
+<ul>
+  <li><a href="../doc.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/button.html">button</a></li>
+  <li><a href="../classes/frame.html">frame</a></li>
+  <li><a href="../classes/gui.html">gui</a></li>
+  <li><a href="../classes/imagelabel.html">imagelabel</a></li>
+  <li><a href="../classes/textlabel.html">textlabel</a></li>
+  <li><a href="../classes/udim2.html">udim2</a></li>
+  <li><a href="../classes/basicGun.html">basicGun</a></li>
+  <li><a href="../classes/devGun.html">devGun</a></li>
+  <li><a href="../classes/spamGun.html">spamGun</a></li>
+  <li><strong>camera</strong></li>
+  <li><a href="../classes/collisions.html">collisions</a></li>
+  <li><a href="../classes/connections.html">connections</a></li>
+  <li><a href="../classes/enemy.html">enemy</a></li>
+  <li><a href="../classes/player.html">player</a></li>
+  <li><a href="../classes/timer.html">timer</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>camera</code></h1>
+<p>Modulo de camara para gestionar la vista del juego</p>
+<p></p>
+
+
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#camera:update">camera:update (targetX, targetY)</a></td>
+	<td class="summary">Actualiza la camara al objetivo.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#camera:attach">camera:attach ()</a></td>
+	<td class="summary">Aplica las transformaciones de la camara</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#camera:detach">camera:detach ()</a></td>
+	<td class="summary">Restablece las transformaciones de la camara despues de dibujar el mundo.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#camera:screenToWorld">camera:screenToWorld (screenX, screenY)</a></td>
+	<td class="summary">Convierte coordenadas de la pantalla a las del mundo</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#camera:worldToScreen">camera:worldToScreen (worldX, worldY)</a></td>
+	<td class="summary">Convierte coordenadas del mundo a las de la pantalla</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "camera:update"></a>
+    <strong>camera:update (targetX, targetY)</strong>
+    </dt>
+    <dd>
+    Actualiza la camara al objetivo.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">targetX</span>
+         La posicion X del objetivo
+        </li>
+        <li><span class="parameter">targetY</span>
+         La posicion Y del objetivo
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">camera.<span class="function-name">update</span>(<span class="number">100</span>, <span class="number">200</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "camera:attach"></a>
+    <strong>camera:attach ()</strong>
+    </dt>
+    <dd>
+    Aplica las transformaciones de la camara
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">camera.<span class="function-name">attach</span>() ... camera.<span class="function-name">detach</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "camera:detach"></a>
+    <strong>camera:detach ()</strong>
+    </dt>
+    <dd>
+    Restablece las transformaciones de la camara despues de dibujar el mundo.
+Se usa antes de los interfaz para que se queden en la pantalla fijos.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">camera.<span class="function-name">attach</span>() ... camera.<span class="function-name">detach</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "camera:screenToWorld"></a>
+    <strong>camera:screenToWorld (screenX, screenY)</strong>
+    </dt>
+    <dd>
+    Convierte coordenadas de la pantalla a las del mundo
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">screenX</span>
+         La posicion X en la pantalla
+        </li>
+        <li><span class="parameter">screenY</span>
+         La posicion Y en la pantalla
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        worldX, worldY Las coordenadas en el mundo
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> mouseX, mouseY = camera.<span class="function-name">screenToWorld</span>(love.mouse.<span class="function-name">getPosition</span>())</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "camera:worldToScreen"></a>
+    <strong>camera:worldToScreen (worldX, worldY)</strong>
+    </dt>
+    <dd>
+    Convierte coordenadas del mundo a las de la pantalla
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">worldX</span>
+         La posicion X en el mundo
+        </li>
+        <li><span class="parameter">worldY</span>
+         La posicion Y en el mundo
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        screenX, screenY Las coordenadas en la pantalla
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> screenX, screenY = camera.<span class="function-name">worldToScreen</span>(<span class="number">100</span>, <span class="number">200</span>)</pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2025-08-11 22:04:02 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

@@ -1,0 +1,378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+
+<ul>
+  <li><a href="../doc.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
+
+
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/button.html">button</a></li>
+  <li><a href="../classes/frame.html">frame</a></li>
+  <li><a href="../classes/gui.html">gui</a></li>
+  <li><a href="../classes/imagelabel.html">imagelabel</a></li>
+  <li><a href="../classes/textlabel.html">textlabel</a></li>
+  <li><a href="../classes/udim2.html">udim2</a></li>
+  <li><a href="../classes/basicGun.html">basicGun</a></li>
+  <li><a href="../classes/devGun.html">devGun</a></li>
+  <li><a href="../classes/spamGun.html">spamGun</a></li>
+  <li><a href="../classes/camera.html">camera</a></li>
+  <li><strong>collisions</strong></li>
+  <li><a href="../classes/connections.html">connections</a></li>
+  <li><a href="../classes/enemy.html">enemy</a></li>
+  <li><a href="../classes/player.html">player</a></li>
+  <li><a href="../classes/timer.html">timer</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Class <code>collisions</code></h1>
+<p>Modulo de colisiones para detectar choques entre objetos.</p>
+<p></p>
+
+
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#collisions:new">collisions:new (type, enabled, onHit)</a></td>
+	<td class="summary">Crea una nueva colisión</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#collisions:AddTag">collisions:AddTag (tagName)</a></td>
+	<td class="summary">Añade una etiqueta al collider</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#collisions:RemoveTag">collisions:RemoveTag (tagName)</a></td>
+	<td class="summary">Elimina una etiqueta del collider</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#collisions:ReplaceTag">collisions:ReplaceTag (tagToReplace, replacement)</a></td>
+	<td class="summary">Remplaza una etiqueta por otra</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#collisions:ChangeType">collisions:ChangeType (typeName)</a></td>
+	<td class="summary">Cambia el tipo de colision de un colider</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#collisions:getCollisions">collisions:getCollisions ()</a></td>
+	<td class="summary">Consigue todas las colisiones existentes</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#collisions:UpdateSpeed">collisions:UpdateSpeed (dt)</a></td>
+	<td class="summary">Actualiza la posicion del collider segun su velocidad</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#collisions:getDirection">collisions:getDirection ()</a></td>
+	<td class="summary">Consigue la direccion del collider.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#collisions:Destroy">collisions:Destroy ()</a></td>
+	<td class="summary">Destruye el colider</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#collisions:check">collisions:check ()</a></td>
+	<td class="summary">Consigue todas las colisiones que estan adentro del colider.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "collisions:new"></a>
+    <strong>collisions:new (type, enabled, onHit)</strong>
+    </dt>
+    <dd>
+    Crea una nueva colisión
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">type</span>
+         El tipo de colision, puede ser "box" o "hitbox"
+        </li>
+        <li><span class="parameter">enabled</span>
+         Si la colision empieza activada
+        </li>
+        <li><span class="parameter">onHit</span>
+        (otherCollider) La funcion que se llama cuando la colision ocurre
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        collider El collider creado
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> myCollision = collisions.<span class="function-name">new</span>(<span class="string">"box"</span>, <span class="keyword">true</span>, <span class="keyword">function</span>(otherCollider)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "collisions:AddTag"></a>
+    <strong>collisions:AddTag (tagName)</strong>
+    </dt>
+    <dd>
+    Añade una etiqueta al collider
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tagName</span>
+         Nombre de la etiqueta a añadir
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myCollision:<span class="function-name">AddTag</span>(<span class="string">"nuevoTag"</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "collisions:RemoveTag"></a>
+    <strong>collisions:RemoveTag (tagName)</strong>
+    </dt>
+    <dd>
+    Elimina una etiqueta del collider
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tagName</span>
+         Nombre de la etiqueta a quitar
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myCollision:<span class="function-name">RemoveTag</span>(<span class="string">"nuevoTag"</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "collisions:ReplaceTag"></a>
+    <strong>collisions:ReplaceTag (tagToReplace, replacement)</strong>
+    </dt>
+    <dd>
+    Remplaza una etiqueta por otra
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tagToReplace</span>
+         Nombre de la etiqueta a reemplazar
+        </li>
+        <li><span class="parameter">replacement</span>
+         Nombre de la nueva etiqueta
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myCollision:<span class="function-name">ReplaceTag</span>(<span class="string">"antiguoTag"</span>, <span class="string">"nuevoTag"</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "collisions:ChangeType"></a>
+    <strong>collisions:ChangeType (typeName)</strong>
+    </dt>
+    <dd>
+    Cambia el tipo de colision de un colider
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">typeName</span>
+         El nuevo tipo de colision, puede ser "box" o "hitbox"
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myCollision:<span class="function-name">ChangeType</span>(<span class="string">"hitbox"</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "collisions:getCollisions"></a>
+    <strong>collisions:getCollisions ()</strong>
+    </dt>
+    <dd>
+    Consigue todas las colisiones existentes
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table Tabla de colisiones
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> allCollisions = collisions.<span class="function-name">getCollisions</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "collisions:UpdateSpeed"></a>
+    <strong>collisions:UpdateSpeed (dt)</strong>
+    </dt>
+    <dd>
+    Actualiza la posicion del collider segun su velocidad
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">dt</span>
+         Delta time
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myCollision:<span class="function-name">UpdateSpeed</span>(dt)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "collisions:getDirection"></a>
+    <strong>collisions:getDirection ()</strong>
+    </dt>
+    <dd>
+    Consigue la direccion del collider.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        number, number Velocidad X e Y del colider.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> speedX, speedY = myCollision:<span class="function-name">getDirection</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "collisions:Destroy"></a>
+    <strong>collisions:Destroy ()</strong>
+    </dt>
+    <dd>
+    Destruye el colider
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myCollision:<span class="function-name">Destroy</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "collisions:check"></a>
+    <strong>collisions:check ()</strong>
+    </dt>
+    <dd>
+    Consigue todas las colisiones que estan adentro del colider.
+Los "box" colider son los unicos que son repelidos al chocarse con otro, en otras palabras, no se atraviesan.
+Los "hitbox" colider no chocan con otros, son solo areas de deteccion.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        table Tabla con todas las colisiones entro del colider.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <li><pre class="example"><span class="keyword">local</span> hitting = myHitbox:<span class="function-name">check</span>()</pre></li>
+        <li><pre class="example">myCollision:<span class="function-name">check</span>()</pre></li>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2025-08-11 22:04:02 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
