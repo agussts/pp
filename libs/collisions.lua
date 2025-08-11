@@ -54,6 +54,7 @@ end
 ---
 --Añade una etiqueta al collider
 --@param tagName Nombre de la etiqueta a añadir
+--@usage myCollision:AddTag("nuevoTag")
 function collisions:AddTag(tagName)
     table.insert(self.tags, tagName)
 end
@@ -61,6 +62,7 @@ end
 ---
 -- Elimina una etiqueta del collider
 --@param tagName Nombre de la etiqueta a quitar
+--@usage myCollision:RemoveTag("nuevoTag")
 function collisions:RemoveTag(tagName)
     for i,v in pairs(self.tags) do
         if v == tagName then
@@ -74,6 +76,7 @@ end
 --Remplaza una etiqueta por otra
 --@param tagToReplace Nombre de la etiqueta a reemplazar
 --@param replacement Nombre de la nueva etiqueta
+--@usage myCollision:ReplaceTag("antiguoTag", "nuevoTag")
 function collisions:ReplaceTag(tagToReplace, replacement)
     self:RemoveTag(tagToReplace)
     self:AddTag(replacement)
@@ -82,6 +85,7 @@ end
 ---
 --Cambia el tipo de colision de un colider
 --@param typeName El nuevo tipo de colision, puede ser "box" o "hitbox"
+--@usage myCollision:ChangeType("hitbox")
 function collisions:ChangeType(typeName) 
     local typeFound = false
     if typeName == "hitbox" then
@@ -103,6 +107,7 @@ end
 ---
 --Consigue todas las colisiones existentes
 --@return table Tabla de colisiones
+--@usage local allCollisions = collisions.getCollisions()
 collisions.getCollisions = function()
     return addedCollisions
 end
@@ -110,6 +115,7 @@ end
 ---
 --Actualiza la posicion del collider segun su velocidad
 --@param dt Delta time
+--@usage myCollision:UpdateSpeed(dt)
 function collisions:UpdateSpeed(dt)
     local x, y = self.position:transformToPixels()
     local screenWidth, screenHeight = love.graphics.getPixelDimensions()
@@ -121,10 +127,17 @@ function collisions:UpdateSpeed(dt)
     self.position:offsetToScale()
 end
 
+---
+-- Consigue la direccion del collider.
+--@return number, number Velocidad X e Y del colider.
+--@usage local speedX, speedY = myCollision:getDirection()
 function collisions:getDirection()
     return self.speedX, self.speedY
 end
 
+---
+--Destruye el colider
+--@usage myCollision:Destroy()
 function collisions:Destroy()
     for i,v in pairs(addedCollisions) do
         if v == self then
@@ -139,6 +152,13 @@ function collisions:Destroy()
     return
 end
 
+---
+--Consigue todas las colisiones que estan adentro del colider.
+--Los "box" colider son los unicos que son repelidos al chocarse con otro, en otras palabras, no se atraviesan.
+--Los "hitbox" colider no chocan con otros, son solo areas de deteccion.
+--@return table Tabla con todas las colisiones entro del colider.
+--@usage local hitting = myHitbox:check()
+--@usage myCollision:check()
 function collisions:check()
     if not self.enabled then return end
     local hitting = {}
