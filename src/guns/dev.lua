@@ -4,7 +4,7 @@
 
 local gun = {}
 
-local basic = require("Guns.basic")
+local basic = require("src.guns.basic")
 
 gun.new = function()
     local self = basic.new()
