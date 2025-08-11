@@ -1,2 +1,2 @@
 doc-site:
-	ldoc .
+	ldoc -c config.ld .
