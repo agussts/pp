@@ -1,2 +1,2 @@
 doc-site:
-	ldoc guis guns libs src -o doc
+	ldoc guis guns libs src -o doc -i index
