@@ -1,3 +1,8 @@
+---
+--@module textlabel
+--@extends gui
+--@classmod textlabel
+
 local textlabel = {}
 
 local gui = require("guis.gui")

@@ -1,3 +1,8 @@
+---
+--@module imagelabel
+--@extends gui
+--@classmod imagelabel
+
 local imagelabel = {}
 
 local gui = require("guis.gui")

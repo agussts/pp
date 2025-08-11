@@ -1,3 +1,7 @@
+---
+--@module timer
+--@classmod timer
+
 local timer = {}
 timer.passedTime = 0
 

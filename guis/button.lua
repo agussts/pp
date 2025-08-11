@@ -1,3 +1,8 @@
+---
+--@module button
+--@extends gui
+--@classmod button
+
 local button = {}
 
 local gui = require("guis.gui")

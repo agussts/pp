@@ -1,3 +1,7 @@
+---
+--@module enemy
+--@classmod enemy
+
 local enemy = {}
 local collisions = require("libs.collisions")
 local timer      = require("libs.timer")

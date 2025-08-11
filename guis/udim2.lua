@@ -1,3 +1,6 @@
+---
+--@module udim2
+--@classmod udim2
 local udim2 = {}
 
 udim2.__index = udim2

@@ -1,3 +1,7 @@
+---
+--@module player
+--@classmod player
+
 local module = {}
 
 local collisions = require("libs.collisions")

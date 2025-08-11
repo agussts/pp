@@ -1,3 +1,7 @@
+---
+--@module basicGun
+--@classmod basicGun
+
 local gun = {}
 local collisions = require("libs.collisions")
 local timer      = require("libs.timer")

@@ -1,3 +1,3 @@
 doc-site:
-	ldoc guis guns libs src -o doc
+	ldoc guis guns libs -o doc
 	mv doc/doc.html doc/index.html

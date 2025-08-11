@@ -1,3 +1,7 @@
+---
+--@module connections
+--@classmod connections
+
 local connections = {}
 
 -- Conecta una funcion con un evento
