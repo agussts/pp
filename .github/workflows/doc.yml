@@ -8,23 +8,23 @@ on:
     branches:
     - main
     - master
-  workflow_dispatch:
+  workflow_dispatch: 
 
 jobs:
   build:
     name: Build docs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Lua and LuaRocks
         uses: leafo/gh-actions-luarocks@v4
       
-      - name: Install LDoc
+      - name: Install ldoc
         run: luarocks install ldoc
 
-      - name: Build documentation
+      - name: Build docs
         run: ldoc -c config.ld .
 
       - name: Deploy
