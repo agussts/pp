@@ -1,34 +1,35 @@
-name: Build Docs
+name: Build and Deploy LDoc
+
 on:
-  pull_request:
-    branches:
-    - master
   push:
     branches:
-    - master
-  workflow_dispatch: 
+      - main
+      - master
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build docs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Lua
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Lua and LDoc
         uses: leafo/gh-actions-lua@v8
         with:
-          luaVersion: 5.4
-      - name: Setup Lua Rocks
-        uses: leafo/gh-actions-luarocks@v4
-      - name: Install ldoc
+          luaVersion: '5.4'
+
+      - name: Install LDoc via LuaRocks
         run: luarocks install ldoc
 
-      - name: Build docs
+      - name: Build documentation
         run: ldoc -c config.ld .
 
-      - name: Deploy
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          path: './doc'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
