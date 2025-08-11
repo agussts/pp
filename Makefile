@@ -1,2 +1,2 @@
 doc-site:
-	ldoc --config config.ld
+	ldoc guis guns libs src
