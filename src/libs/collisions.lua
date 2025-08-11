@@ -2,7 +2,7 @@
 -- Modulo de colisiones para detectar choques entre objetos.
 --@classmod collisions
 
-local udim2 = require "guis.udim2"
+local udim2 = require "src.guis.udim2"
 local collisions = {}
 
 local addedCollisions = {}

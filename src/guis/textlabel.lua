@@ -4,7 +4,7 @@
 
 local textlabel = {}
 
-local gui = require("guis.gui")
+local gui = require("src.guis.gui")
 
 function textlabel.new(text)
     local self = gui.new()

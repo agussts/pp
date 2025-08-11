@@ -1,10 +1,10 @@
 --Requiere todos los modulos
-require("src.require")  
+require("src.utils.require")  
 Config.init()
 
 --Requiere funciones
-require("src.pausemenu")
-require("libs.connections")
+require("src.utils.pausemenu")
+require("src.libs.connections")
 
 love.load = function ()
     --Crea a el jugador y el enemigo

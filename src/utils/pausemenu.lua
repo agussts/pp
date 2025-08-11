@@ -67,6 +67,26 @@ local function createTextButton(parent, position, size, text, callback)
     return btn, textlabel
 end
 
+
+-- Helper para crear un frame con texto
+local function createTextFrame(parent, position, size, text)
+    local frame = Frame.new()
+    frame:setParent(parent)
+    frame.position = position
+    frame.size = size
+    frame.bgColor = {0.3, 0.3, 0.3, 1}
+
+    local textlabel = Textlabel.new(text)
+    textlabel:setParent(frame)
+    textlabel.position = UDim2.fromScale(0.5, 0.5)
+    textlabel.size = UDim2.fromScale(1, 1)
+    textlabel.anchorPoint = {0.5, 0.5}
+    textlabel.textColor = {1, 1, 1, 1}
+    textlabel.zIndex = 1
+
+    return frame, textlabel
+end
+
 -- Helper para crear un boton con imagen
 local function createImageButton(parent, position, size, imagePath, callback)
     local btn = Button.new(callback)
@@ -157,6 +177,19 @@ local function createSettingsMenu(parent)
     titleText.textColor = {1, 1, 1, 1}
     table.insert(menu, titleText)
 
+    -- Boton para acceder a keybinds
+    local keybindsBtn, keybindsText = createTextButton(
+        parent,
+        UDim2.fromScale(0.5, 0.15),
+        UDim2.fromScale(0.8, 0.1),
+        "Keybinds",
+        function ()
+            showMenu("keybinds")
+        end
+    )
+    table.insert(menu, keybindsBtn)
+    table.insert(menu, keybindsText)
+
     -- Logica para Checkbox
     local function createCheckBox(pos, text, name)
         local btn
@@ -239,13 +272,16 @@ local function createSettingsMenu(parent)
     table.insert(menu, resRightImg)
 
     -- Logica para el Slider de Volumen
-    local sliderFrame = Frame.new()
-    sliderFrame:setParent(parent)
-    sliderFrame.position = UDim2.fromScale(0.5, 0.7)
-    sliderFrame.size = UDim2.fromScale(0.9, 0.05)
+    local sliderFrame, sliderText = createTextFrame(
+        parent,
+        UDim2.fromScale(0.5, 0.7),
+        UDim2.fromScale(0.9, 0.05),
+        "Volume"
+    )
     sliderFrame.anchorPoint = {0.5, 0.5}
     sliderFrame.bgColor = {0.5, 0.5, 0.5, 1}
     table.insert(menu, sliderFrame)
+    table.insert(menu, sliderText)
 
     local sliderBtn = Button.new()
     sliderBtn:setParent(sliderFrame)
@@ -257,7 +293,7 @@ local function createSettingsMenu(parent)
     local sliderImg = ImageLabel.new("assets/sprites/slider.png")
     sliderImg:setParent(sliderBtn)
     sliderImg.size = UDim2.fromScale(1, 1)
-    sliderImg.zIndex = 1
+    sliderImg.zIndex = 2
     
     sliderBtn.whenPressing = function ()
         local sliderX, _ = sliderFrame:getRenderPosition()
@@ -335,10 +371,38 @@ local function createSettingsMenu(parent)
     return menu
 end
 
+local function createKeybindsMenu(parent)
+    local menu = {}
+
+    local titleText = Textlabel.new("Keybinds")
+    titleText:setParent(parent)
+    titleText.position = UDim2.fromScale(0, 0)
+    titleText.size = UDim2.fromScale(1, 0.1)
+    titleText.textColor = {1, 1, 1, 1}
+    table.insert(menu, titleText)
+
+    local function createKeybindEntry(actionName, position, text)
+        local changeBtn, actionText = createTextButton(
+            parent,
+            position,
+            UDim2.fromScale(.8, .1),
+            text.. Config.ConfigTable[actionName],
+            function ()
+                print("Change keybind for: " .. actionName)
+            end
+        )
+        return changeBtn, actionText
+    end
+    local changeBtn, actionText = createKeybindEntry("PLEFT", UDim2.fromScale(0.5, 0.2), "Move left: ")
+    table.insert(menu, actionText)
+    table.insert(menu, changeBtn)
+    
+    return menu
+end
 -- Inicialización de los menus
 menus.menu = createMainMenu(listThing)
 menus.settings = createSettingsMenu(listThing)
-menus.keybinds = {} -- Aun no implementado
+menus.keybinds = createKeybindsMenu(listThing)
 showMenu("")
 
 -- -------------------------------------------

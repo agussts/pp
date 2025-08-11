@@ -4,7 +4,7 @@
 
 local imagelabel = {}
 
-local gui = require("guis.gui")
+local gui = require("src.guis.gui")
 
 function imagelabel.new(image)
     local self = gui.new()

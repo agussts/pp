@@ -4,7 +4,7 @@
 
 local frame = {}
 
-local gui = require("guis.gui")
+local gui = require("src.guis.gui")
 
 function frame.new(position, size)
     local self = gui.new()

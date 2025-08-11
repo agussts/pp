@@ -3,9 +3,9 @@
 
 local module = {}
 
-local collisions = require("libs.collisions")
-local timer      = require("libs.timer")
-local udim2      = require("guis.udim2")
+local collisions = require("src.libs.collisions")
+local timer      = require("src.libs.timer")
+local udim2      = require("src.guis.udim2")
 
 module.name = "player"
 module.controlsMovement = {

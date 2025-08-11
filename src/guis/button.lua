@@ -4,7 +4,7 @@
 
 local button = {}
 
-local gui = require("guis.gui")
+local gui = require("src.guis.gui")
 
 function button.new(callback)
     local self = gui.new()

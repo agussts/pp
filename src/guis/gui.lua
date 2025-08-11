@@ -4,7 +4,7 @@
 local gui = {}
 
 local addedGuis = {}
-local udim2 = require("guis.udim2")
+local udim2 = require("src.guis.udim2")
 
 --Crea un nuevo gui
 function gui.new()
