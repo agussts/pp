@@ -3,6 +3,8 @@
 local ConfigManager = {}
 
 ConfigManager.ConfigTable = {}
+ConfigManager.SavedConfigs = {}
+
 ConfigManager.Resolutions = {
     {width = 320, height = 180, scale = 0.5},
     {width = 640, height = 360, scale = 1},
@@ -12,7 +14,7 @@ ConfigManager.Resolutions = {
 ConfigManager.DefaultConfigs = {
     BORDERLESS = false,
     VSYNC = true,
-    RESOLUTION = 4,
+    RESOLUTION = 3,
     VOLUME = 1,
     PLEFT = "a",
     PRIGHT = "d",
@@ -21,10 +23,23 @@ ConfigManager.DefaultConfigs = {
     PDASH = "space",
 }
 
+local function tableClone(original)
+    local copy = {}
+    for i, v in pairs(original) do
+        if type(i) == "table" then
+            copy[i] = tableClone(v)
+        else
+            copy[i] = v
+        end
+    end
+    return copy
+end
+
 function ConfigManager.init()
-    --Configuracion Predeterminada
-    --Resoluciones que se pueden elijir
-    
+    local tempConfigTable = {}
+
+    tempConfigTable = tableClone(ConfigManager.DefaultConfigs)
+
     --Crea config.ini si no existe
     if love.filesystem.getInfo("config.ini") == nil then
         local data = ""
@@ -34,24 +49,37 @@ function ConfigManager.init()
         love.filesystem.write("config.ini", data)
     end
 
-    --Saca las lineas del archivo config.ini
-    ConfigFile = love.filesystem.lines("config.ini")
-
-    --Escribe los datos del archivo config.ini a la tabla ConfigTable
-    for line in ConfigFile do
-
-        local i, v = line:match("^(%S+) = (%S+)$") 
-        if v == "true" then 
+    --Saca las lineas del archivo config.ini, y sobreescribe variables que ya tenga en tempConfigTable
+    local configFile = love.filesystem.lines("config.ini")
+    for line in configFile do
+        local i, v = line:match("^(%S+) = (%S+)$")
+        if v == "true" then
             v = true
         elseif v == "false" then
             v = false
         elseif tonumber(v) ~= nil then
             v = tonumber(v)
         end
-        
-        ConfigManager.ConfigTable[i] = v
+
+        tempConfigTable[i] = v
     end
 
+    --Escribe los datos de tempConfigTable al archivo config.ini
+    local data = ""
+    for i,v in pairs(tempConfigTable) do
+        if type(v) == "boolean" then
+            v = v and "true" or "false"
+        else
+            v = tostring(v)
+        end
+        data = data..tostring(i).." = "..v.."\n"
+    end
+    love.filesystem.write("config.ini", data)
+
+    --Escribe los datos del tempConfigTable (que es identico a config.ini) a la tabla ConfigTable
+    ConfigManager.ConfigTable = tableClone(tempConfigTable)
+    ConfigManager.SavedConfigs = tableClone(tempConfigTable)
+    tempConfigTable =  nil
     --Actualiza la ventana a los ajustes actuales
     ConfigManager.updateWindow()
 end
@@ -70,12 +98,20 @@ end
 
 --Carga los ajustes de configuracion al archivo para guardar
 function ConfigManager.saveConfig()
+    ConfigManager.SavedConfigs = {}
     local data = ""
     for i,v in pairs(ConfigManager.ConfigTable) do
-        v = tostring(v)
+        ConfigManager.SavedConfigs[i] = v
+        if type(v) == "boolean" then
+            v = v and "true" or "false"
+        else
+            v = tostring(v)
+        end
         data = data..tostring(i).." = "..v.."\n"
     end
     love.filesystem.write("config.ini", data)
 end
+
+ConfigManager.init()
 
 return ConfigManager

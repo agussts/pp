@@ -1,6 +1,6 @@
 --Requiere todos los modulos
 require("src.utils.require")  
-Config.init()
+--Config.init()
 
 --Requiere funciones
 require("src.utils.pausemenu")

@@ -1,15 +1,19 @@
 --Requiere modulos
-PlayerModule = require("src.libs.player")
-EnemyModule = require("src.libs.enemy")
-ColliderModule = require("src.libs.collisions")
-GunModule = require("src.guns.dev")
-Gun = GunModule.new()
+Config = require("src.utils.config_manager")
+
 Timer = require("src.libs.timer")
+ColliderModule = require("src.libs.collisions")
 UDim2 = require("src.guis.udim2")
 Guis = require("src.guis.gui")
-Button = require("src.guis.button")
-Textlabel = require("src.guis.textlabel")
-Frame = require("src.guis.frame")
-ImageLabel = require("src.guis.imagelabel")
-Config = require("src.utils.config_manager")
+
+    Button = require("src.guis.button")
+    Textlabel = require("src.guis.textlabel")
+    Frame = require("src.guis.frame")
+    ImageLabel = require("src.guis.imagelabel")
+
+PlayerModule = require("src.libs.player")
+EnemyModule = require("src.libs.enemy")
+GunModule = require("src.guns.dev")
+Gun = GunModule.new()
+    
 Camera = require("src.libs.camera")

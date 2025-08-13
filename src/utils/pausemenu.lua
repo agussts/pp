@@ -303,7 +303,7 @@ local function createSettingsMenu(parent)
         local newScale = (x - sliderX) / sliderWidth
         
         sliderBtn.position = UDim2.fromScale(newScale, 0.5)
-        Config.ConfigTable.VOLUME = newScale
+        Config.ConfigTable.VOLUME = math.floor(newScale * 100) / 100 -- Redondea a dos decimales
     end
     table.insert(menu, sliderBtn)
     table.insert(menu, sliderImg)
@@ -379,24 +379,47 @@ local function createKeybindsMenu(parent)
     titleText.position = UDim2.fromScale(0, 0)
     titleText.size = UDim2.fromScale(1, 0.1)
     titleText.textColor = {1, 1, 1, 1}
-    table.insert(menu, titleText)
+    table.insert(menu, titleText)               
 
     local function createKeybindEntry(actionName, position, text)
-        local changeBtn, actionText = createTextButton(
+        local changeBtn, actionText
+        changeBtn, actionText = createTextButton(
             parent,
             position,
             UDim2.fromScale(.8, .1),
             text.. Config.ConfigTable[actionName],
             function ()
-                print("Change keybind for: " .. actionName)
+                local shouldRegisterKey = true
+                local function onKeyPress(key)
+                    if not shouldRegisterKey then return end
+                    Config.ConfigTable[actionName] = key
+                    actionText.text = text.. key
+                end
+                Once("keyPressed", onKeyPress)
+                Timer.after(5, function() 
+                    print("took too long to press a key, reverting to previous keybind")
+                    shouldRegisterKey = false
+                end)
             end
         )
         return changeBtn, actionText
     end
-    local changeBtn, actionText = createKeybindEntry("PLEFT", UDim2.fromScale(0.5, 0.2), "Move left: ")
-    table.insert(menu, actionText)
-    table.insert(menu, changeBtn)
-    
+    local leftBtn, leftText = createKeybindEntry("PLEFT", UDim2.fromScale(0.5, 0.2), "Move left: ")
+    table.insert(menu, leftBtn)
+    table.insert(menu, leftText)
+
+    local rightBtn, rightText = createKeybindEntry("PRIGHT", UDim2.fromScale(0.5, 0.4), "Move right: ")
+    table.insert(menu, rightBtn)
+    table.insert(menu, rightText)
+
+    local upBtn, upText = createKeybindEntry("PUP", UDim2.fromScale(0.5, 0.6), "Move up: ")
+    table.insert(menu, upBtn)
+    table.insert(menu, upText)
+
+    local downBtn, downText = createKeybindEntry("PDOWN", UDim2.fromScale(0.5, 0.8), "Move down: ")
+    table.insert(menu, downBtn)
+    table.insert(menu, downText)
+
     return menu
 end
 -- Inicialización de los menus
