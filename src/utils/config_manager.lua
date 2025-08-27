@@ -21,6 +21,7 @@ ConfigManager.DefaultConfigs = {
     PUP = "w",
     PDOWN = "s",
     PDASH = "space",
+    PBACK = "escape",
 }
 
 local function tableClone(original)

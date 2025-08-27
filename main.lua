@@ -24,24 +24,27 @@ love.keypressed = function(key)
 end
 
 Connect("keyPressed", function (key)
-    if key == "escape" then
-        PauseMenu()
-    elseif key == Player.otherControls.dash then
-        --Funcionamiento de dash
-        Player.speed = Player.speed * 3
-        Player.collision:ChangeType("hitbox")
-        --Daño del dash
-        Player.collision.onHit = function (otherCollider)
-            if otherCollider.link ~= nil and otherCollider.link.health ~= nil then
-                otherCollider.link.health = otherCollider.link.health - 1
+    if Gamestate == "playing" then
+        if key == Config.SavedConfigs.PDASH then
+            --Funcionamiento de dash
+            Player.speed = Player.speed * 3
+            Player.collision:ChangeType("hitbox")
+            --Daño del dash
+            Player.collision.onHit = function (otherCollider)
+                if otherCollider.link ~= nil and otherCollider.link.health ~= nil then
+                    otherCollider.link.health = otherCollider.link.health - 1
+                end
             end
+            --Detiene el dash
+            Timer.after(0.2, function()
+                Player.speed = Player.speed / 3
+                Player.collision.onHit = function () end
+                Player.collision:ChangeType("box")
+            end)
         end
-        --Detiene el dash
-        Timer.after(0.2, function()
-            Player.speed = Player.speed / 3
-            Player.collision.onHit = function () end
-            Player.collision:ChangeType("box")
-        end)
+    end
+    if key == Config.SavedConfigs.PBACK then
+        PauseMenu()
     end
 end)
 

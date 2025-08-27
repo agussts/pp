@@ -13,7 +13,7 @@ local types = {
 --- Crea una nueva colisión
 --@param type El tipo de colision, puede ser "box" o "hitbox"
 --@param enabled Si la colision empieza activada
---@param onHit(otherCollider) La funcion que se llama cuando la colision ocurre
+--@param onHit La funcion que se llama cuando la colision ocurre
 --@usage local myCollision = collisions.new("box", true, function(otherCollider)
 --@return collider El collider creado
 collisions.new = function(type, enabled, onHit)

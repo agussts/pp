@@ -294,7 +294,6 @@ local function createSettingsMenu(parent)
     sliderImg:setParent(sliderBtn)
     sliderImg.size = UDim2.fromScale(1, 1)
     sliderImg.zIndex = 2
-    
     sliderBtn.whenPressing = function ()
         local sliderX, _ = sliderFrame:getRenderPosition()
         local sliderWidth, _ = sliderFrame:getRenderSize()
@@ -371,11 +370,11 @@ local function createSettingsMenu(parent)
     return menu
 end
 
-local function createKeybindsMenu(parent)
+local function createKeybindsMenu()
     local menu = {}
+    local keybindEntries = {}
 
     local titleText = Textlabel.new("Keybinds")
-    titleText:setParent(parent)
     titleText.position = UDim2.fromScale(0, 0)
     titleText.size = UDim2.fromScale(1, 0.1)
     titleText.textColor = {1, 1, 1, 1}
@@ -384,48 +383,69 @@ local function createKeybindsMenu(parent)
     local function createKeybindEntry(actionName, position, text)
         local changeBtn, actionText
         changeBtn, actionText = createTextButton(
-            parent,
+            nil,
             position,
-            UDim2.fromScale(.8, .1),
-            text.. Config.ConfigTable[actionName],
+            UDim2.fromScale(.3, .1),
+            text.. (Config.ConfigTable[actionName] or "None"),
             function ()
-                local shouldRegisterKey = true
+                local prevKey = Config.ConfigTable[actionName]
                 local function onKeyPress(key)
-                    if not shouldRegisterKey then return end
+                    Disconnect("keyPressed", onKeyPress)
+
+                    for i,v in pairs(Config.ConfigTable) do
+                        if i ~= actionName and v == key then
+                            Config.ConfigTable[i] = nil
+                            keybindEntries[i].actionText.text = keybindEntries[i].actionText.text:gsub("..$", " None")
+                        end
+                    end
+
                     Config.ConfigTable[actionName] = key
                     actionText.text = text.. key
                 end
-                Once("keyPressed", onKeyPress)
+                Connect("keyPressed", onKeyPress)
                 Timer.after(5, function() 
-                    print("took too long to press a key, reverting to previous keybind")
-                    shouldRegisterKey = false
+                    if ConnectionExists("keyPressed", onKeyPress) then
+                        Disconnect("keyPressed", onKeyPress)
+                        print("took too long to press a key, reverting to previous keybind")
+                        actionText.text = text .. (prevKey or "None")
+                    end
                 end)
             end
         )
+
+        keybindEntries[actionName] = {button = changeBtn, actionText = actionText}
         return changeBtn, actionText
     end
-    local leftBtn, leftText = createKeybindEntry("PLEFT", UDim2.fromScale(0.5, 0.2), "Move left: ")
+    local leftBtn, leftText = createKeybindEntry("PLEFT", UDim2.fromScale(0.3, 0.2), "Move left: ")
     table.insert(menu, leftBtn)
     table.insert(menu, leftText)
 
-    local rightBtn, rightText = createKeybindEntry("PRIGHT", UDim2.fromScale(0.5, 0.4), "Move right: ")
+    local rightBtn, rightText = createKeybindEntry("PRIGHT", UDim2.fromScale(0.3, 0.4), "Move right: ")
     table.insert(menu, rightBtn)
     table.insert(menu, rightText)
 
-    local upBtn, upText = createKeybindEntry("PUP", UDim2.fromScale(0.5, 0.6), "Move up: ")
+    local upBtn, upText = createKeybindEntry("PUP", UDim2.fromScale(0.3, 0.6), "Move up: ")
     table.insert(menu, upBtn)
     table.insert(menu, upText)
 
-    local downBtn, downText = createKeybindEntry("PDOWN", UDim2.fromScale(0.5, 0.8), "Move down: ")
+    local downBtn, downText = createKeybindEntry("PDOWN", UDim2.fromScale(0.3, 0.8), "Move down: ")
     table.insert(menu, downBtn)
     table.insert(menu, downText)
+
+    local dashBtn, dashText = createKeybindEntry("PDASH", UDim2.fromScale(0.7, 0.2), "Dash: ")
+    table.insert(menu, dashBtn)
+    table.insert(menu, dashText)
+
+    local backBtn, backText = createKeybindEntry("PBACK", UDim2.fromScale(0.7, 0.4), "Back: ")
+    table.insert(menu, backBtn)
+    table.insert(menu, backText)
 
     return menu
 end
 -- Inicialización de los menus
 menus.menu = createMainMenu(listThing)
 menus.settings = createSettingsMenu(listThing)
-menus.keybinds = createKeybindsMenu(listThing)
+menus.keybinds = createKeybindsMenu()
 showMenu("")
 
 -- -------------------------------------------
@@ -440,7 +460,19 @@ function PauseMenu()
     elseif Gamestate == "paused" then
         print("resuming")
         Gamestate = "playing"
+        showMenu("")
+        -- local psStatePos = 1
+        -- for i,v in pairs(PauseStates) do
+        --     if v == PauseState then
+        --         psStatePos = i
+        --         break
+        --     end
+        -- end
+        -- if psStatePos == 1 then
+        --     showMenu("") -- Oculta todos los sub-menus
+        -- else
+        --     showMenu(PauseStates[psStatePos-1])
+        -- end
         pauseMenuContainer.visible = false
-        showMenu("") -- Oculta todos los sub-menus
     end
 end
