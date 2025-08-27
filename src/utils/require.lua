@@ -1,9 +1,11 @@
 --Requiere modulos
 Config = require("src.utils.config_manager")
 
+Signal = require("src.libs.signal")
 Timer = require("src.libs.timer")
 ColliderModule = require("src.libs.collisions")
 UDim2 = require("src.guis.udim2")
+Animation = require("src.libs.animation")
 Guis = require("src.guis.gui")
 
     Button = require("src.guis.button")

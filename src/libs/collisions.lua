@@ -15,7 +15,7 @@ local types = {
 --@param enabled Si la colision empieza activada
 --@param onHit La funcion que se llama cuando la colision ocurre
 --@usage local myCollision = collisions.new("box", true, function(otherCollider)
---@return collider El collider creado
+--@return El collider creado
 collisions.new = function(type, enabled, onHit)
     local self = setmetatable({}, { __index = collisions })
 
@@ -106,7 +106,7 @@ end
 
 ---
 --Consigue todas las colisiones existentes
---@return table Tabla de colisiones
+--@return Tabla de colisiones
 --@usage local allCollisions = collisions.getCollisions()
 collisions.getCollisions = function()
     return addedCollisions
@@ -129,7 +129,7 @@ end
 
 ---
 -- Consigue la direccion del collider.
---@return number, number Velocidad X e Y del colider.
+--@return Velocidad X e Y del colider.
 --@usage local speedX, speedY = myCollision:getDirection()
 function collisions:getDirection()
     return self.speedX, self.speedY
@@ -156,7 +156,7 @@ end
 --Consigue todas las colisiones que estan adentro del colider.
 --Los "box" colider son los unicos que son repelidos al chocarse con otro, en otras palabras, no se atraviesan.
 --Los "hitbox" colider no chocan con otros, son solo areas de deteccion.
---@return table Tabla con todas las colisiones entro del colider.
+--@return Tabla con todas las colisiones entro del colider.
 --@usage local hitting = myHitbox:check()
 --@usage myCollision:check()
 function collisions:check()

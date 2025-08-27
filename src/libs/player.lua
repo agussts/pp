@@ -22,10 +22,11 @@ module.controlsMovement = {
 module.new = function(spriteName, width, height)
     local self = setmetatable({}, { __index = module })
 
-    self.sprite = love.graphics.newImage(spriteName)
+    self.sprite = Animation.new(spriteName, 32, 32, 3, 3, 0.1)
+    self.size = udim2.new(width, 0, height, 0)
     self.collision = collisions.new("box")
     self.collision.position = udim2.new(0, 0, 0, 0)
-    self.collision.size = udim2.new(width, 0, height, 0)
+    self.collision.size = udim2.new(width * 0.8, 0, height * 0.8, 0)
     self.collision:AddTag("player")
     self.health = 100
     self.collision.link = self
