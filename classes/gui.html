@@ -31,6 +31,10 @@
   <li><a href="../doc.html">Index</a></li>
 </ul>
 
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
 
 
 <h2>Classes</h2>
@@ -62,22 +66,255 @@
 <div id="content">
 
 <h1>Class <code>gui</code></h1>
-<p></p>
+<p>Libreria de componentes de GUI</p>
 <p></p>
 
 
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#gui:new">gui:new ()</a></td>
+	<td class="summary">Crea un nuevo gui</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#gui:isHovering">gui:isHovering ()</a></td>
+	<td class="summary">Determina si el mouse esta sobre el gui</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#gui:getRenderSize">gui:getRenderSize ()</a></td>
+	<td class="summary">Devuelve el tamaño del GUI al que se le tiene que renderizar</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#gui:getRenderPosition">gui:getRenderPosition ()</a></td>
+	<td class="summary">Devuelve la posicion del GUI al que se le tiene que renderizar</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#gui:setParent">gui:setParent (parentGui)</a></td>
+	<td class="summary">Establece el padre del GUI</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#gui:calculateRenderProperties">gui:calculateRenderProperties ()</a></td>
+	<td class="summary">Calcula las propiedades de renderizado del GUI</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#gui:getTopLevelGuis">gui:getTopLevelGuis ()</a></td>
+	<td class="summary">Devuelve una lista de guis que no tienen padre</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#gui:getAll">gui:getAll ()</a></td>
+	<td class="summary">Devuelve todos los guis añadidos</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#gui:Destroy">gui:Destroy ()</a></td>
+	<td class="summary">Destruye el gui</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "gui:new"></a>
+    <strong>gui:new ()</strong>
+    </dt>
+    <dd>
+    Crea un nuevo gui
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (gui) Instancia del gui
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> baseGui = gui.<span class="function-name">new</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "gui:isHovering"></a>
+    <strong>gui:isHovering ()</strong>
+    </dt>
+    <dd>
+    Determina si el mouse esta sobre el gui
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (boolean) Si el mouse esta sobre el gui
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">if</span> gui:<span class="function-name">isHovering</span>() <span class="keyword">then</span>
+ <span class="global">print</span>(<span class="string">"El mouse esta sobre el gui"</span>)
+<span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "gui:getRenderSize"></a>
+    <strong>gui:getRenderSize ()</strong>
+    </dt>
+    <dd>
+    Devuelve el tamaño del GUI al que se le tiene que renderizar
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> width, height = gui:<span class="function-name">getRenderSize</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "gui:getRenderPosition"></a>
+    <strong>gui:getRenderPosition ()</strong>
+    </dt>
+    <dd>
+    Devuelve la posicion del GUI al que se le tiene que renderizar
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> x, y = gui:<span class="function-name">getRenderPosition</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "gui:setParent"></a>
+    <strong>gui:setParent (parentGui)</strong>
+    </dt>
+    <dd>
+    Establece el padre del GUI
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">parentGui</span>
+         (gui) El nuevo padre del GUI
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">gui:<span class="function-name">setParent</span>(nuevoPadre)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "gui:calculateRenderProperties"></a>
+    <strong>gui:calculateRenderProperties ()</strong>
+    </dt>
+    <dd>
+    Calcula las propiedades de renderizado del GUI
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">gui:<span class="function-name">calculateRenderProperties</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "gui:getTopLevelGuis"></a>
+    <strong>gui:getTopLevelGuis ()</strong>
+    </dt>
+    <dd>
+    Devuelve una lista de guis que no tienen padre
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (table) Una lista de guis que no tienen padre
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> topLevelGuis = gui.<span class="function-name">getTopLevelGuis</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "gui:getAll"></a>
+    <strong>gui:getAll ()</strong>
+    </dt>
+    <dd>
+    Devuelve todos los guis añadidos
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (table) Una lista de todos los guis añadidos
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> allGuis = gui.<span class="function-name">getAll</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "gui:Destroy"></a>
+    <strong>gui:Destroy ()</strong>
+    </dt>
+    <dd>
+    Destruye el gui
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">gui:<span class="function-name">Destroy</span>()</pre>
+    </ul>
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2025-08-28 00:14:49 </i>
+<i style="float:right;">Last updated 2025-08-28 00:48:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

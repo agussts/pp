@@ -31,6 +31,10 @@
   <li><a href="../doc.html">Index</a></li>
 </ul>
 
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
 
 
 <h2>Classes</h2>
@@ -62,22 +66,297 @@
 <div id="content">
 
 <h1>Class <code>timer</code></h1>
-<p></p>
+<p>Modulo para manejar temporizadores.</p>
 <p></p>
 
 
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#timer:new">timer:new (time)</a></td>
+	<td class="summary">Crea un nuevo temporizador</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#timer:check">timer:check ()</a></td>
+	<td class="summary">Verifica si el temporizador ha terminado.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#timer:reset">timer:reset ()</a></td>
+	<td class="summary">Reinicia el temporizador.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#timer:pause">timer:pause ()</a></td>
+	<td class="summary">Pausa el temporizador.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#timer:continue">timer:continue ()</a></td>
+	<td class="summary">Despausa el temporizador.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#timer:Destroy">timer:Destroy ()</a></td>
+	<td class="summary">Destruye el temporizador.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#timer:after">timer:after (time, callback)</a></td>
+	<td class="summary">Crea un temporizador que se ejecuta una vez después de un tiempo determinado.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#timer:every">timer:every (time, callback)</a></td>
+	<td class="summary">Crea un temporizador que se ejecuta en intervalos regulares.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#timer:update">timer:update (dt)</a></td>
+	<td class="summary">Actualiza todos los temporizadores, tiene que ser usado en love.update(dt)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#timer:getTimers">timer:getTimers ()</a></td>
+	<td class="summary">Obtiene una lista de todos los temporizadores.</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "timer:new"></a>
+    <strong>timer:new (time)</strong>
+    </dt>
+    <dd>
+    Crea un nuevo temporizador
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">time</span>
+         (number) El tiempo en segundos que durara el temporizador
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myTimer = Timer.<span class="function-name">new</span>(<span class="number">5</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "timer:check"></a>
+    <strong>timer:check ()</strong>
+    </dt>
+    <dd>
+    Verifica si el temporizador ha terminado.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (boolean) Verdadero si el temporizador ha terminado, falso en caso contrario
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">if</span> myTimer:<span class="function-name">check</span>() <span class="keyword">then</span>
+    <span class="global">print</span>(<span class="string">"Timer has finished!"</span>)
+<span class="keyword">end</span></pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "timer:reset"></a>
+    <strong>timer:reset ()</strong>
+    </dt>
+    <dd>
+    Reinicia el temporizador.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myTimer:<span class="function-name">reset</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "timer:pause"></a>
+    <strong>timer:pause ()</strong>
+    </dt>
+    <dd>
+    Pausa el temporizador.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myTimer:<span class="function-name">pause</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "timer:continue"></a>
+    <strong>timer:continue ()</strong>
+    </dt>
+    <dd>
+    Despausa el temporizador.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myTimer:<span class="function-name">continue</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "timer:Destroy"></a>
+    <strong>timer:Destroy ()</strong>
+    </dt>
+    <dd>
+    Destruye el temporizador.
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myTimer:<span class="function-name">Destroy</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "timer:after"></a>
+    <strong>timer:after (time, callback)</strong>
+    </dt>
+    <dd>
+    Crea un temporizador que se ejecuta una vez después de un tiempo determinado.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">time</span>
+         (number) El tiempo en segundos que durara el temporizador
+        </li>
+        <li><span class="parameter">callback</span>
+         (function) La funcion que se ejecutara cuando el temporizador termine
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (timer) El temporizador creado
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myTimer = Timer.<span class="function-name">after</span>(<span class="number">5</span>, <span class="keyword">function</span>() <span class="global">print</span>(<span class="string">"Timer has finished!"</span>) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "timer:every"></a>
+    <strong>timer:every (time, callback)</strong>
+    </dt>
+    <dd>
+    Crea un temporizador que se ejecuta en intervalos regulares.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">time</span>
+         (number) El tiempo en segundos entre cada ejecución del temporizador
+        </li>
+        <li><span class="parameter">callback</span>
+         (function) La funcion que se ejecutara cuando el temporizador se active
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (timer) El temporizador creado
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myTimer = Timer.<span class="function-name">every</span>(<span class="number">5</span>, <span class="keyword">function</span>() <span class="global">print</span>(<span class="string">"I get printed every 5 seconds!"</span>) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "timer:update"></a>
+    <strong>timer:update (dt)</strong>
+    </dt>
+    <dd>
+    Actualiza todos los temporizadores, tiene que ser usado en love.update(dt)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">dt</span>
+         (number) El delta time de love.update
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Timer.<span class="function-name">update</span>(dt)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "timer:getTimers"></a>
+    <strong>timer:getTimers ()</strong>
+    </dt>
+    <dd>
+    Obtiene una lista de todos los temporizadores.
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (table) Una tabla con todos los temporizadores.
+    </ol>
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2025-08-28 00:14:49 </i>
+<i style="float:right;">Last updated 2025-08-28 00:48:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

@@ -31,6 +31,10 @@
   <li><a href="../doc.html">Index</a></li>
 </ul>
 
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
 
 
 <h2>Classes</h2>
@@ -62,22 +66,299 @@
 <div id="content">
 
 <h1>Class <code>udim2</code></h1>
-<p></p>
-<p></p>
+<p>Unidad de medida 2D en la pantalla.</p>
+<p>
+ Se usa para definir posiciones y tamaños en el GUI.
+ Permite definir una parte proporcional al tamaño del padre (scale) y una parte fija en pixeles (offset).</p>
 
 
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#udim2:new">udim2:new (xScale, xOffset, yScale, yOffset)</a></td>
+	<td class="summary">Crea un nuevo UDim2</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#udim2:toPixels">udim2:toPixels (parentWidth, parentHeight)</a></td>
+	<td class="summary">Transforma la posicion de UDim2 a pixeles propocionalmente al tamaño del padre</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#udim2:toScale">udim2:toScale (parentWidth, parentHeight)</a></td>
+	<td class="summary">Transforma la posicion de UDim2 a scale propocionalmente al tamaño del padre</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#udim2:transformToPixels">udim2:transformToPixels ()</a></td>
+	<td class="summary">Lo mismo que UDim2:toPixels() (Sin parametros)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#udim2:fromScale">udim2:fromScale (xScale, yScale)</a></td>
+	<td class="summary">Lo mismo que UDim2.new(xScale, 0, yScale, 0)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#udim2:fromOffset">udim2:fromOffset (xOffset, yOffset)</a></td>
+	<td class="summary">Lo mismo que UDim2.new(0, xOffset, 0, yOffset)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#udim2:Clone">udim2:Clone ()</a></td>
+	<td class="summary">Clona el UDim2</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#udim2:Lerp">udim2:Lerp (goal, alpha)</a></td>
+	<td class="summary">Interpolacion entre dos udim2.</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "udim2:new"></a>
+    <strong>udim2:new (xScale, xOffset, yScale, yOffset)</strong>
+    </dt>
+    <dd>
+    Crea un nuevo UDim2
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">xScale</span>
+         (number) Escala en X
+        </li>
+        <li><span class="parameter">xOffset</span>
+         (number) Offset en X
+        </li>
+        <li><span class="parameter">yScale</span>
+         (number) Escala en Y
+        </li>
+        <li><span class="parameter">yOffset</span>
+         (number) Offset en Y
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (UDim2) Instancia del UDim2
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> myUdim2 = UDim2.<span class="function-name">new</span>(<span class="number">0.5</span>, <span class="number">10</span>, <span class="number">0.5</span>, <span class="number">10</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "udim2:toPixels"></a>
+    <strong>udim2:toPixels (parentWidth, parentHeight)</strong>
+    </dt>
+    <dd>
+    Transforma la posicion de UDim2 a pixeles propocionalmente al tamaño del padre
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">parentWidth</span>
+         (number) Ancho del padre en pixeles. Si no se proporciona, se usa el ancho de la pantalla.
+        </li>
+        <li><span class="parameter">parentHeight</span>
+         (number) Alto del padre en pixeles. Si no se proporciona, se usa el alto de la pantalla.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (number, number) Posicion en pixeles (x, y)
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> x, y = myUdim2:<span class="function-name">toPixels</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "udim2:toScale"></a>
+    <strong>udim2:toScale (parentWidth, parentHeight)</strong>
+    </dt>
+    <dd>
+    Transforma la posicion de UDim2 a scale propocionalmente al tamaño del padre
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">parentWidth</span>
+         (number) Ancho del padre en pixeles. Si no se proporciona, se usa el ancho de la pantalla.
+        </li>
+        <li><span class="parameter">parentHeight</span>
+         (number) Alto del padre en pixeles. Si no se proporciona, se usa el alto de la pantalla.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (number, number) Posicion en scale (x, y)
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> x, y = myUdim2:<span class="function-name">toScale</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "udim2:transformToPixels"></a>
+    <strong>udim2:transformToPixels ()</strong>
+    </dt>
+    <dd>
+    Lo mismo que UDim2:toPixels() (Sin parametros)
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (number, number) Posicion en pixeles (x, y)
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "udim2:fromScale"></a>
+    <strong>udim2:fromScale (xScale, yScale)</strong>
+    </dt>
+    <dd>
+    Lo mismo que UDim2.new(xScale, 0, yScale, 0)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">xScale</span>
+         (number) Escala en X
+        </li>
+        <li><span class="parameter">yScale</span>
+         (number) Escala en Y
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (UDim2) Instancia del UDim2
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> myUdim2 = UDim2.<span class="function-name">fromScale</span>(<span class="number">0.5</span>, <span class="number">0.5</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "udim2:fromOffset"></a>
+    <strong>udim2:fromOffset (xOffset, yOffset)</strong>
+    </dt>
+    <dd>
+    Lo mismo que UDim2.new(0, xOffset, 0, yOffset)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">xOffset</span>
+         (number) Offset en X
+        </li>
+        <li><span class="parameter">yOffset</span>
+         (number) Offset en Y
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (UDim2) Instancia del UDim2
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> myUdim2 = UDim2.<span class="function-name">fromOffset</span>(<span class="number">10</span>, <span class="number">10</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "udim2:Clone"></a>
+    <strong>udim2:Clone ()</strong>
+    </dt>
+    <dd>
+    Clona el UDim2
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (UDim2) Instancia clonada del UDim2
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> myUdim2Clone = myUdim2:<span class="function-name">Clone</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "udim2:Lerp"></a>
+    <strong>udim2:Lerp (goal, alpha)</strong>
+    </dt>
+    <dd>
+    Interpolacion entre dos udim2.
+Lerp es una abreviacion de Linear Interpolation.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">goal</span>
+         (UDim2) El UDim2 al que se quiere llegar
+        </li>
+        <li><span class="parameter">alpha</span>
+         (number) Un valor entre 0 y 1 que indica la interpolacion
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> myUdim2 = myUdim2:<span class="function-name">Lerp</span>(targetUdim2, <span class="number">0.5</span>)</pre>
+    </ul>
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2025-08-28 00:14:49 </i>
+<i style="float:right;">Last updated 2025-08-28 00:48:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

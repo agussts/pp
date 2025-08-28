@@ -31,6 +31,10 @@
   <li><a href="../doc.html">Index</a></li>
 </ul>
 
+<h2>Contents</h2>
+<ul>
+<li><a href="#Methods">Methods</a></li>
+</ul>
 
 
 <h2>Classes</h2>
@@ -66,18 +70,291 @@
 <p></p>
 
 
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#animations:new">animations:new (imagePath, gridWidth, gridHeight, columns, rows, frameDuration, looped, reversed)</a></td>
+	<td class="summary">Crea una nueva animacion</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#animations:Play">animations:Play ()</a></td>
+	<td class="summary">Reproduce la animacion</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#animations:Pause">animations:Pause ()</a></td>
+	<td class="summary">Pausa la animacion</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#animations:Stop">animations:Stop (reset)</a></td>
+	<td class="summary">Detiene la animacion
+Tambien ejecuta OnFinish</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#animations:Reset">animations:Reset ()</a></td>
+	<td class="summary">Resetea la animacion al primer frame</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#animations:GoToFrame">animations:GoToFrame (frame)</a></td>
+	<td class="summary">Va a un frame especifico de la animacion</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#animations:update">animations:update (dt)</a></td>
+	<td class="summary">Actualiza el modulo de animacion</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#animations:draw">animations:draw (x, y, width, height)</a></td>
+	<td class="summary">Dibuja la animacion</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#animations:getAllAnimations">animations:getAllAnimations ()</a></td>
+	<td class="summary">Consigue todas las animaciones añadidas</td>
+	</tr>
+</table>
 
 <br/>
 <br/>
 
 
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "animations:new"></a>
+    <strong>animations:new (imagePath, gridWidth, gridHeight, columns, rows, frameDuration, looped, reversed)</strong>
+    </dt>
+    <dd>
+    Crea una nueva animacion
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">imagePath</span>
+         Directorio de la imagen
+        </li>
+        <li><span class="parameter">gridWidth</span>
+         El ancho de cada cuadro
+        </li>
+        <li><span class="parameter">gridHeight</span>
+         El alto de cada cuadro
+        </li>
+        <li><span class="parameter">columns</span>
+         Numero de columnas en la imagen
+        </li>
+        <li><span class="parameter">rows</span>
+         Numero de filas en la imagen
+        </li>
+        <li><span class="parameter">frameDuration</span>
+         Cuanto dura cada cuadro en segundos
+        </li>
+        <li><span class="parameter">looped</span>
+         Opcional: Si la animacion se repite, si no esta marcado, es true por defecto
+        </li>
+        <li><span class="parameter">reversed</span>
+         Opcional: Si la animacion va al reves, si no esta marcado, es false por defecto
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (animation) La animacion creada
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> myAnimation = animations.<span class="function-name">new</span>(<span class="string">"assets/sprites/player-Sheet.png"</span>, <span class="number">32</span>, <span class="number">32</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">0.1</span>, <span class="keyword">true</span>, <span class="keyword">false</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "animations:Play"></a>
+    <strong>animations:Play ()</strong>
+    </dt>
+    <dd>
+    Reproduce la animacion
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myAnimation:<span class="function-name">Play</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "animations:Pause"></a>
+    <strong>animations:Pause ()</strong>
+    </dt>
+    <dd>
+    Pausa la animacion
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myAnimation:<span class="function-name">Pause</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "animations:Stop"></a>
+    <strong>animations:Stop (reset)</strong>
+    </dt>
+    <dd>
+    Detiene la animacion
+Tambien ejecuta OnFinish
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">reset</span>
+         Opcional: Si es true, resetea la animacion al primer frame
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myAnimation:<span class="function-name">Stop</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "animations:Reset"></a>
+    <strong>animations:Reset ()</strong>
+    </dt>
+    <dd>
+    Resetea la animacion al primer frame
+
+
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myAnimation:<span class="function-name">Reset</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "animations:GoToFrame"></a>
+    <strong>animations:GoToFrame (frame)</strong>
+    </dt>
+    <dd>
+    Va a un frame especifico de la animacion
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">frame</span>
+         El frame al que se quiere ir
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myAnimation:<span class="function-name">GoToFrame</span>(<span class="number">2</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "animations:update"></a>
+    <strong>animations:update (dt)</strong>
+    </dt>
+    <dd>
+    Actualiza el modulo de animacion
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">dt</span>
+         Delta time
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myAnimation:<span class="function-name">update</span>(dt)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "animations:draw"></a>
+    <strong>animations:draw (x, y, width, height)</strong>
+    </dt>
+    <dd>
+    Dibuja la animacion
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">x</span>
+         La posicion x en la pantalla
+        </li>
+        <li><span class="parameter">y</span>
+         La posicion y en la pantalla
+        </li>
+        <li><span class="parameter">width</span>
+         El ancho del dibujo
+        </li>
+        <li><span class="parameter">height</span>
+         La altura del dibujo
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myAnimation:<span class="function-name">draw</span>()</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "animations:getAllAnimations"></a>
+    <strong>animations:getAllAnimations ()</strong>
+    </dt>
+    <dd>
+    Consigue todas las animaciones añadidas
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (table) Una tabla con todas las animaciones
+    </ol>
+
+
+
+
+</dd>
+</dl>
 
 
 </div> <!-- id="content" -->
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2025-08-28 00:14:49 </i>
+<i style="float:right;">Last updated 2025-08-28 00:48:00 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
