@@ -8,7 +8,7 @@ require("src.libs.connections")
 
 love.load = function ()
     --Crea a el jugador y el enemigo
-    Player = PlayerModule.new("assets/sprites/maxresdefault.png", 0.0625, 0.11)
+    Player = PlayerModule.new("assets/sprites/player-Sheet.png", 0.0625, 0.11)
     Player.collision.position = UDim2.fromScale(.5, .5)
     Enemy = EnemyModule.new("assets/sprites/slungus.png", 0.0625, 0.11)
     Enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
@@ -19,11 +19,11 @@ love.load = function ()
     Collider.size = UDim2.new(0.08, 0, 0.13, 0)
 end
 
-love.keypressed = function(key)
-    Fire("keyPressed", key)
+love.keypressed = function (key)
+    Connections.Fire("keyPressed", key)
 end
 
-Connect("keyPressed", function (key)
+Connections.Connect("keyPressed", function (key)
     if Gamestate == "playing" then
         if key == Config.SavedConfigs.PDASH then
             --Funcionamiento de dash
@@ -64,7 +64,10 @@ end
 love.update = function (dt)
     --Actualiza modulo de timer
     Timer.update(dt)
-
+    --Actualiza animaciones
+    for _,animation in pairs(Animation.getAllAnimations()) do
+        animation:update(dt)
+    end
     if love.mouse.isDown(1) then
         --Activa funcion de cuando se presiona el boton
         for _,self in pairs(Guis.getAll()) do
@@ -116,17 +119,20 @@ love.update = function (dt)
     end
 end
 
+
 love.draw = function ()
     --Ajustes antes de empezar renderizacion
     love.graphics.setDefaultFilter("nearest")
     --Dibuja el jugador
-    
+
+    love.graphics.setBackgroundColor(.4, .4, .4, 1)    
+
     local playerX, playerY = Player.collision.position:transformToPixels()
-    local width, height = Player.collision.size:transformToPixels()
+    local width, height = Player.size:transformToPixels()
+
+    
     Camera.attach()
-        love.graphics.draw(Player.sprite, playerX, playerY, 0 , width / Player.sprite:getWidth(), height / Player.sprite:getHeight())
-
-
+        Player.sprite:draw(playerX, playerY, width, height)
         --Dibuja a los enemigos
         for _,v in pairs(EnemyModule.getEnemies()) do
             local x,y = v.collision.position:transformToPixels()
@@ -158,6 +164,7 @@ love.draw = function ()
     end)
 
     --Dibuja interfaz, tiene que ser al final de la funcion para que se renderize sobre todo
+
     for _,self in pairs(sortedGuis) do
         if not self.visible then goto continue end
         local x, y = self:getRenderPosition()

@@ -390,7 +390,7 @@ local function createKeybindsMenu()
             function ()
                 local prevKey = Config.ConfigTable[actionName]
                 local function onKeyPress(key)
-                    Disconnect("keyPressed", onKeyPress)
+                    Connections.Disconnect("keyPressed", onKeyPress)
 
                     for i,v in pairs(Config.ConfigTable) do
                         if i ~= actionName and v == key then
@@ -402,10 +402,10 @@ local function createKeybindsMenu()
                     Config.ConfigTable[actionName] = key
                     actionText.text = text.. key
                 end
-                Connect("keyPressed", onKeyPress)
+                Connections.Connect("keyPressed", onKeyPress)
                 Timer.after(5, function() 
-                    if ConnectionExists("keyPressed", onKeyPress) then
-                        Disconnect("keyPressed", onKeyPress)
+                    if Connections.ConnectionExists("keyPressed", onKeyPress) then
+                        Connections.Disconnect("keyPressed", onKeyPress)
                         print("took too long to press a key, reverting to previous keybind")
                         actionText.text = text .. (prevKey or "None")
                     end

@@ -1,6 +1,6 @@
 ---
---@classmod Animations
---Crea una nueva animacion
+-- Crea una nueva animacion
+--@classmod animations
 local animations = {}
 local addedAnimations = {}
 ---
@@ -13,7 +13,7 @@ local addedAnimations = {}
 --@param looped Opcional: Si la animacion se repite, si no esta marcado, es true por defecto
 --@param reversed Opcional: Si la animacion va al reves, si no esta marcado, es false por defecto
 --@usage local myAnimation = animations.new("assets/sprites/player-Sheet.png", 32, 32, 3, 3, 0.1, true, false)
---@return La animacion creada
+--@return (animation) La animacion creada
 function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDuration, looped, reversed)
     --Revisa si los parametros son validos
     assert(type(gridWidth) == "number" and gridWidth > 0, "Invalid gridWidth: expected positive number, got " .. tostring(gridWidth))
@@ -30,8 +30,8 @@ function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDu
     self.columns = columns
     self.rows = rows
 
-    self.OnFinish = function() end
-    self.OnLoop = function() end
+    self.OnFinish = Signal.new()
+    self.OnLoop = Signal.new()
 
     self.currFrame = 1
     self.elapsedTime = 0
@@ -69,6 +69,7 @@ end
 
 ---
 --Detiene la animacion
+--Tambien ejecuta OnFinish
 --@param reset Opcional: Si es true, resetea la animacion al primer frame
 --@usage myAnimation:Stop()
 function animations:Stop(reset)
@@ -76,6 +77,7 @@ function animations:Stop(reset)
     if reset then
         self:Reset()
     end
+    self.OnFinish:Fire()
 end
 
 ---
@@ -98,6 +100,10 @@ function animations:GoToFrame(frame)
     self.elapsedTime = (frame - 1) * self.frameDuration
 end
 
+---
+--Actualiza el modulo de animacion
+--@param dt Delta time
+--@usage myAnimation:update(dt)
 function animations:update(dt)
     if not self.playing then return end
 
@@ -110,8 +116,10 @@ function animations:update(dt)
             self.currFrame = self.currFrame - framesToAdvance
             if self.currFrame < 1 then
                 if self.loop then
+                    self.OnLoop:Fire()
                     self.currFrame = self.columns * self.rows + self.currFrame
                 else
+                    self.OnFinish:Fire()
                     self.currFrame = 1
                     self.playing = false
                 end
@@ -120,8 +128,10 @@ function animations:update(dt)
             self.currFrame = self.currFrame + framesToAdvance
             if self.currFrame > self.columns * self.rows then
                 if self.loop then
+                    self.OnLoop:Fire()
                     self.currFrame = (self.currFrame - 1) % (self.columns * self.rows) + 1
                 else
+                    self.OnFinish:Fire()
                     self.currFrame = self.columns * self.rows
                     self.playing = false
                 end
@@ -132,12 +142,19 @@ end
 
 ---
 --Dibuja la animacion
+--@param x La posicion x en la pantalla
+--@param y La posicion y en la pantalla
+--@param width El ancho del dibujo
+--@param height La altura del dibujo
 --@usage myAnimation:draw()
 function animations:draw(x, y, width, height)
     local quad = self.quads[self.currFrame][3]
     love.graphics.draw(self.image, quad, x, y, 0, width / self.gridWidth, height / self.gridHeight)
 end
 
+---
+-- Consigue todas las animaciones añadidas
+--@return (table) Una tabla con todas las animaciones
 function animations.getAllAnimations()
     return addedAnimations
 end
