@@ -2,7 +2,6 @@
 Config = require("src.utils.config_manager")
 
 Signal = require("src.libs.signal")
-Connections = require("src.libs.connections")
 Timer = require("src.libs.timer")
 ColliderModule = require("src.libs.collisions")
 UDim2 = require("src.guis.udim2")

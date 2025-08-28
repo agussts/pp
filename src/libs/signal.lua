@@ -1,7 +1,7 @@
 ---
--- Clase para manejar señales y eventos
--- Permite conectar, desconectar y disparar eventos
--- Funciona a par con connections
+-- Clase para manejar señales y eventos.
+-- Permite conectar, desconectar y disparar eventos.
+-- Funciona a par con connections.
 --@see connections
 --@classmod signal
 

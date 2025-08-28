@@ -20,10 +20,10 @@ love.load = function ()
 end
 
 love.keypressed = function (key)
-    Connections.Fire("keyPressed", key)
+    Fire("keyPressed", key)
 end
 
-Connections.Connect("keyPressed", function (key)
+Connect("keyPressed", function (key)
     if Gamestate == "playing" then
         if key == Config.SavedConfigs.PDASH then
             --Funcionamiento de dash
