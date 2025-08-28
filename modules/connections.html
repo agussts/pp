@@ -33,10 +33,14 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Methods">Methods</a></li>
+<li><a href="#Functions">Functions</a></li>
 </ul>
 
 
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>connections</strong></li>
+</ul>
 <h2>Classes</h2>
 <ul class="nowrap">
   <li><a href="../classes/button.html">button</a></li>
@@ -48,12 +52,12 @@
   <li><a href="../classes/basicGun.html">basicGun</a></li>
   <li><a href="../classes/devGun.html">devGun</a></li>
   <li><a href="../classes/spamGun.html">spamGun</a></li>
-  <li><a href="../classes/Animations.html">Animations</a></li>
+  <li><a href="../classes/animations.html">animations</a></li>
   <li><a href="../classes/camera.html">camera</a></li>
   <li><a href="../classes/collisions.html">collisions</a></li>
-  <li><strong>connections</strong></li>
   <li><a href="../classes/enemy.html">enemy</a></li>
   <li><a href="../classes/player.html">player</a></li>
+  <li><a href="../classes/signal.html">signal</a></li>
   <li><a href="../classes/timer.html">timer</a></li>
 </ul>
 
@@ -61,41 +65,46 @@
 
 <div id="content">
 
-<h1>Class <code>connections</code></h1>
+<h1>Module <code>connections</code></h1>
+<p>Maneja eventos y conexiones entre funciones y eventos
+ Funciona a par con signal</p>
 <p></p>
-<p></p>
+    <h3>See also:</h3>
+    <ul>
+         <a href="../classes/signal.html#">signal</a>
+    </ul>
 
 
-<h2><a href="#Methods">Methods</a></h2>
+<h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#connections:Connect">connections:Connect (eventName, callback)</a></td>
+	<td class="name" nowrap><a href="#Connect">Connect (eventName, callback)</a></td>
 	<td class="summary">Conecta una funcion con un evento</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#connections:Once">connections:Once (eventName, callback)</a></td>
+	<td class="name" nowrap><a href="#Once">Once (eventName, callback)</a></td>
 	<td class="summary">Conecta una funcion con un evento
  con diferencia que al ser llamado una vez,
  se desconecta automaticamente</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#connections:Disconnect">connections:Disconnect (eventName, callback)</a></td>
+	<td class="name" nowrap><a href="#Disconnect">Disconnect (eventName, callback)</a></td>
 	<td class="summary">Desconecta la funcion del evento</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#connections:Fire">connections:Fire (eventName, ...)</a></td>
+	<td class="name" nowrap><a href="#Fire">Fire (eventName, ...)</a></td>
 	<td class="summary">Dispara un evento y ejecuta todas las funciones conectadas</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#connections:GetConnections">connections:GetConnections (eventName)</a></td>
+	<td class="name" nowrap><a href="#GetConnections">GetConnections (eventName)</a></td>
 	<td class="summary">Consigue todas las conexiones de un evento</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#connections:ConnectionExists">connections:ConnectionExists (eventName, callback)</a></td>
+	<td class="name" nowrap><a href="#ConnectionExists">ConnectionExists (eventName, callback)</a></td>
 	<td class="summary">Revisa si existe una conexion entre una funcion y un evento</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#connections:GeAllConnections">connections:GeAllConnections ()</a></td>
+	<td class="name" nowrap><a href="#GetAllConnections">GetAllConnections ()</a></td>
 	<td class="summary">Consigue todas las conexiones registradas</td>
 	</tr>
 </table>
@@ -104,12 +113,12 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "connections:Connect"></a>
-    <strong>connections:Connect (eventName, callback)</strong>
+    <a name = "Connect"></a>
+    <strong>Connect (eventName, callback)</strong>
     </dt>
     <dd>
     Conecta una funcion con un evento
@@ -131,8 +140,8 @@
 
 </dd>
     <dt>
-    <a name = "connections:Once"></a>
-    <strong>connections:Once (eventName, callback)</strong>
+    <a name = "Once"></a>
+    <strong>Once (eventName, callback)</strong>
     </dt>
     <dd>
     Conecta una funcion con un evento
@@ -156,8 +165,8 @@
 
 </dd>
     <dt>
-    <a name = "connections:Disconnect"></a>
-    <strong>connections:Disconnect (eventName, callback)</strong>
+    <a name = "Disconnect"></a>
+    <strong>Disconnect (eventName, callback)</strong>
     </dt>
     <dd>
     Desconecta la funcion del evento
@@ -179,8 +188,8 @@
 
 </dd>
     <dt>
-    <a name = "connections:Fire"></a>
-    <strong>connections:Fire (eventName, ...)</strong>
+    <a name = "Fire"></a>
+    <strong>Fire (eventName, ...)</strong>
     </dt>
     <dd>
     Dispara un evento y ejecuta todas las funciones conectadas
@@ -202,8 +211,8 @@
 
 </dd>
     <dt>
-    <a name = "connections:GetConnections"></a>
-    <strong>connections:GetConnections (eventName)</strong>
+    <a name = "GetConnections"></a>
+    <strong>GetConnections (eventName)</strong>
     </dt>
     <dd>
     Consigue todas las conexiones de un evento
@@ -227,8 +236,8 @@
 
 </dd>
     <dt>
-    <a name = "connections:ConnectionExists"></a>
-    <strong>connections:ConnectionExists (eventName, callback)</strong>
+    <a name = "ConnectionExists"></a>
+    <strong>ConnectionExists (eventName, callback)</strong>
     </dt>
     <dd>
     Revisa si existe una conexion entre una funcion y un evento
@@ -255,8 +264,8 @@
 
 </dd>
     <dt>
-    <a name = "connections:GeAllConnections"></a>
-    <strong>connections:GeAllConnections ()</strong>
+    <a name = "GetAllConnections"></a>
+    <strong>GetAllConnections ()</strong>
     </dt>
     <dd>
     Consigue todas las conexiones registradas
@@ -280,7 +289,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2025-08-27 23:40:26 </i>
+<i style="float:right;">Last updated 2025-08-28 00:05:29 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
