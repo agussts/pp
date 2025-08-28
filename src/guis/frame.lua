@@ -1,13 +1,18 @@
 ---
+--Crea un frame basico.
+--Usa componentes de GUI.
 --@classmod frame
 --@see gui
 
 local frame = {}
 
-local gui = require("src.guis.gui")
-
+---
+--Crea un nuevo frame
+--@param position Posicion del frame
+--@param size Tamaño del frame
+--@return (frame) Instancia del frame
 function frame.new(position, size)
-    local self = gui.new()
+    local self = Guis.new()
     self.bgColor = {1,1,1,1}
     self.type = "frame"    
     return self

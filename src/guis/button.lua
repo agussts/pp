@@ -1,13 +1,17 @@
 ---
+--Boton basico de GUI.
+--Usa componentes de Guis.
 --@classmod button
 --@see gui
 
 local button = {}
 
-local gui = require("src.guis.gui")
-
+---
+--Crea un nuevo boton
+--@param callback Funcion a llamar cuando se presiona el boton
+--@return (button) Instancia del boton
 function button.new(callback)
-    local self = gui.new()
+    local self = Guis.new()
     self.callback = callback
     self.whenPressing = function () end
     self.bgColor = {.5,.5,.5,1}

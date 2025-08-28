@@ -1,16 +1,19 @@
 ---
+-- Pistola basica, tambien la base de otras pistolas
 --@classmod basicGun
 
 local gun = {}
-local collisions = require("src.libs.collisions")
-local timer      = require("src.libs.timer")
-local udim2      = require("src.guis.udim2")
 
 local audios = {
     hit = love.audio.newSource("assets/sfx/hitHurt.wav", "static"),
     boxhit = love.audio.newSource("assets/sfx/blip.wav", "static"),
     shoot = love.audio.newSource("assets/sfx/shoot.wav", "static")
 }
+
+---
+-- Crea una nueva pistola
+--@return (basicGun) La nueva pistola creada
+--@usage local myGun = Gun.new()
 function gun.new()
     local self = setmetatable({}, { __index = gun })
     self.name = "Basic Gun"
@@ -27,6 +30,11 @@ function gun.new()
     return self
 end
 
+---
+--Dispara la pistola
+--@param x (number) La posicion X desde donde se dispara
+--@param y (number) La posicion Y desde donde se dispara
+--@usage myGun:Fire(100, 200)
 function gun:Fire(x, y)
     if self.lastFireTime > 0 then
         return
@@ -38,7 +46,7 @@ function gun:Fire(x, y)
     end
     self.ammo = self.ammo - 1
     local collider
-    collider = collisions.new("hitbox", true, function (otherCollider)
+    collider = Collisions.new("hitbox", true, function (otherCollider)
         for i,v in pairs(otherCollider.tags) do
             if v == "player" or v == "projectile" then return end
         end
@@ -61,9 +69,9 @@ function gun:Fire(x, y)
     mouseY = mouseY
     local dx = mouseX - x
     local dy = mouseY - y
-    collider.position = udim2.new(0, x, 0, y)
-    collider.position:offsetToScale()
-    collider.size = udim2.new(0.04, 0, 0.07, 0)
+    collider.position = UDim2.new(0, x, 0, y)
+    collider.position:toScale()
+    collider.size = UDim2.new(0.04, 0, 0.07, 0)
     local distance = math.sqrt(dx*dx + dy*dy)
     collider.speedY = (dy / distance) * self.speed
     collider.speedX = (dx / distance) * self.speed
@@ -71,9 +79,9 @@ function gun:Fire(x, y)
     self.lastFireTime = self.fireRate
     audios.shoot:clone():play()
 
-    timer.after(8, function()
+    Timer.after(8, function()
         collider:Destroy()
     end)
-    return
 end
+
 return gun

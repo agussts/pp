@@ -4,6 +4,7 @@
 local animations = {}
 local addedAnimations = {}
 ---
+--Crea una nueva animacion
 --@param imagePath Directorio de la imagen
 --@param gridWidth El ancho de cada cuadro
 --@param gridHeight El alto de cada cuadro

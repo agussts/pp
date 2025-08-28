@@ -1,10 +1,8 @@
 ---
+-- Modulo para manejar al jugador.
 --@classmod player
 
 local module = {}
-
-local collisions = require("src.libs.collisions")
-local udim2      = require("src.guis.udim2")
 
 module.name = "player"
 module.controlsMovement = {
@@ -19,14 +17,21 @@ module.controlsMovement = {
 --    ["back"] = "PBACK"
 --}
 
+---
+-- Crea al jugador
+--@param spriteName (string) El nombre del sprite del jugador
+--@param width (number) El ancho del jugador
+--@param height (number) La altura del jugador
+--@return (player) El nuevo jugador creado
+--@usage local player = Player.new("assets/sprites/player.png", 32, 32)
 module.new = function(spriteName, width, height)
     local self = setmetatable({}, { __index = module })
 
     self.sprite = Animation.new(spriteName, 32, 32, 3, 3, 0.1)
-    self.size = udim2.new(width, 0, height, 0)
-    self.collision = collisions.new("box")
-    self.collision.position = udim2.new(0, 0, 0, 0)
-    self.collision.size = udim2.new(width, 0, height, 0)
+    self.size = UDim2.new(width, 0, height, 0)
+    self.collision = Collisions.new("box")
+    self.collision.position = UDim2.new(0, 0, 0, 0)
+    self.collision.size = UDim2.new(width, 0, height, 0)
     self.collision:AddTag("player")
     self.health = 100
     self.collision.link = self

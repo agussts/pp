@@ -124,7 +124,7 @@ function collisions:UpdateSpeed(dt)
     x = x + self.speedX * screenWidth * dt
     y = y + self.speedY * screenHeight * dt
     self.position = udim2.new(0, x, 0, y)
-    self.position:offsetToScale()
+    self.position:toScale()
 end
 
 ---
@@ -197,7 +197,7 @@ function collisions:check()
             end
         end
         self.position = udim2.new(0, x, 0, y)
-        self.position:offsetToScale()
+        self.position:toScale()
         ::continue::
     end
     return hitting

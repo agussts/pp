@@ -1,17 +1,20 @@
 ---
+-- Libreria de componentes de GUI
 --@classmod gui
 
 local gui = {}
 
 local addedGuis = {}
-local udim2 = require("src.guis.udim2")
 
+---
 --Crea un nuevo gui
+--@return (gui) Instancia del gui
+--@usage local baseGui = gui.new()
 function gui.new()
     --Propiedades por defecto
     local self = setmetatable({}, { __index = gui })
-    self.position = udim2.new(0,0,0,0)
-    self.size = udim2.new(0,0,0,0)
+    self.position = UDim2.new(0,0,0,0)
+    self.size = UDim2.new(0,0,0,0)
     self.visible = true
     self.anchorPoint = {0, 0}
     self.zIndex = 0
@@ -29,6 +32,13 @@ function gui.new()
     return self
 end
 
+---
+-- Determina si el mouse esta sobre el gui
+--@return (boolean) Si el mouse esta sobre el gui
+--@usage 
+-- if gui:isHovering() then 
+--  print("El mouse esta sobre el gui")
+-- end
 function gui:isHovering()
     local mouseX, mouseY = love.mouse.getPosition()
     local x, y = self:getRenderPosition()
@@ -37,14 +47,24 @@ function gui:isHovering()
     return mouseX >= x and mouseX <= x + width and mouseY >= y and mouseY <= y + height
 end
 
+---
+--Devuelve el tamaño del GUI al que se le tiene que renderizar
+--@usage local width, height = gui:getRenderSize()
 function gui:getRenderSize()
     return self._renderWidth, self._renderHeight
 end
 
+---
+--Devuelve la posicion del GUI al que se le tiene que renderizar
+--@usage local x, y = gui:getRenderPosition()
 function gui:getRenderPosition()
     return self._renderX, self._renderY
 end
 
+---
+-- Establece el padre del GUI
+--@param parentGui (gui) El nuevo padre del GUI
+--@usage gui:setParent(nuevoPadre)
 function gui:setParent(parentGui)
     --Si el gui ya tiene parent, lo elimina de la lista de hijos del parent
     if self.parent then
@@ -64,6 +84,9 @@ function gui:setParent(parentGui)
     end
 end
 
+---
+-- Calcula las propiedades de renderizado del GUI
+--@usage gui:calculateRenderProperties()
 function gui:calculateRenderProperties()
     --Si no es visible, no calcula la posicion ni el tamaño
     --Esto es para evitar cálculos innecesarios y mejorar el rendimiento
@@ -108,8 +131,11 @@ function gui:calculateRenderProperties()
     end
 end
 
+---
+-- Devuelve una lista de guis que no tienen padre
+--@return (table) Una lista de guis que no tienen padre
+--@usage local topLevelGuis = gui.getTopLevelGuis()
 function gui.getTopLevelGuis()
-    --Devuelve una lista de guis que no tienen padre
     local topLevelGuis = {}
     for _, gui in ipairs(addedGuis) do
         if gui.parent == nil then
@@ -119,12 +145,16 @@ function gui.getTopLevelGuis()
     return topLevelGuis
 end
 
---Da todos los guis añadidos
+--- Devuelve todos los guis añadidos
+--@return (table) Una lista de todos los guis añadidos
+--@usage local allGuis = gui.getAll()
 function gui.getAll()
     return addedGuis
 end
 
+---
 --Destruye el gui
+--@usage gui:Destroy()
 function gui:Destroy()
     for i, v in ipairs(addedGuis) do
         if v == self then

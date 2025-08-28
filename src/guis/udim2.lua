@@ -1,4 +1,7 @@
 ---
+-- Unidad de medida 2D en la pantalla.
+-- Se usa para definir posiciones y tamaños en el GUI.
+-- Permite definir una parte proporcional al tamaño del padre (scale) y una parte fija en pixeles (offset).
 --@classmod udim2
 local udim2 = {}
 
@@ -48,7 +51,14 @@ udim2.__tostring = function (self)
     return tostring(self.x.scale), tostring(self.x.offset), tostring(self.y.scale), tostring(self.y.offset)
 end
 
+---
 --Crea un nuevo UDim2
+--@param xScale (number) Escala en X
+--@param xOffset (number) Offset en X
+--@param yScale (number) Escala en Y
+--@param yOffset (number) Offset en Y
+--@return (UDim2) Instancia del UDim2
+--@usage local myUdim2 = UDim2.new(0.5, 10, 0.5, 10)
 function udim2.new(xScale, xOffset, yScale, yOffset)
     local self = setmetatable({}, udim2)
     self.x = {}
@@ -60,7 +70,12 @@ function udim2.new(xScale, xOffset, yScale, yOffset)
     return self
 end
 
+---
 --Transforma la posicion de UDim2 a pixeles propocionalmente al tamaño del padre
+--@param parentWidth (number) Ancho del padre en pixeles. Si no se proporciona, se usa el ancho de la pantalla.
+--@param parentHeight (number) Alto del padre en pixeles. Si no se proporciona, se usa el alto de la pantalla.
+--@return (number, number) Posicion en pixeles (x, y)
+--@usage local x, y = myUdim2:toPixels()
 function udim2:toPixels(parentWidth, parentHeight)
     if not parentWidth or not parentHeight then
         parentWidth = love.graphics.getWidth()
@@ -71,7 +86,12 @@ function udim2:toPixels(parentWidth, parentHeight)
     return x, y
 end
 
+---
 --Transforma la posicion de UDim2 a scale propocionalmente al tamaño del padre
+--@param parentWidth (number) Ancho del padre en pixeles. Si no se proporciona, se usa el ancho de la pantalla.
+--@param parentHeight (number) Alto del padre en pixeles. Si no se proporciona, se usa el alto de la pantalla.
+--@return (number, number) Posicion en scale (x, y)
+--@usage local x, y = myUdim2:toScale()
 function udim2:toScale(parentWidth, parentHeight)
     if not parentWidth or not parentHeight then
         parentWidth = love.graphics.getWidth()
@@ -82,29 +102,47 @@ function udim2:toScale(parentWidth, parentHeight)
     return x, y
 end
 
---Transforma la posicion de UDim2 a pixeles en la pantalla
+---
+--Lo mismo que UDim2:toPixels() (Sin parametros)
+--@return (number, number) Posicion en pixeles (x, y)
 function udim2:transformToPixels()
     return self:toPixels()
 end
 
+---
 --Lo mismo que UDim2.new(xScale, 0, yScale, 0)
+--@param xScale (number) Escala en X
+--@param yScale (number) Escala en Y
+--@return (UDim2) Instancia del UDim2
+--@usage local myUdim2 = UDim2.fromScale(0.5, 0.5)
 function udim2.fromScale(xScale, yScale)
     return udim2.new(xScale, 0, yScale, 0)
 end
 
+---
 --Lo mismo que UDim2.new(0, xOffset, 0, yOffset)
+--@param xOffset (number) Offset en X
+--@param yOffset (number) Offset en Y
+--@return (UDim2) Instancia del UDim2
+--@usage local myUdim2 = UDim2.fromOffset(10, 10)
 function udim2.fromOffset(xOffset, yOffset)
     return udim2.new(0, xOffset, 0, yOffset)
 end
 
+---
 --Clona el UDim2
+--@usage local myUdim2Clone = myUdim2:Clone()
+--@return (UDim2) Instancia clonada del UDim2
 function udim2:Clone()
     return udim2.new(self.x.scale, self.x.offset, self.y.scale, self.y.offset)
 end
 
+---
 --Interpolacion entre dos udim2.
---Alpha es un valor entre 0 y 1, donde 0 es el inicio y 1 es el final.
 --Lerp es una abreviacion de Linear Interpolation.
+--@param goal (UDim2) El UDim2 al que se quiere llegar
+--@param alpha (number) Un valor entre 0 y 1 que indica la interpolacion
+--@usage local myUdim2 = myUdim2:Lerp(targetUdim2, 0.5)
 function udim2:Lerp(goal, alpha)
     return udim2.new(
         self.x.scale + (goal.x.scale - self.x.scale) * alpha,
@@ -112,29 +150,6 @@ function udim2:Lerp(goal, alpha)
         self.y.scale + (goal.y.scale - self.y.scale) * alpha,
         self.y.offset + (goal.y.offset - self.y.offset) * alpha
     )
-end
-
----------Metodos depcrecados---------
--------------------------------------
-
-function udim2:offsetToScale()
-    local screenWidth = love.graphics.getWidth()
-    local screenHeight = love.graphics.getHeight()
-    self.x.scale = self.x.scale + self.x.offset / screenWidth
-    self.y.scale = self.y.scale + self.y.offset / screenHeight
-    self.x.offset = 0
-    self.y.offset = 0
-    return self
-end
-
-function udim2:scaleToOffset()
-    local screenWidth = love.graphics.getWidth()
-    local screenHeight = love.graphics.getHeight()
-    self.x.offset = self.x.scale * screenWidth
-    self.y.offset = self.y.scale * screenHeight
-    self.x.scale = 0
-    self.y.scale = 0
-    return self
 end
 
 return udim2

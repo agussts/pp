@@ -1,4 +1,5 @@
 ---
+-- Pistola de desarrollo, para pruebas y desarrollo
 --@classmod devGun
 --@see basicGun
 
@@ -6,6 +7,10 @@ local gun = {}
 
 local basic = require("src.guns.basic")
 
+---
+--Crea una nueva pistola de desarrollo
+--@return (devGun) La nueva pistola de desarrollo creada
+--@usage local myDevGun = DevGun.new()
 gun.new = function()
     local self = basic.new()
     self.name = "dev g"

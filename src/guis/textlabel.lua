@@ -1,13 +1,18 @@
 ---
+-- Etiqueta de texto que se muestra en el GUI
+-- Usa componentes de GUI
 --@classmod textlabel
 --@see gui
 
 local textlabel = {}
 
-local gui = require("src.guis.gui")
-
+---
+-- Crea un nuevo textlabel
+--@param text (string) El texto a mostrar
+--@return (textlabel) Instancia del textlabel
+--@usage local myLabel = textlabel.new("Hola Mundo")
 function textlabel.new(text)
-    local self = gui.new()
+    local self = Guis.new()
     self.text = text
     self.textColor = {1,1,1,1}
     self.font = love.graphics.getFont()

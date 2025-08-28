@@ -14,7 +14,7 @@ love.load = function ()
     Enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
 
     --Crea un colider de caja
-    Collider = ColliderModule.new("box")
+    Collider = Collisions.new("box")
     Collider.position = UDim2.new(0.2, 0, 0.13, 0)
     Collider.size = UDim2.new(0.08, 0, 0.13, 0)
 end
@@ -94,7 +94,7 @@ love.update = function (dt)
         end
 
         --Fisicas de coliders
-        for _,v in pairs(ColliderModule.getCollisions()) do
+        for _,v in pairs(Collisions.getCollisions()) do
             v.visualized = true
             v:UpdateSpeed(dt)
             if v.enabled then
@@ -141,7 +141,7 @@ love.draw = function ()
         end
 
         --Dibuja a los coliders que son visibles
-        for i,v in pairs(ColliderModule.getCollisions()) do
+        for i,v in pairs(Collisions.getCollisions()) do
             if v.visualized then
                 love.graphics.setColor(v.color)
                 local x,y = v.position:transformToPixels()

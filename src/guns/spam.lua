@@ -1,4 +1,5 @@
 ---
+-- Pistola de disparo rapido, se basa en basicGun
 --@classmod spamGun
 --@see basicGun
 
@@ -6,6 +7,10 @@ local gun = {}
 
 local basic = require("Guns.basic")
 
+---
+-- Crea una nueva pistola de disparo rapido
+--@return (spamGun) La nueva pistola de disparo rapido creada
+--@usage local mySpamGun = SpamGun.new()
 gun.new = function()
     local self = basic.new()
     self.name = "Spam Gun"
