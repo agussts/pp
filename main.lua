@@ -2,6 +2,10 @@
 require("src.utils.require")  
 --Config.init()
 
+PlayingTimers = Timer.group.new()
+PauseMenuTimers = Timer.group.new()
+PauseMenuTimers:pause()
+
 --Requiere funciones
 require("src.utils.pausemenu")
 require("src.libs.connections")
@@ -17,6 +21,10 @@ love.load = function ()
     Collider = Collisions.new("box")
     Collider.position = UDim2.new(0.2, 0, 0.13, 0)
     Collider.size = UDim2.new(0.08, 0, 0.13, 0)
+
+    Timer.after(1, function()
+        Camera.shake(10, 5, "XY")
+    end):addToGroup(PlayingTimers)
 end
 
 love.keypressed = function (key)
@@ -40,7 +48,7 @@ Connect("keyPressed", function (key)
                 Player.speed = Player.speed / 3
                 Player.collision.onHit = function () end
                 Player.collision:ChangeType("box")
-            end)
+            end):addToGroup(PlayingTimers)
         end
     end
     if key == Config.SavedConfigs.PBACK then
@@ -65,9 +73,6 @@ love.update = function (dt)
     --Actualiza modulo de timer
     Timer.update(dt)
     --Actualiza animaciones
-    for _,animation in pairs(Animation.getAllAnimations()) do
-        animation:update(dt)
-    end
     if love.mouse.isDown(1) then
         --Activa funcion de cuando se presiona el boton
         for _,self in pairs(Guis.getAll()) do
@@ -111,7 +116,7 @@ love.update = function (dt)
         
 
         --Actualiza el movimiento del jugador
-        Player:UpdateInput()
+        Player:Update(dt)
 
         --Actualiza la camara a la posicion del jugador
         local playerX, playerY = Player.collision.position:toPixels()

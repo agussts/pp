@@ -9,6 +9,39 @@ local timers = {}
 local timersAfter = {}
 local timersEvery = {}
 
+timer.group = {}
+
+function timer.group.new()
+    local self = setmetatable({}, { __index = timer.group })
+    self.timers = {}
+    self.playing = true
+    return self
+end
+
+function timer.group:addTimer(timer)
+    assert(timer and timer.check, "Invalid timer")
+    if not self.playing then
+        timer:pause()
+    end
+    table.insert(self.timers, timer)
+end
+function timer.group:pause()
+    self.playing = false
+    for _, timer in ipairs(self.timers) do
+        timer:pause()
+    end
+end
+function timer.group:continue()
+    self.playing = true
+    for _, timer in ipairs(self.timers) do
+        timer:continue()
+    end
+end
+
+function timer.addToGroup(timer, group)
+    group:addTimer(timer)
+end
+
 ---
 -- Crea un nuevo temporizador
 --@param time (number) El tiempo en segundos que durara el temporizador
@@ -23,6 +56,11 @@ function timer.new(time)
     self._pauseTime = 0
     table.insert(timers, self)
     return self
+end
+
+function timer:addToGroup(group)
+    assert(group and group.timers, "Invalid group")
+    group:addTimer(self)
 end
 
 ---
@@ -66,6 +104,7 @@ end
 --@usage myTimer:Destroy()
 function timer:Destroy()
     self:pause()
+    self:reset()
     for i,v in pairs(timers) do
         if v == self then
             table.remove(timers, i)
@@ -122,17 +161,22 @@ end
 --@usage Timer.update(dt)
 function timer.update(dt)
     timer.passedTime = timer.passedTime + dt
+
     for i,v in pairs(timersEvery) do
-        if timer.passedTime >= v.time + v._currTime then
+        if v.time == nil or not v.playing then goto continue end
+        if timer.passedTime >= v.time + v._currTime + v._pauseTime then
             v.callback()
             v:reset()
         end
+        ::continue::
     end
     for i,v in pairs(timersAfter) do
-        if timer.passedTime >= v.time + v._currTime then
+        if v.time == nil or not v.playing then goto continue end
+        if timer.passedTime >= v.time + v._currTime + v._pauseTime then
             v.callback()
             v:Destroy()
         end
+        ::continue::
     end
 end
 

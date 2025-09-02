@@ -40,7 +40,8 @@ module.new = function(spriteName, width, height)
 end
 
 
-function module:UpdateInput()
+function module:Update(dt)
+    self.sprite:update(dt)
     self.collision.speedX = 0
     self.collision.speedY = 0
     for i, v in pairs(module.controlsMovement) do

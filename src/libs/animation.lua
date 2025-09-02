@@ -11,11 +11,9 @@ local addedAnimations = {}
 --@param columns Numero de columnas en la imagen
 --@param rows Numero de filas en la imagen
 --@param frameDuration Cuanto dura cada cuadro en segundos
---@param looped Opcional: Si la animacion se repite, si no esta marcado, es true por defecto
---@param reversed Opcional: Si la animacion va al reves, si no esta marcado, es false por defecto
---@usage local myAnimation = animations.new("assets/sprites/player-Sheet.png", 32, 32, 3, 3, 0.1, true, false)
+--@usage local myAnimation = animations.new("assets/sprites/player-Sheet.png", 32, 32, 3, 3, 0.1)
 --@return (animation) La animacion creada
-function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDuration, looped, reversed)
+function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDuration)
     --Revisa si los parametros son validos
     assert(type(gridWidth) == "number" and gridWidth > 0, "Invalid gridWidth: expected positive number, got " .. tostring(gridWidth))
     assert(type(gridHeight) == "number" and gridHeight > 0, "Invalid gridHeight: expected positive number, got " .. tostring(gridHeight))
@@ -38,8 +36,8 @@ function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDu
     self.elapsedTime = 0
     self.frameDuration = frameDuration
     self.playing = true
-    self.loop = looped or true
-    self.reversed = reversed or false
+    self.loop = true
+    self.reversed = false
 
     self.quads = {}
     local frameIndex = 1

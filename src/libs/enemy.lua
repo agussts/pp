@@ -27,6 +27,7 @@ enemy.new = function(spritePath, width, height)
     self.collision.link = self
     self.cd = 1
     self.timer = Timer.new(self.cd)
+    self.timer:addToGroup(PlayingTimers)
     self.collision.onHit = (function (collider)
         if not self.timer:check() then return end
         for i,v in pairs(collider.tags) do

@@ -81,7 +81,7 @@ function gun:Fire(x, y)
 
     Timer.after(8, function()
         collider:Destroy()
-    end)
+    end):addToGroup(PlayingTimers)
 end
 
 return gun

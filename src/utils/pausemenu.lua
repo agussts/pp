@@ -409,7 +409,7 @@ local function createKeybindsMenu()
                         print("took too long to press a key, reverting to previous keybind")
                         actionText.text = text .. (prevKey or "None")
                     end
-                end)
+                end):addToGroup(PauseMenuTimers)
             end
         )
 
@@ -454,6 +454,8 @@ showMenu("")
 
 function PauseMenu()
     if Gamestate == "playing" then
+        PlayingTimers:pause()
+        PauseMenuTimers:continue()
         Gamestate = "paused"
         pauseMenuContainer.visible = true
         showMenu("menu")
@@ -461,6 +463,8 @@ function PauseMenu()
         print("resuming")
         Gamestate = "playing"
         showMenu("")
+        PlayingTimers:continue()
+        PauseMenuTimers:pause()
         -- local psStatePos = 1
         -- for i,v in pairs(PauseStates) do
         --     if v == PauseState then

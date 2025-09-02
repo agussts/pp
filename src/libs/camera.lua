@@ -6,6 +6,8 @@
 local camera = {}
 camera.x = 0
 camera.y = 0
+camera.shakeOffsetX = 0
+camera.shakeOffsetY = 0
 
 ---
 --Actualiza la camara al objetivo.
@@ -13,8 +15,8 @@ camera.y = 0
 --@param targetY La posicion Y del objetivo
 --@usage camera.update(100, 200)
 function camera.update(targetX, targetY)
-    camera.x = targetX - love.graphics.getWidth() / 2
-    camera.y = targetY - love.graphics.getHeight() / 2
+    camera.x = (targetX - love.graphics.getWidth() / 2) + camera.shakeOffsetX
+    camera.y = (targetY - love.graphics.getHeight() / 2) + camera.shakeOffsetY
 end
 
 ---
@@ -55,6 +57,32 @@ function camera.worldToScreen(worldX, worldY)
     local screenX = worldX - camera.x
     local screenY = worldY - camera.y
     return screenX, screenY
+end
+
+function camera.shake(intensity, time, direction)
+    assert(intensity > 0, "Intensity must be greater than 0")
+    assert(time > 0, "Time must be greater than 0")
+    assert(direction == "X" or direction == "Y" or direction == "XY", "Direction must be 'X', 'Y' or 'XY'")
+    local timerEvery
+    timerEvery = Timer.every(0.02, function()
+        local shakeX, shakeY = 0, 0
+        if direction == "X" then
+            shakeX = math.random() * intensity * (math.random() > 0.5 and 1 or -1)
+        elseif direction == "Y" then
+            shakeY = math.random() * intensity * (math.random() > 0.5 and 1 or -1)
+        elseif direction == "XY" then
+            shakeX = math.random() * intensity * (math.random() > 0.5 and 1 or -1)
+            shakeY = math.random() * intensity * (math.random() > 0.5 and 1 or -1)
+        end
+        camera.shakeOffsetX = shakeX
+        camera.shakeOffsetY = shakeY
+    end)
+    timerEvery:addToGroup(PlayingTimers)
+    Timer.after(time, function()
+        camera.shakeOffsetX = 0
+        camera.shakeOffsetY = 0
+        timerEvery:Destroy()
+    end):addToGroup(PlayingTimers)
 end
 
 return camera
