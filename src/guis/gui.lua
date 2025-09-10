@@ -27,6 +27,7 @@ function gui.new()
     self._renderY = 0
     self._renderWidth = 0
     self._renderHeight = 0
+    self._renderZIndex = 0
 
     table.insert(addedGuis, self)
     return self

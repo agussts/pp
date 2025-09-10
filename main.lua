@@ -11,20 +11,23 @@ require("src.utils.pausemenu")
 require("src.libs.connections")
 
 love.load = function ()
+    --Ajustes antes de empezar renderizacion
+    love.graphics.setDefaultFilter("nearest", "nearest", 1)
+
     --Crea a el jugador y el enemigo
     Player = PlayerModule.new("assets/sprites/player-Sheet.png", 0.0625, 0.11)
     Player.collision.position = UDim2.fromScale(.5, .5)
     Enemy = EnemyModule.new("assets/sprites/slungus.png", 0.0625, 0.11)
     Enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
+    BackgroundA = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1,1)
+    BackgroundB = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1, 1)
+    BackgroundA.color = {.2,1,1,0.05}
+    BackgroundB.color = {1,.2,1,0.02}
 
     --Crea un colider de caja
     Collider = Collisions.new("box")
     Collider.position = UDim2.new(0.2, 0, 0.13, 0)
     Collider.size = UDim2.new(0.08, 0, 0.13, 0)
-
-    Timer.after(1, function()
-        Camera.shake(10, 5, "XY")
-    end):addToGroup(PlayingTimers)
 end
 
 love.keypressed = function (key)
@@ -38,15 +41,15 @@ Connect("keyPressed", function (key)
             Player.speed = Player.speed * 3
             Player.collision:ChangeType("hitbox")
             --Daño del dash
-            Player.collision.onHit = function (otherCollider)
+            local plrDashConnection = Player.collision.onHit:Connect(function (otherCollider)
                 if otherCollider.link ~= nil and otherCollider.link.health ~= nil then
                     otherCollider.link.health = otherCollider.link.health - 1
                 end
-            end
+            end)
             --Detiene el dash
             Timer.after(0.2, function()
                 Player.speed = Player.speed / 3
-                Player.collision.onHit = function () end
+                plrDashConnection:Disconnect()
                 Player.collision:ChangeType("box")
             end):addToGroup(PlayingTimers)
         end
@@ -68,6 +71,7 @@ love.mousepressed = function (x, y, button)
         end
     end
 end
+
 
 love.update = function (dt)
     --Actualiza modulo de timer
@@ -93,6 +97,10 @@ love.update = function (dt)
     end
 
     if Gamestate == "playing" then
+        BackgroundA:setScroll(BackgroundA.scrollX + 50*dt, BackgroundA.scrollY - 25*dt)
+        BackgroundB:setScroll(BackgroundB.scrollX - 25*dt, BackgroundB.scrollY + 50*dt)
+        BackgroundA.color[4] = 0.035 + 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
+        BackgroundB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
         if love.mouse.isDown(1) then
             local x,y = Player.collision.position:transformToPixels()
             Gun:Fire(x, y)
@@ -124,18 +132,12 @@ love.update = function (dt)
     end
 end
 
-
-love.draw = function ()
-    --Ajustes antes de empezar renderizacion
-    love.graphics.setDefaultFilter("nearest")
-    --Dibuja el jugador
-
-    love.graphics.setBackgroundColor(.4, .4, .4, 1)    
-
+love.draw = function () 
     local playerX, playerY = Player.collision.position:transformToPixels()
     local width, height = Player.size:transformToPixels()
-
     
+    BackgroundA:draw(Camera.x, Camera.y)
+    BackgroundB:draw(Camera.x, Camera.y)
     Camera.attach()
         Player.sprite:draw(playerX, playerY, width, height)
         --Dibuja a los enemigos

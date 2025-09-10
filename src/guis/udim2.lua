@@ -6,6 +6,7 @@
 local udim2 = {}
 
 udim2.__index = udim2
+
 --Suma de dos UDim2
 udim2.__add = function (self, other)
     return udim2.new(
@@ -36,7 +37,7 @@ end
 --Division de un escalar por un UDim2
 udim2.__div = function (self, scalar)
     if scalar == 0 then
-        error("Division by zero is not allowed.")
+        error("Division by zero is not allowed.")   
     end
     return udim2.new(
         self.x.scale / scalar,
@@ -48,7 +49,7 @@ end
 
 --Formatea el UDmim2 a un string legible
 udim2.__tostring = function (self)
-    return tostring(self.x.scale), tostring(self.x.offset), tostring(self.y.scale), tostring(self.y.offset)
+    return string.format("UDim2(%.2f, %d, %.2f, %d)", self.x.scale, self.x.offset, self.y.scale, self.y.offset)
 end
 
 ---
@@ -69,6 +70,8 @@ function udim2.new(xScale, xOffset, yScale, yOffset)
     self.y.offset = yOffset
     return self
 end
+
+udim2.zero = udim2.new(0, 0, 0, 0)
 
 ---
 --Transforma la posicion de UDim2 a pixeles propocionalmente al tamaño del padre
@@ -97,8 +100,8 @@ function udim2:toScale(parentWidth, parentHeight)
         parentWidth = love.graphics.getWidth()
         parentHeight = love.graphics.getHeight()
     end
-    local x = self.x.offset / parentWidth + self.x.scale
-    local y = self.y.offset / parentHeight + self.y.scale
+    local x =  self.x.offset / parentWidth + self.x.scale
+    local y =  self.y.offset / parentHeight + self.y.scale
     return x, y
 end
 

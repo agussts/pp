@@ -14,6 +14,8 @@ local frame = {}
 function frame.new(position, size)
     local self = Guis.new()
     self.bgColor = {1,1,1,1}
+    self.position = position or UDim2.zero
+    self.size = size or UDim2.fromScale(.3, .3)
     self.type = "frame"    
     return self
 end

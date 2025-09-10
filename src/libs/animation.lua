@@ -41,8 +41,8 @@ function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDu
 
     self.quads = {}
     local frameIndex = 1
-    for y = 0, columns - 1 do
-        for x = 0, rows - 1 do
+    for y = 0, rows - 1 do
+        for x = 0, columns - 1 do
             local quad = love.graphics.newQuad(x * gridWidth, y * gridHeight, gridWidth, gridHeight, self.image:getDimensions())
             self.quads[frameIndex] = {x + 1, y + 1, quad}
             frameIndex = frameIndex + 1

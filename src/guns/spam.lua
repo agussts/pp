@@ -5,7 +5,7 @@
 
 local gun = {}
 
-local basic = require("Guns.basic")
+local basic = require("src.guns.basic")
 
 ---
 -- Crea una nueva pistola de disparo rapido

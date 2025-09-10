@@ -46,7 +46,8 @@ function gun:Fire(x, y)
     end
     self.ammo = self.ammo - 1
     local collider
-    collider = Collisions.new("hitbox", true, function (otherCollider)
+    collider = Collisions.new("hitbox", true)
+    collider.onHit:Connect(function (otherCollider)
         for i,v in pairs(otherCollider.tags) do
             if v == "player" or v == "projectile" then return end
         end
@@ -61,7 +62,8 @@ function gun:Fire(x, y)
         end
         collider:Destroy()
     end)
-    for i,v in pairs(self.tags) do
+    
+    for _,v in pairs(self.tags) do
         collider:AddTag(v)
     end
     local mouseX, mouseY = Camera.screenToWorld(love.mouse:getPosition())

@@ -15,6 +15,9 @@ function timer.group.new()
     local self = setmetatable({}, { __index = timer.group })
     self.timers = {}
     self.playing = true
+    self.pauseStart = 0
+    self.pauseEnd = 0
+    self.pausedTime = 0
     return self
 end
 
@@ -27,15 +30,22 @@ function timer.group:addTimer(timer)
 end
 function timer.group:pause()
     self.playing = false
+    self.pauseStart = timer.passedTime
     for _, timer in ipairs(self.timers) do
         timer:pause()
     end
 end
 function timer.group:continue()
     self.playing = true
+    self.pauseEnd = timer.passedTime
+    self.pausedTime = self.pausedTime + (self.pauseEnd - self.pauseStart)
     for _, timer in ipairs(self.timers) do
         timer:continue()
     end
+end
+
+function timer.group:getTimePassed()
+    return timer.passedTime - self.pausedTime
 end
 
 function timer.addToGroup(timer, group)
@@ -96,7 +106,10 @@ end
 function timer:continue()
     self.playing = true
     self._pauseEnd = timer.passedTime
-    self._pauseTime = self._pauseEnd - self._pauseStart
+    if self._pauseTime == nil then
+        self._pauseTime = 0
+    end
+    self._pauseTime = self._pauseTime + (self._pauseEnd - self._pauseStart)
 end
 
 ---
@@ -119,7 +132,7 @@ function timer:Destroy()
     end
     for i,v in pairs(timersEvery) do
         if v == self then
-            table.remove(timersAfter, i)
+            table.remove(timersEvery, i)
             break
         end
     end

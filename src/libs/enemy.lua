@@ -28,7 +28,7 @@ enemy.new = function(spritePath, width, height)
     self.cd = 1
     self.timer = Timer.new(self.cd)
     self.timer:addToGroup(PlayingTimers)
-    self.collision.onHit = (function (collider)
+    self.collision.onHit:Connect(function (collider)
         if not self.timer:check() then return end
         for i,v in pairs(collider.tags) do
             if v == "hitbox" then return end

@@ -5,6 +5,8 @@ local ConfigManager = {}
 ConfigManager.ConfigTable = {}
 ConfigManager.SavedConfigs = {}
 
+ConfigManager.IdealResolution = {width = 640, height = 360}
+
 ConfigManager.Resolutions = {
     {width = 320, height = 180, scale = 0.5},
     {width = 640, height = 360, scale = 1},
@@ -27,7 +29,7 @@ ConfigManager.DefaultConfigs = {
 local function tableClone(original)
     local copy = {}
     for i, v in pairs(original) do
-        if type(i) == "table" then
+        if type(v) == "table" then
             copy[i] = tableClone(v)
         else
             copy[i] = v

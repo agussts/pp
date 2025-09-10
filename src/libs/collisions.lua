@@ -2,7 +2,7 @@
 -- Modulo de colisiones para detectar choques entre objetos.
 --@classmod collisions
 
-local udim2 = require "src.guis.udim2"
+
 local collisions = {}
 
 local addedCollisions = {}
@@ -16,16 +16,16 @@ local types = {
 --@param onHit La funcion que se llama cuando la colision ocurre
 --@usage local myCollision = collisions.new("box", true, function(otherCollider)
 --@return El collider creado
-collisions.new = function(type, enabled, onHit)
+collisions.new = function(type, enabled)
     local self = setmetatable({}, { __index = collisions })
 
-    self.position = udim2.new(0, 0, 0, 0)
-    self.size = udim2.new(0, 0, 0, 0)
+    self.position = UDim2.new(0, 0, 0, 0)
+    self.size = UDim2.new(0, 0, 0, 0)
     self.speedX = 0
     self.speedY = 0
     self.visualized = false
-    self.enabled = enabled or true
-    self.onHit = onHit or function () end
+    self.enabled = enabled ~= false
+    self.onHit = Signal.new()
     self.color = {1, 1, 1, 1}
     self.link = nil
 
@@ -117,14 +117,14 @@ end
 --@param dt Delta time
 --@usage myCollision:UpdateSpeed(dt)
 function collisions:UpdateSpeed(dt)
-    local x, y = self.position:transformToPixels()
-    local screenWidth, screenHeight = love.graphics.getPixelDimensions()
-    screenWidth = screenWidth / 640
-    screenHeight = screenHeight / 360
-    x = x + self.speedX * screenWidth * dt
-    y = y + self.speedY * screenHeight * dt
-    self.position = udim2.new(0, x, 0, y)
-    self.position:toScale()
+    local x, y = self.position:toPixels()
+    local screenWidth, screenHeight = love.graphics.getDimensions()
+    local sx = screenWidth / Config.IdealResolution.width
+    local sy = screenHeight / Config.IdealResolution.height
+    x = x + self.speedX * sx * dt
+    y = y + self.speedY * sy * dt
+    self.position = UDim2.fromOffset(x, y)
+    self.position = UDim2.fromScale(self.position:toScale())
 end
 
 ---
@@ -149,7 +149,6 @@ function collisions:Destroy()
         v = nil
     end
     self = nil
-    return
 end
 
 ---
@@ -162,19 +161,18 @@ end
 function collisions:check()
     if not self.enabled then return end
     local hitting = {}
+    local x, y = self.position:toPixels()
+    local width, height = self.size:toPixels()
     for _, otherCollider in pairs(addedCollisions) do
-        if otherCollider == self then goto continue end
-
-        local x, y = self.position:transformToPixels()
-        local width, height = self.size:transformToPixels()
-        local otherX, otherY = otherCollider.position:transformToPixels()
-        local otherWidth, otherHeight = otherCollider.size:transformToPixels()
+        if otherCollider == self then goto continue end      
+        local otherX, otherY = otherCollider.position:toPixels()
+        local otherWidth, otherHeight = otherCollider.size:toPixels()
         if x <= otherX + otherWidth
         and x + width >= otherX
         and y <= otherY + otherHeight
         and y + height >= otherY then
             table.insert(hitting, otherCollider)
-            self.onHit(otherCollider)
+            self.onHit:Fire(otherCollider)
             if self.type == "box" and otherCollider.type == "box" then
                 local dx = math.min(x + width, otherX + otherWidth) - math.max(x, otherX)
                 local dy = math.min(y + height, otherY + otherHeight) - math.max(y, otherY)
@@ -196,10 +194,10 @@ function collisions:check()
                 end
             end
         end
-        self.position = udim2.new(0, x, 0, y)
-        self.position:toScale()
         ::continue::
     end
+    self.position = UDim2.fromOffset(x, y)
+    self.position = UDim2.fromScale(self.position:toScale())
     return hitting
 end
 
