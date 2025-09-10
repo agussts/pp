@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+
+<ul>
+  <li><a href="../doc.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>libs.background</strong></li>
+  <li><a href="../modules/connections.html">connections</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/button.html">button</a></li>
+  <li><a href="../classes/frame.html">frame</a></li>
+  <li><a href="../classes/gui.html">gui</a></li>
+  <li><a href="../classes/imagelabel.html">imagelabel</a></li>
+  <li><a href="../classes/textlabel.html">textlabel</a></li>
+  <li><a href="../classes/udim2.html">udim2</a></li>
+  <li><a href="../classes/basicGun.html">basicGun</a></li>
+  <li><a href="../classes/devGun.html">devGun</a></li>
+  <li><a href="../classes/spamGun.html">spamGun</a></li>
+  <li><a href="../classes/animations.html">animations</a></li>
+  <li><a href="../classes/camera.html">camera</a></li>
+  <li><a href="../classes/collisions.html">collisions</a></li>
+  <li><a href="../classes/enemy.html">enemy</a></li>
+  <li><a href="../classes/player.html">player</a></li>
+  <li><a href="../classes/signal.html">signal</a></li>
+  <li><a href="../classes/timer.html">timer</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>libs.background</code></h1>
+<p>Fondo con tamaño de tile configurable (en pixeles de pantalla),
+ repetido para cubrir todo el viewport, con soporte de scroll/parallax.</p>
+<p></p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Background.new">Background.new (imagePath, tileW, tileH, parallaxX:, parallaxY:)</a></td>
+	<td class="summary">Crea un nuevo fondo</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Background:setTileSize">Background:setTileSize (tileW, tileH)</a></td>
+	<td class="summary">Cambia tamaño del tile (en pixeles de pantalla)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Background:setScroll">Background:setScroll (px, py)</a></td>
+	<td class="summary">Scroll manual (por ejemplo para animar el fondo)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Background:setParallax">Background:setParallax (px, py)</a></td>
+	<td class="summary">Parallax (0 = fijo a pantalla, 1 = se mueve como el mundo/camara)</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Background:draw">Background:draw (cameraX, cameraY)</a></td>
+	<td class="summary">Dibuja el fondo.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    Methods
+    <dl class="function">
+    <dt>
+    <a name = "Background.new"></a>
+    <strong>Background.new (imagePath, tileW, tileH, parallaxX:, parallaxY:)</strong>
+    </dt>
+    <dd>
+    Crea un nuevo fondo
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">imagePath</span>
+         ruta de la textura
+        </li>
+        <li><span class="parameter">tileW</span>
+         ancho del tile en pixeles de la pantalla (como de grande se “ve” cada repeticion)
+        </li>
+        <li><span class="parameter">tileH</span>
+         altura del tile en pixeles de la pantalla (como de grande se “ve” cada repeticion)
+        </li>
+        <li><span class="parameter">parallaxX:</span>
+         0 = fijo a pantalla, 1 = se mueve como la camara
+        </li>
+        <li><span class="parameter">parallaxY:</span>
+         0 = fijo a pantalla, 1 = se mueve como la camara
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        (background) Instancia del fondo
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> myBackground = Background.<span class="function-name">new</span>(<span class="string">"assets/sprites/image.png"</span>, <span class="number">200</span>, <span class="number">150</span>, <span class="number">0.5</span>, <span class="number">0.5</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Background:setTileSize"></a>
+    <strong>Background:setTileSize (tileW, tileH)</strong>
+    </dt>
+    <dd>
+    Cambia tamaño del tile (en pixeles de pantalla)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tileW</span>
+         ancho del tile en pixeles de la pantalla (como de grande se “ve” cada repeticion)
+        </li>
+        <li><span class="parameter">tileH</span>
+         altura del tile en pixeles de la pantalla (como de grande se “ve” cada repeticion)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myBackground:<span class="function-name">setTileSize</span>(<span class="number">200</span>, <span class="number">150</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Background:setScroll"></a>
+    <strong>Background:setScroll (px, py)</strong>
+    </dt>
+    <dd>
+    Scroll manual (por ejemplo para animar el fondo)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">px</span>
+         desplazamiento en X en pixeles de pantalla
+        </li>
+        <li><span class="parameter">py</span>
+         desplazamiento en Y en pixeles de pantalla
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myBackground:<span class="function-name">setScroll</span>(<span class="number">100</span>, <span class="number">50</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Background:setParallax"></a>
+    <strong>Background:setParallax (px, py)</strong>
+    </dt>
+    <dd>
+    Parallax (0 = fijo a pantalla, 1 = se mueve como el mundo/camara)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">px</span>
+         parallax en X
+        </li>
+        <li><span class="parameter">py</span>
+         parallax en Y
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myBackground:<span class="function-name">setParallax</span>(<span class="number">0.5</span>, <span class="number">0.5</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Background:draw"></a>
+    <strong>Background:draw (cameraX, cameraY)</strong>
+    </dt>
+    <dd>
+    Dibuja el fondo.  cameraX/Y son coordenadas de la camara (en pixeles mundo)
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cameraX</span>
+         posicion X de la camara en pixeles mundo
+        </li>
+        <li><span class="parameter">cameraY</span>
+         posicion Y de la camara en pixeles mundo
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">myBackground:<span class="function-name">draw</span>(cameraX, cameraY)</pre>
+    </ul>
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2025-09-10 21:20:51 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
