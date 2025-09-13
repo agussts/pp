@@ -17,10 +17,10 @@ end
 ---
 -- Crea un nuevo enemigo
 --@return (enemy) El nuevo enemigo creado
---@usage local myEnemy = Enemy.new("assets/sprites/enemy.png", 32, 32)
-enemy.new = function(spritePath, width, height)
+--@usage local myEnemy = Enemy.new(myEnemyAnimation, 32, 32)
+enemy.new = function(spriteAnim, width, height)
     local self = setmetatable({}, { __index = enemy })
-    self.sprite = love.graphics.newImage(spritePath)
+    self.sprite = spriteAnim or Animation.new("assets/sprites/slungus.png", 223, 226, 1, 1, 1)
     self.collision = Collisions.new("box")
     self.collision.position = UDim2.new(0, 0, 0, 0)
     self.collision.size = UDim2.new(width, 0, height, 0)
@@ -48,6 +48,21 @@ enemy.new = function(spritePath, width, height)
     return self
 end
 
+function enemy:draw()
+    local x,y = self.collision.position:toPixels()
+    local w,h = self.collision.size:toPixels()
+    self.sprite:draw(x, y, w, h)
+end
 
+function enemy:Destroy()
+    self.collision:Destroy()
+    for i,v in pairs(addedEnemies) do
+        if v == self then
+            table.remove(addedEnemies, i)
+            break
+        end
+    end
+    self = nil
+end
 
 return enemy

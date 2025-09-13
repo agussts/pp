@@ -23,7 +23,7 @@ collisions.new = function(type, enabled)
     self.size = UDim2.new(0, 0, 0, 0)
     self.speedX = 0
     self.speedY = 0
-    self.visualized = false
+    self.visualized = true --TEMPORAL: CAMBIAR A FALSE DESPUES
     self.enabled = enabled ~= false
     self.onHit = Signal.new()
     self.color = {1, 1, 1, 1}
@@ -117,6 +117,7 @@ end
 --@param dt Delta time
 --@usage myCollision:UpdateSpeed(dt)
 function collisions:UpdateSpeed(dt)
+    if not self.enabled then return end
     local x, y = self.position:toPixels()
     local screenWidth, screenHeight = love.graphics.getDimensions()
     local sx = screenWidth / Config.IdealResolution.width
@@ -199,6 +200,16 @@ function collisions:check()
     self.position = UDim2.fromOffset(x, y)
     self.position = UDim2.fromScale(self.position:toScale())
     return hitting
+end
+
+function collisions:draw()
+    if self.visualized and self.enabled then
+        local x, y = self.position:toPixels()
+        local width, height = self.size:toPixels()
+        love.graphics.setColor(self.color)
+        love.graphics.rectangle("line", x, y, width, height)
+        love.graphics.setColor(1, 1, 1, 1)
+    end
 end
 
 return collisions
