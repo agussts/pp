@@ -13,8 +13,8 @@ Guis = require("src.guis.gui")
     Frame = require("src.guis.frame")
     ImageLabel = require("src.guis.imagelabel")
 
-PlayerModule = require("src.libs.player")
-EnemyModule = require("src.libs.enemy")
+PlayerModule = require("src.objs.player")
+EnemyModule = require("src.objs.enemy")
 GunModule = require("src.guns.dev")
 Gun = GunModule.new()
     

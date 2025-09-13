@@ -17,7 +17,7 @@ love.load = function ()
     --Crea a el jugador y el enemigo
     Player = PlayerModule.new("assets/sprites/player-Sheet.png", 0.0625, 0.11)
     Player.collision.position = UDim2.fromScale(.5, .5)
-    Enemy = EnemyModule.new("assets/sprites/slungus.png", 0.0625, 0.11)
+    Enemy = EnemyModule.new(nil, 0.0625, 0.11)
     Enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
     BackgroundA = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1,1)
     BackgroundB = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1, 1)
@@ -133,8 +133,8 @@ love.update = function (dt)
 end
 
 love.draw = function () 
-    local playerX, playerY = Player.collision.position:transformToPixels()
-    local width, height = Player.size:transformToPixels()
+    local playerX, playerY = Player.collision.position:toPixels()
+    local width, height = Player.size:toPixels()
     
     BackgroundA:draw(Camera.x, Camera.y)
     BackgroundB:draw(Camera.x, Camera.y)
@@ -142,20 +142,14 @@ love.draw = function ()
         Player.sprite:draw(playerX, playerY, width, height)
         --Dibuja a los enemigos
         for _,v in pairs(EnemyModule.getEnemies()) do
-            local x,y = v.collision.position:transformToPixels()
-            local width, height = v.collision.size:transformToPixels()
-            love.graphics.draw(v.sprite, x, y, 0, width / v.sprite:getWidth(), height / v.sprite:getHeight())
+            local x,y = v.collision.position:toPixels()
+            local width, height = v.collision.size:toPixels()
+            v:draw(x, y, width, height)
         end
 
         --Dibuja a los coliders que son visibles
         for i,v in pairs(Collisions.getCollisions()) do
-            if v.visualized then
-                love.graphics.setColor(v.color)
-                local x,y = v.position:transformToPixels()
-                local width, height = v.size:transformToPixels()
-                love.graphics.rectangle("line", x, y, width, height)
-                love.graphics.setColor(1,1,1,1)
-            end
+            v:draw()
         end
     Camera.detach()
 
