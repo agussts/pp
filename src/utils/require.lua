@@ -20,3 +20,6 @@ Gun = GunModule.new()
     
 Camera = require("src.libs.camera")
 Background = require("src.libs.background")
+
+Scene = require("src.scenes.scene")
+Transition = require("src.scenes.transition")

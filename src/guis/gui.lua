@@ -165,4 +165,35 @@ function gui:Destroy()
     end
 end
 
+-- Marca si este GUI (y su árbol) deben sobrevivir a los cambios de escena
+function gui:setPersistent(isPersistent)
+    self._persistent = not not isPersistent
+end
+
+-- Devuelve el top-level ancestor de un gui
+local function getRoot(guiObj)
+    local root = guiObj
+    while root.parent do root = root.parent end
+    return root
+end
+
+-- Limpia SOLO los GUIs cuyo root NO sea persistente
+function gui.clearNonPersistent()
+    for i = #addedGuis, 1, -1 do
+        local g = addedGuis[i]
+        local root = getRoot(g)
+        if not root._persistent then
+            table.remove(addedGuis, i)
+        end
+    end
+end
+
+-- (opcional, se mantiene por si ya la usas en algún lado)
+function gui.clearAll()
+    for i = #addedGuis, 1, -1 do
+        addedGuis[i] = nil
+    end
+end
+
+
 return gui

@@ -10,24 +10,31 @@ PauseMenuTimers:pause()
 require("src.utils.pausemenu")
 require("src.libs.connections")
 
+local testScene = require("src.scenes.testscene")
+local Level2 = require("src.scenes.level2")
+Scene.register("testScene", testScene)
+Scene.register("level2", Level2)
+
+-- BackgroundA = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1,1)
+-- BackgroundB = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1, 1)
+-- BackgroundA.color = {.2,1,1,0.05}
+-- BackgroundB.color = {1,.2,1,0.02}
+--Crea a el jugador y el enemigo
+-- Player = PlayerModule.new("assets/sprites/player-Sheet.png", 0.0625, 0.11)
+-- Player.collision.position = UDim2.fromScale(.5, .5)
+-- Enemy = EnemyModule.new(nil, 0.0625, 0.11)
+-- Enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
+
+
+-- --Crea un colider de caja
+-- Collider = Collisions.new("box")
+-- Collider.position = UDim2.new(0.2, 0, 0.13, 0)
+-- Collider.size = UDim2.new(0.08, 0, 0.13, 0)
+
 love.load = function ()
     --Ajustes antes de empezar renderizacion
     love.graphics.setDefaultFilter("nearest", "nearest", 1)
-
-    --Crea a el jugador y el enemigo
-    Player = PlayerModule.new("assets/sprites/player-Sheet.png", 0.0625, 0.11)
-    Player.collision.position = UDim2.fromScale(.5, .5)
-    Enemy = EnemyModule.new(nil, 0.0625, 0.11)
-    Enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
-    BackgroundA = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1,1)
-    BackgroundB = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1, 1)
-    BackgroundA.color = {.2,1,1,0.05}
-    BackgroundB.color = {1,.2,1,0.02}
-
-    --Crea un colider de caja
-    Collider = Collisions.new("box")
-    Collider.position = UDim2.new(0.2, 0, 0.13, 0)
-    Collider.size = UDim2.new(0.08, 0, 0.13, 0)
+    Scene.load("testScene")
 end
 
 love.keypressed = function (key)
@@ -97,61 +104,64 @@ love.update = function (dt)
     end
 
     if Gamestate == "playing" then
-        BackgroundA:setScroll(BackgroundA.scrollX + 50*dt, BackgroundA.scrollY - 25*dt)
-        BackgroundB:setScroll(BackgroundB.scrollX - 25*dt, BackgroundB.scrollY + 50*dt)
-        BackgroundA.color[4] = 0.035 + 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
-        BackgroundB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
-        if love.mouse.isDown(1) then
-            local x,y = Player.collision.position:transformToPixels()
-            Gun:Fire(x, y)
-        end
+        Scene.update(dt)
+        -- BackgroundA:setScroll(BackgroundA.scrollX + 50*dt, BackgroundA.scrollY - 25*dt)
+        -- BackgroundB:setScroll(BackgroundB.scrollX - 25*dt, BackgroundB.scrollY + 50*dt)
+        -- BackgroundA.color[4] = 0.035 + 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
+        -- BackgroundB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
+        -- if love.mouse.isDown(1) then
+        --     local x,y = Player.collision.position:transformToPixels()
+        --     Gun:Fire(x, y)
+        -- end
 
-        --Fisicas de coliders
-        for _,v in pairs(Collisions.getCollisions()) do
-            v.visualized = true
-            v:UpdateSpeed(dt)
-            if v.enabled then
-                v:check()
-            end
-        end
+        -- --Fisicas de coliders
+        -- for _,v in pairs(Collisions.getCollisions()) do
+        --     v.visualized = true
+        --     v:UpdateSpeed(dt)
+        --     if v.enabled then
+        --         v:check()
+        --     end
+        -- end
 
-        --Funcionamiento de la pistola
-        if Gun.lastFireTime > 0 then
-            Gun.lastFireTime = Gun.lastFireTime - dt
-        else
-            Gun.lastFireTime = 0
-        end
+        -- --Funcionamiento de la pistola
+        -- if Gun.lastFireTime > 0 then
+        --     Gun.lastFireTime = Gun.lastFireTime - dt
+        -- else
+        --     Gun.lastFireTime = 0
+        -- end
         
 
-        --Actualiza el movimiento del jugador
-        Player:Update(dt)
+        -- --Actualiza el movimiento del jugador
+        -- Player:Update(dt)
 
-        --Actualiza la camara a la posicion del jugador
-        local playerX, playerY = Player.collision.position:toPixels()
-        Camera.update(playerX, playerY)
+        -- --Actualiza la camara a la posicion del jugador
+        -- local playerX, playerY = Player.collision.position:toPixels()
+        -- Camera.update(playerX, playerY)
     end
+    Transition.update(dt)
 end
 
 love.draw = function () 
-    local playerX, playerY = Player.collision.position:toPixels()
-    local width, height = Player.size:toPixels()
+    Scene.draw()
+    -- local playerX, playerY = Player.collision.position:toPixels()
+    -- local width, height = Player.size:toPixels()
     
-    BackgroundA:draw(Camera.x, Camera.y)
-    BackgroundB:draw(Camera.x, Camera.y)
-    Camera.attach()
-        Player.sprite:draw(playerX, playerY, width, height)
-        --Dibuja a los enemigos
-        for _,v in pairs(EnemyModule.getEnemies()) do
-            local x,y = v.collision.position:toPixels()
-            local width, height = v.collision.size:toPixels()
-            v:draw(x, y, width, height)
-        end
+    -- BackgroundA:draw(Camera.x, Camera.y)
+    -- BackgroundB:draw(Camera.x, Camera.y)
+    -- Camera.attach()
+    --     Player.sprite:draw(playerX, playerY, width, height)
+    --     --Dibuja a los enemigos
+    --     for _,v in pairs(EnemyModule.getEnemies()) do
+    --         local x,y = v.collision.position:toPixels()
+    --         local width, height = v.collision.size:toPixels()
+    --         v:draw(x, y, width, height)
+    --     end
 
-        --Dibuja a los coliders que son visibles
-        for i,v in pairs(Collisions.getCollisions()) do
-            v:draw()
-        end
-    Camera.detach()
+    --     --Dibuja a los coliders que son visibles
+    --     for i,v in pairs(Collisions.getCollisions()) do
+    --         v:draw()
+    --     end
+    -- Camera.detach()
 
     -- Ordena por zIndex, si son iguales, ordena por el orden de insercion
     local sortedGuis = Guis.getAll()
@@ -196,4 +206,5 @@ love.draw = function ()
         love.graphics.setColor(1,1,1,1)
         ::continue::
     end
+    Transition.draw()
 end

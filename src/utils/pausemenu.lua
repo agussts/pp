@@ -8,6 +8,7 @@ PauseState = "menu"
 
 -- Creamos el contenedor principal de la interfaz
 local pauseMenuContainer = Frame.new()
+pauseMenuContainer:setPersistent(true)
 pauseMenuContainer.size = UDim2.fromScale(1, 1)
 pauseMenuContainer.bgColor = {0, 0, 0, 0.65}
 pauseMenuContainer.visible = false
@@ -19,6 +20,13 @@ listThing.position = UDim2.fromScale(0.5, 0.5)
 listThing.anchorPoint = {0.5, 0.5}
 listThing.bgColor = {1, 1, 1, 0}
 listThing:setParent(pauseMenuContainer)
+
+local otherList = Frame.new()
+otherList.size = UDim2.fromScale(1, 1)
+otherList.position = UDim2.fromScale(0.5, 0.5)
+otherList.anchorPoint = {0.5, 0.5}
+otherList.bgColor = {1, 1, 1, 0}
+otherList:setParent(pauseMenuContainer)
 
 
 -- -------------------------------------------
@@ -370,11 +378,12 @@ local function createSettingsMenu(parent)
     return menu
 end
 
-local function createKeybindsMenu()
+local function createKeybindsMenu(parent)
     local menu = {}
     local keybindEntries = {}
 
     local titleText = Textlabel.new("Keybinds")
+    titleText:setParent(parent)
     titleText.position = UDim2.fromScale(0, 0)
     titleText.size = UDim2.fromScale(1, 0.1)
     titleText.textColor = {1, 1, 1, 1}
@@ -383,7 +392,7 @@ local function createKeybindsMenu()
     local function createKeybindEntry(actionName, position, text)
         local changeBtn, actionText
         changeBtn, actionText = createTextButton(
-            nil,
+            parent,
             position,
             UDim2.fromScale(.3, .1),
             text.. (Config.ConfigTable[actionName] or "None"),
@@ -445,7 +454,7 @@ end
 -- Inicialización de los menus
 menus.menu = createMainMenu(listThing)
 menus.settings = createSettingsMenu(listThing)
-menus.keybinds = createKeybindsMenu()
+menus.keybinds = createKeybindsMenu(otherList)
 showMenu("")
 
 -- -------------------------------------------

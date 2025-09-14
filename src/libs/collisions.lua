@@ -202,6 +202,12 @@ function collisions:check()
     return hitting
 end
 
+function collisions.clearAll()
+    for i = #addedCollisions, 1, -1 do
+        addedCollisions[i]:Destroy()
+    end
+end
+
 function collisions:draw()
     if self.visualized and self.enabled then
         local x, y = self.position:toPixels()
