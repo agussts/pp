@@ -1,6 +1,7 @@
 ---
 -- Fondo con tamaño de tile configurable (en pixeles de pantalla),
 -- repetido para cubrir todo el viewport, con soporte de scroll/parallax.
+--@classmod background
 
 local Background = {}
 Background.__index = Background

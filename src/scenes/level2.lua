@@ -1,6 +1,3 @@
--- src/scenes/level2.lua
-local Door = require("src.objs.door")
-
 return function()
     local scene = {}
 
@@ -17,11 +14,7 @@ return function()
         Gun = GunModule.new()
 
         -- Puerta de vuelta a level1
-        self.door = Door.new{
-            to = "testScene",
-            position = UDim2.fromScale(0.1, 0.6),
-            size = UDim2.fromScale(0.04, 0.1),
-        }
+        self.door = Door.new("testScene", UDim2.fromScale(0.1, 0.6), UDim2.fromScale(0.04, 0.1))
     end
 
     scene.update = function(self, dt)

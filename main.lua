@@ -12,29 +12,17 @@ require("src.libs.connections")
 
 local testScene = require("src.scenes.testscene")
 local Level2 = require("src.scenes.level2")
+local internetscn = require("src.scenes.internetscn")
+local darkweb = require("src.scenes.darkweb")
 Scene.register("testScene", testScene)
 Scene.register("level2", Level2)
-
--- BackgroundA = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1,1)
--- BackgroundB = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1, 1)
--- BackgroundA.color = {.2,1,1,0.05}
--- BackgroundB.color = {1,.2,1,0.02}
---Crea a el jugador y el enemigo
--- Player = PlayerModule.new("assets/sprites/player-Sheet.png", 0.0625, 0.11)
--- Player.collision.position = UDim2.fromScale(.5, .5)
--- Enemy = EnemyModule.new(nil, 0.0625, 0.11)
--- Enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
-
-
--- --Crea un colider de caja
--- Collider = Collisions.new("box")
--- Collider.position = UDim2.new(0.2, 0, 0.13, 0)
--- Collider.size = UDim2.new(0.08, 0, 0.13, 0)
+Scene.register("internetscn", internetscn)
+Scene.register("darkweb", darkweb)
 
 love.load = function ()
     --Ajustes antes de empezar renderizacion
     love.graphics.setDefaultFilter("nearest", "nearest", 1)
-    Scene.load("testScene")
+    Scene.load("internetscn")
 end
 
 love.keypressed = function (key)
@@ -105,63 +93,12 @@ love.update = function (dt)
 
     if Gamestate == "playing" then
         Scene.update(dt)
-        -- BackgroundA:setScroll(BackgroundA.scrollX + 50*dt, BackgroundA.scrollY - 25*dt)
-        -- BackgroundB:setScroll(BackgroundB.scrollX - 25*dt, BackgroundB.scrollY + 50*dt)
-        -- BackgroundA.color[4] = 0.035 + 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
-        -- BackgroundB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
-        -- if love.mouse.isDown(1) then
-        --     local x,y = Player.collision.position:transformToPixels()
-        --     Gun:Fire(x, y)
-        -- end
-
-        -- --Fisicas de coliders
-        -- for _,v in pairs(Collisions.getCollisions()) do
-        --     v.visualized = true
-        --     v:UpdateSpeed(dt)
-        --     if v.enabled then
-        --         v:check()
-        --     end
-        -- end
-
-        -- --Funcionamiento de la pistola
-        -- if Gun.lastFireTime > 0 then
-        --     Gun.lastFireTime = Gun.lastFireTime - dt
-        -- else
-        --     Gun.lastFireTime = 0
-        -- end
-        
-
-        -- --Actualiza el movimiento del jugador
-        -- Player:Update(dt)
-
-        -- --Actualiza la camara a la posicion del jugador
-        -- local playerX, playerY = Player.collision.position:toPixels()
-        -- Camera.update(playerX, playerY)
     end
     Transition.update(dt)
 end
 
 love.draw = function () 
     Scene.draw()
-    -- local playerX, playerY = Player.collision.position:toPixels()
-    -- local width, height = Player.size:toPixels()
-    
-    -- BackgroundA:draw(Camera.x, Camera.y)
-    -- BackgroundB:draw(Camera.x, Camera.y)
-    -- Camera.attach()
-    --     Player.sprite:draw(playerX, playerY, width, height)
-    --     --Dibuja a los enemigos
-    --     for _,v in pairs(EnemyModule.getEnemies()) do
-    --         local x,y = v.collision.position:toPixels()
-    --         local width, height = v.collision.size:toPixels()
-    --         v:draw(x, y, width, height)
-    --     end
-
-    --     --Dibuja a los coliders que son visibles
-    --     for i,v in pairs(Collisions.getCollisions()) do
-    --         v:draw()
-    --     end
-    -- Camera.detach()
 
     -- Ordena por zIndex, si son iguales, ordena por el orden de insercion
     local sortedGuis = Guis.getAll()
@@ -178,32 +115,7 @@ love.draw = function ()
 
     for _,self in pairs(sortedGuis) do
         if not self.visible then goto continue end
-        local x, y = self:getRenderPosition()
-        local width, height = self:getRenderSize()
-
-        --Dibuja el texto si es que tiene
-        if self.text then
-            love.graphics.setColor(self.textColor or {0,0,0,1})
-            love.graphics.scale(TrueResolution.scale)
-            local font = self.font or love.graphics.getFont()
-            font:setFilter("nearest", "nearest")
-            local text = love.graphics.newText(font, self.text)
-            love.graphics.draw(text, (x + width / 2) / TrueResolution.scale - text:getWidth() / 2, (y + height / 2) / TrueResolution.scale - text:getHeight() / 2)
-            love.graphics.setColor(1,1,1,1)
-            love.graphics.scale(1 / TrueResolution.scale)
-            goto continue
-        end
-        --Dibuja la imagen si es que tiene
-        if self.image then
-            love.graphics.setColor(self.imageColor or {1,1,1,1})
-            love.graphics.draw(self.image, x, y, 0, width / self.image:getWidth(), height / self.image:getHeight())
-            love.graphics.setColor(1,1,1,1)
-            goto continue
-        end
-        --Dibuja el fondo del gui
-        love.graphics.setColor(self.bgColor or {1,1,1,1})
-        love.graphics.rectangle("fill", x, y, width, height)
-        love.graphics.setColor(1,1,1,1)
+        self:draw()
         ::continue::
     end
     Transition.draw()

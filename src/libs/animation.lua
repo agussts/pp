@@ -23,7 +23,7 @@ function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDu
     assert(type(imagePath) == "string", "Invalid imagePath: expected string, got " .. tostring(imagePath))
 
     local self = setmetatable({}, {__index = animations})
-    self.image = love.graphics.newImage(imagePath)
+    self.sprite = love.graphics.newImage(imagePath)
     self.gridWidth = gridWidth
     self.gridHeight = gridHeight
     self.columns = columns
@@ -43,7 +43,7 @@ function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDu
     local frameIndex = 1
     for y = 0, rows - 1 do
         for x = 0, columns - 1 do
-            local quad = love.graphics.newQuad(x * gridWidth, y * gridHeight, gridWidth, gridHeight, self.image:getDimensions())
+            local quad = love.graphics.newQuad(x * gridWidth, y * gridHeight, gridWidth, gridHeight, self.sprite:getDimensions())
             self.quads[frameIndex] = {x + 1, y + 1, quad}
             frameIndex = frameIndex + 1
         end
@@ -148,7 +148,7 @@ end
 --@usage myAnimation:draw()
 function animations:draw(x, y, width, height)
     local quad = self.quads[self.currFrame][3]
-    love.graphics.draw(self.image, quad, x, y, 0, width / self.gridWidth, height / self.gridHeight)
+    love.graphics.draw(self.sprite, quad, x, y, 0, width / self.gridWidth, height / self.gridHeight)
 end
 
 ---

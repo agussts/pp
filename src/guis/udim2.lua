@@ -106,13 +106,6 @@ function udim2:toScale(parentWidth, parentHeight)
 end
 
 ---
---Lo mismo que UDim2:toPixels() (Sin parametros)
---@return (number, number) Posicion en pixeles (x, y)
-function udim2:transformToPixels()
-    return self:toPixels()
-end
-
----
 --Lo mismo que UDim2.new(xScale, 0, yScale, 0)
 --@param xScale (number) Escala en X
 --@param yScale (number) Escala en Y

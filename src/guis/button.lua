@@ -30,6 +30,14 @@ function button.new(callback)
         return false
     end
 
+    self.draw = function ()
+        local x, y = self:getRenderPosition()
+        local width, height = self:getRenderSize()
+        love.graphics.setColor(self.bgColor or {1,1,1,1})
+        love.graphics.rectangle("fill", x, y, width, height)
+        love.graphics.setColor(1,1,1,1)
+    end
+
     return self
 end
 

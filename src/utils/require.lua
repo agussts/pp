@@ -13,10 +13,12 @@ Guis = require("src.guis.gui")
     Frame = require("src.guis.frame")
     ImageLabel = require("src.guis.imagelabel")
 
+Block = require("src.objs.block")
 PlayerModule = require("src.objs.player")
 EnemyModule = require("src.objs.enemy")
+Door = require("src.objs.door")
+
 GunModule = require("src.guns.dev")
-Gun = GunModule.new()
     
 Camera = require("src.libs.camera")
 Background = require("src.libs.background")

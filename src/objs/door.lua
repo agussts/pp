@@ -3,14 +3,14 @@ local Door = {}
 Door.__index = Door
 
 -- args = { to = "level2", position = UDim2, size = UDim2, label = "..." }
-function Door.new(args)
+function Door.new(to, position, size)
     local self = setmetatable({}, Door)
-    self.to = assert(args.to, "Door.new requiere 'to'")
-
+    assert(type(to)=="string", "to has to be a registered destination scene name")
+    self.to = to
     -- Hitbox: no bloquea al jugador, solo detecta contacto
     self.collision = Collisions.new("hitbox")
-    self.collision.position = args.position or UDim2.fromScale(.8, .5)
-    self.collision.size     = args.size     or UDim2.fromScale(.06, .12)
+    self.collision.position = position or UDim2.fromScale(.8, .5)
+    self.collision.size     = size     or UDim2.fromScale(.06, .12)
     self.collision:AddTag("door")
 
     -- Conectar señal de colisión

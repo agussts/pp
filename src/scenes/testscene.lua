@@ -1,11 +1,8 @@
--- src/scenes/level1.lua
-local Door = require("src.objs.door")
-
 return function()
     local scene = {}
 
     scene.load = function(self)
-        -- Fondos usando lo que ya tienes
+        -- Fondos
         self.bgA = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1,1)
         self.bgB = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1,1)
         self.bgA.color = {.2,1,1,0.05}
@@ -18,7 +15,7 @@ return function()
         local enemy = EnemyModule.new(nil, 0.0625, 0.11)
         enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
 
-        -- Un collider de caja (tu “pared” de ejemplo)
+        -- Un collider de caja
         local box = Collisions.new("box")
         box.position = UDim2.new(0.2, 0, 0.13, 0)
         box.size     = UDim2.new(0.08, 0, 0.13, 0)
@@ -27,11 +24,7 @@ return function()
         Gun = GunModule.new()
 
         -- Puerta a la otra escena
-        self.door = Door.new{
-            to = "level2",
-            position = UDim2.fromScale(0.8, 0.5),
-            size = UDim2.fromScale(0.04, 0.1),
-        }
+        self.door = Door.new("level2", UDim2.fromScale(0.8, 0.5), UDim2.fromScale(0.04, 0.1))
     end
 
     scene.start = function(self)
@@ -47,7 +40,7 @@ return function()
 
         -- Disparo contínuo con click
         if love.mouse.isDown(1) and Gun then
-            local x,y = Player.collision.position:transformToPixels()
+            local x,y = Player.collision.position:toPixels()
             Gun:Fire(x, y)
         end
 
@@ -90,7 +83,7 @@ return function()
             end
         Camera.detach()
 
-        -- GUI (ya lo maneja tu main al final)
+        -- GUI (ya lo maneja main.lua al final)
     end
 
     scene.unload = function(self)
