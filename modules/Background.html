@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+
+<ul>
+  <li><a href="../doc.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>Background</strong></li>
+  <li><a href="../modules/connections.html">connections</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/button.html">button</a></li>
+  <li><a href="../classes/frame.html">frame</a></li>
+  <li><a href="../classes/gui.html">gui</a></li>
+  <li><a href="../classes/imagelabel.html">imagelabel</a></li>
+  <li><a href="../classes/textlabel.html">textlabel</a></li>
+  <li><a href="../classes/udim2.html">udim2</a></li>
+  <li><a href="../classes/basicGun.html">basicGun</a></li>
+  <li><a href="../classes/devGun.html">devGun</a></li>
+  <li><a href="../classes/spamGun.html">spamGun</a></li>
+  <li><a href="../classes/animations.html">animations</a></li>
+  <li><a href="../classes/camera.html">camera</a></li>
+  <li><a href="../classes/collisions.html">collisions</a></li>
+  <li><a href="../classes/signal.html">signal</a></li>
+  <li><a href="../classes/timer.html">timer</a></li>
+  <li><a href="../classes/enemy.html">enemy</a></li>
+  <li><a href="../classes/player.html">player</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Background</code></h1>
+<p></p>
+<p></p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#new">new (imagePath[, tileW[, tileH[, parallaxX=1[, parallaxY=1]]]])</a></td>
+	<td class="summary">Crea un nuevo fondo.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setTileSize">setTileSize ([tileW[, tileH]])</a></td>
+	<td class="summary">Cambia el tamaño del tile en pixeles virtuales.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setScroll">setScroll ([px=0[, py=0]])</a></td>
+	<td class="summary">Establece el scroll manual en pixeles de pantalla.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setParallax">setParallax ([px[, py]])</a></td>
+	<td class="summary">Configura el parallax.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#draw">draw ([cameraX=0[, cameraY=0]])</a></td>
+	<td class="summary">Dibuja el fondo.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    Methods
+    <dl class="function">
+    <dt>
+    <a name = "new"></a>
+    <strong>new (imagePath[, tileW[, tileH[, parallaxX=1[, parallaxY=1]]]])</strong>
+    </dt>
+    <dd>
+    Crea un nuevo fondo.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">imagePath</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Ruta a la imagen
+        </li>
+        <li><span class="parameter">tileW</span>
+            <span class="types"><span class="type">number</span></span>
+         Ancho del tile en pixeles virtuales
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">tileH</span>
+            <span class="types"><span class="type">number</span></span>
+         Alto del tile en pixeles virtuales
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">parallaxX</span>
+            <span class="types"><span class="type">number</span></span>
+         Factor de parallax horizontal (0=fijo, 1=sigue cámara)
+         (<em>default</em> 1)
+        </li>
+        <li><span class="parameter">parallaxY</span>
+            <span class="types"><span class="type">number</span></span>
+         Factor de parallax vertical (0=fijo, 1=sigue cámara)
+         (<em>default</em> 1)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Background</span></span>
+        Nuevo objeto Background
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setTileSize"></a>
+    <strong>setTileSize ([tileW[, tileH]])</strong>
+    </dt>
+    <dd>
+    Cambia el tamaño del tile en pixeles virtuales.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">tileW</span>
+            <span class="types"><span class="type">number</span></span>
+         Nuevo ancho (nil = mantener)
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">tileH</span>
+            <span class="types"><span class="type">number</span></span>
+         Nuevo alto (nil = mantener)
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setScroll"></a>
+    <strong>setScroll ([px=0[, py=0]])</strong>
+    </dt>
+    <dd>
+    Establece el scroll manual en pixeles de pantalla.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">px</span>
+            <span class="types"><span class="type">number</span></span>
+         Scroll horizontal en pixeles
+         (<em>default</em> 0)
+        </li>
+        <li><span class="parameter">py</span>
+            <span class="types"><span class="type">number</span></span>
+         Scroll vertical en pixeles
+         (<em>default</em> 0)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setParallax"></a>
+    <strong>setParallax ([px[, py]])</strong>
+    </dt>
+    <dd>
+    Configura el parallax.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">px</span>
+            <span class="types"><span class="type">number</span></span>
+         Factor horizontal (0=fijo, 1=sigue cámara)
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">py</span>
+            <span class="types"><span class="type">number</span></span>
+         Factor vertical (0=fijo, 1=sigue cámara)
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "draw"></a>
+    <strong>draw ([cameraX=0[, cameraY=0]])</strong>
+    </dt>
+    <dd>
+    Dibuja el fondo.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cameraX</span>
+            <span class="types"><span class="type">number</span></span>
+         Posición X de la cámara en pixeles mundo
+         (<em>default</em> 0)
+        </li>
+        <li><span class="parameter">cameraY</span>
+            <span class="types"><span class="type">number</span></span>
+         Posición Y de la cámara en pixeles mundo
+         (<em>default</em> 0)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2025-09-16 20:26:52 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
