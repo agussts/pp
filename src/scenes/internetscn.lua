@@ -3,8 +3,8 @@ return function()
 
     scene.load = function(self)
         -- Fondos
-        self.bgA = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1,1)
-        self.bgB = Background.new("assets/sprites/xthingy.png", 32*6, 18*6, 1,1)
+        self.bgA = Background.new("assets/sprites/xthingy.png", 32*3, 18*3, 1,1)
+        self.bgB = Background.new("assets/sprites/xthingy.png", 32*3, 18*3, 1,1)
         self.bgA.color = {1,.2,1,0.05}
         self.bgB.color = {.2,1,1,0.02}
 
@@ -30,6 +30,8 @@ return function()
         self.leftBlocker = Block.new(nil, -1, -0.1, 0.1, 1.2)
         self.rightBlocker = Block.new(nil, 1.1, -0.1, 0.1, 1.2)
 
+        self.enemy = EnemyModule.new(nil, 0.0625, 0.11)
+        self.enemy.collision.position = UDim2.fromScale(.5, .5)
         Gun = GunModule.new()
     end
 
@@ -43,7 +45,6 @@ return function()
         self.bgA.color[4] = 0.035 + 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
         self.bgB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
         self.darkweb:update(dt)
-
         self.darkwebWindow.position = UDim2.new(self.darkwebWindow.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100, 0)
 
         if love.mouse.isDown(1) and Gun then

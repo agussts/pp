@@ -1,115 +1,120 @@
 ---
--- Fondo con tamaño de tile configurable (en pixeles de pantalla),
--- repetido para cubrir todo el viewport, con soporte de scroll/parallax.
---@classmod background
+-- @module Background
+-- Sistema de fondos "tileables" con parallax y escalado automático al cambiar la resolución.
+-- 
+-- Los tamaños de tile (`tileW`, `tileH`) se especifican en **pixeles virtuales**
+-- (relativos a `Config.IdealResolution`) y se escalan automáticamente por
+-- `TrueResolution.scale` para mantener proporciones al cambiar de resolución.
+--
+-- Uso básico:
+-- ```
+-- local bg = Background.new("img.png", 192, 108, 1, 1)
+-- bg:setScroll(100, 50)
+-- bg:draw(cameraX, cameraY)
+-- ```
 
 local Background = {}
 Background.__index = Background
 
----
---Crea un nuevo fondo
---@return (background) Instancia del fondo
---@param imagePath ruta de la textura
---@param tileW ancho del tile en pixeles de la pantalla (como de grande se “ve” cada repeticion)
---@param tileH altura del tile en pixeles de la pantalla (como de grande se “ve” cada repeticion)
---@param parallaxX: 0 = fijo a pantalla, 1 = se mueve como la camara
---@param parallaxY: 0 = fijo a pantalla, 1 = se mueve como la camara
---@usage local myBackground = Background.new("assets/sprites/image.png", 200, 150, 0.5, 0.5)
+--- Clamp entre 0 y 1.
+-- @tparam number x Valor a clamplear
+-- @treturn number Resultado en [0,1]
+local function clamp01(x) return (x < 0 and 0) or (x > 1 and 1) or x end
+
+--- Módulo positivo (para wrap de texturas).
+-- @tparam number a Valor
+-- @tparam number b Módulo
+-- @treturn number a mod b en rango [0,b)
+local function tmod(a, b) return a - math.floor(a / b) * b end
+
+--- Crea un nuevo fondo.
+-- @tparam string imagePath Ruta a la imagen
+-- @tparam[opt] number tileW Ancho del tile en pixeles virtuales
+-- @tparam[opt] number tileH Alto del tile en pixeles virtuales
+-- @tparam[opt=1] number parallaxX Factor de parallax horizontal (0=fijo, 1=sigue cámara)
+-- @tparam[opt=1] number parallaxY Factor de parallax vertical (0=fijo, 1=sigue cámara)
+-- @treturn Background Nuevo objeto Background
 function Background.new(imagePath, tileW, tileH, parallaxX, parallaxY)
     local self = setmetatable({}, Background)
     self.image = love.graphics.newImage(imagePath)
     self.image:setWrap("repeat", "repeat")
 
-    self.imgW = self.image:getWidth()
-    self.imgH = self.image:getHeight()
+    self.imgW, self.imgH = self.image:getWidth(), self.image:getHeight()
 
-    self.tileW = tileW or self.imgW   -- tamaño deseado del tile en pantalla
+    -- @field tileW Ancho del tile en pixeles virtuales
+    self.tileW = tileW or self.imgW
+    -- @field tileH Alto del tile en pixeles virtuales
     self.tileH = tileH or self.imgH
 
+    -- @field color Color multiplicador {r,g,b,a}
     self.color = {1,1,1,1}
-    self.parallaxX = parallaxX  -- 0 = fijo a pantalla, 1 = sigue camara
-    self.parallaxY = parallaxY  -- 0 = fijo a pantalla, 1 = sigue camara
+    -- @field parallaxX Parallax horizontal
+    self.parallaxX = clamp01(parallaxX or 1)
+    -- @field parallaxY Parallax vertical
+    self.parallaxY = clamp01(parallaxY or 1)
 
-    self.scrollX = 0  -- desplazamiento manual (en pixeles de pantalla)
-    self.scrollY = 0
+    -- @field scrollX Scroll manual X (pixeles pantalla)
+    -- @field scrollY Scroll manual Y (pixeles pantalla)
+    self.scrollX, self.scrollY = 0, 0
 
-    -- Quad dinamico, se actualiza segun la resolucion actual y la escala objetivo
+    -- @field quad Quad reutilizable para dibujar
     self.quad = love.graphics.newQuad(0, 0, 1, 1, self.imgW, self.imgH)
-
     return self
 end
 
----
--- Cambia tamaño del tile (en pixeles de pantalla)
---@param tileW ancho del tile en pixeles de la pantalla (como de grande se “ve” cada repeticion)
---@param tileH altura del tile en pixeles de la pantalla (como de grande se “ve” cada repeticion)
---@usage myBackground:setTileSize(200, 150)
+--- Cambia el tamaño del tile en pixeles virtuales.
+-- @tparam[opt] number tileW Nuevo ancho (nil = mantener)
+-- @tparam[opt] number tileH Nuevo alto (nil = mantener)
 function Background:setTileSize(tileW, tileH)
-    self.tileW = tileW or self.tileW
-    self.tileH = tileH or self.tileH
+    if tileW then self.tileW = tileW end
+    if tileH then self.tileH = tileH end
 end
 
----
--- Scroll manual (por ejemplo para animar el fondo)
---@param px desplazamiento en X en pixeles de pantalla
---@param py desplazamiento en Y en pixeles de pantalla
---@usage myBackground:setScroll(100, 50)
+--- Establece el scroll manual en pixeles de pantalla.
+-- @tparam[opt=0] number px Scroll horizontal en pixeles
+-- @tparam[opt=0] number py Scroll vertical en pixeles
 function Background:setScroll(px, py)
-    self.scrollX = px or self.scrollX
-    self.scrollY = py or self.scrollY
-    if self.scrollX > self.tileW then self.scrollX = self.scrollX - self.tileW end
-    if self.scrollY > self.tileH then self.scrollY = self.scrollY - self.tileH end
+    if px ~= nil then self.scrollX = px end
+    if py ~= nil then self.scrollY = py end
 end
 
----
--- Parallax (0 = fijo a pantalla, 1 = se mueve como el mundo/camara)
---@param px parallax en X
---@param py parallax en Y
---@usage myBackground:setParallax(0.5, 0.5)
+--- Configura el parallax.
+-- @tparam[opt] number px Factor horizontal (0=fijo, 1=sigue cámara)
+-- @tparam[opt] number py Factor vertical (0=fijo, 1=sigue cámara)
 function Background:setParallax(px, py)
-    if px ~= nil then self.parallaxX = px end
-    if py ~= nil then self.parallaxY = py end
+    if px ~= nil then self.parallaxX = clamp01(px) end
+    if py ~= nil then self.parallaxY = clamp01(py) end
 end
 
----
--- Dibuja el fondo. cameraX/Y son coordenadas de la camara (en pixeles mundo)
---@param cameraX posicion X de la camara en pixeles mundo
---@param cameraY posicion Y de la camara en pixeles mundo
---@usage myBackground:draw(cameraX, cameraY)
+--- Dibuja el fondo.
+-- @tparam[opt=0] number cameraX Posición X de la cámara en pixeles mundo
+-- @tparam[opt=0] number cameraY Posición Y de la cámara en pixeles mundo
 function Background:draw(cameraX, cameraY)
     local winW, winH = love.graphics.getDimensions()
+    local scale = (rawget(_G, "TrueResolution") and TrueResolution.scale) or 1
 
-    -- Escala para que el sprite base se vea del tamaño de tile deseado
-    -- (dibujar con scale cambia el tamaño en pantalla del tile)
-    local scaleX = self.tileW / self.imgW
-    local scaleY = self.tileH / self.imgH
+    -- 1) Tamaño real del tile en pantalla
+    local tileWpx = math.max(1, self.tileW * scale)
+    local tileHpx = math.max(1, self.tileH * scale)
 
-    -- El quad necesita tener un tamaño tal que, al multiplicar por escala,
-    -- cubra la pantalla completa.
-    local quadW = winW / scaleX
-    local quadH = winH / scaleY
+    -- 2) Escala del sprite base
+    local sx = tileWpx / self.imgW
+    local sy = tileHpx / self.imgH
 
-    -- Offset de textura (en espacio del QUAD, que esta en pixeles de la textura)
-    -- Convierte desplazamiento en pantalla a espacio del quad dividiendo por la escala.
-    local offX = (self.scrollX or 0) / scaleX
-               + (cameraX or 0) * self.parallaxX / scaleX
-    local offY = (self.scrollY or 0) / scaleY
-               + (cameraY or 0) * self.parallaxY / scaleY
+    -- 3) Quad que cubre toda la pantalla
+    local quadW = winW / sx
+    local quadH = winH / sy
 
-    -- Hace que el offset sea ciclico
-    -- Asi evitar numeros enormes con el tiempo:
-    local function mod(a, b)
-        return a - math.floor(a / b) * b
-    end
-    offX = mod(offX, self.imgW)
-    offY = mod(offY, self.imgH)
+    -- 4) Offset de textura
+    local offX = (self.scrollX + (cameraX or 0) * self.parallaxX) / sx
+    local offY = (self.scrollY + (cameraY or 0) * self.parallaxY) / sy
+    offX = tmod(offX, self.imgW)
+    offY = tmod(offY, self.imgH)
 
-    -- Ajusta viewport del quad: (x, y, w, h) en coordenadas de textura
     self.quad:setViewport(offX, offY, quadW, quadH, self.imgW, self.imgH)
 
-    -- Dibujo
     love.graphics.setColor(self.color)
-    love.graphics.draw(self.image, self.quad, 0, 0, 0, scaleX, scaleY)
+    love.graphics.draw(self.image, self.quad, 0, 0, 0, sx, sy)
     love.graphics.setColor(1,1,1,1)
 end
 

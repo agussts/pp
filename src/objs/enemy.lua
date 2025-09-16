@@ -48,6 +48,18 @@ enemy.new = function(spriteAnim, width, height)
     return self
 end
 
+function enemy:follow(targetUDim2)
+    local targetX = targetUDim2.x.offset + (targetUDim2.x.scale * love.graphics.getWidth())
+    local targetY = targetUDim2.y.offset + (targetUDim2.y.scale * love.graphics.getHeight())
+    local selfX = self.collision.position.x.offset + (self.collision.position.x.scale * love.graphics.getWidth()) + (self.collision.size.x.offset / 2)
+    local selfY = self.collision.position.y.offset + (self.collision.position.y.scale * love.graphics.getHeight()) + (self.collision.size.y.offset / 2)
+    local angle = math.atan2(targetY - selfY, targetX - selfX)
+    local speed = 100
+    local vx = math.cos(angle) * speed
+    local vy = math.sin(angle) * speed
+    self.collision.position = UDim2.new(0, self.collision.position.x.offset + vx * love.timer.getDelta(), 0, self.collision.position.y.offset + vy * love.timer.getDelta())
+end
+
 function enemy:draw()
     local x,y = self.collision.position:toPixels()
     local w,h = self.collision.size:toPixels()
