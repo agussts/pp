@@ -38,6 +38,8 @@ function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDu
     self.playing = true
     self.loop = true
     self.reversed = false
+    self.anchor = {0, 0}
+    self.visible = true
 
     self.quads = {}
     local frameIndex = 1
@@ -56,6 +58,7 @@ end
 --Reproduce la animacion
 --@usage myAnimation:Play()
 function animations:Play()
+    if self._destroying then return end
     self.playing = true
 end
 
@@ -63,6 +66,7 @@ end
 --Pausa la animacion
 --@usage myAnimation:Pause()
 function animations:Pause()
+    if self._destroying then return end
     self.playing = false
 end
 
@@ -72,6 +76,7 @@ end
 --@param reset Opcional: Si es true, resetea la animacion al primer frame
 --@usage myAnimation:Stop()
 function animations:Stop(reset)
+    if self._destroying then return end
     self.playing = false
     if reset then
         self:Reset()
@@ -83,6 +88,7 @@ end
 --Resetea la animacion al primer frame
 --@usage myAnimation:Reset()
 function animations:Reset()
+    if self._destroying then return end
     self.currFrame = 1
     self.elapsedTime = 0
 end
@@ -92,6 +98,7 @@ end
 --@param frame El frame al que se quiere ir
 --@usage myAnimation:GoToFrame(2)
 function animations:GoToFrame(frame)
+    if self._destroying then return end
     if frame < 1 or frame > self.columns * self.rows then
         error("Frame out of bounds: " .. tostring(frame))
     end
@@ -104,7 +111,7 @@ end
 --@param dt Delta time
 --@usage myAnimation:update(dt)
 function animations:update(dt)
-    if not self.playing then return end
+    if not self.playing or self._destroying then return end
 
     self.elapsedTime = self.elapsedTime + dt
     if self.elapsedTime >= self.frameDuration then
@@ -140,15 +147,31 @@ function animations:update(dt)
 end
 
 ---
+-- Destruye la animacion
+function animations:Destroy()
+    self.playing = false
+    self._destroying = true
+    for i,v in pairs(addedAnimations) do
+        if v == self then table.remove(addedAnimations, i) end
+    end
+    self.OnFinish.callbacks = {}
+    self.OnLoop.callbacks = {}
+    self = nil
+end
+
+---
 --Dibuja la animacion
 --@param x La posicion x en la pantalla
 --@param y La posicion y en la pantalla
 --@param width El ancho del dibujo
 --@param height La altura del dibujo
 --@usage myAnimation:draw()
-function animations:draw(x, y, width, height)
+function animations:draw(x, y)
+    if not self.visible or self._destroying then return end
     local quad = self.quads[self.currFrame][3]
-    love.graphics.draw(self.sprite, quad, x, y, 0, width / self.gridWidth, height / self.gridHeight)
+    local drawX = x - self.anchor[1] * self.gridWidth
+    local drawY = y - self.anchor[2] * self.gridHeight
+    love.graphics.draw(self.sprite, quad, drawX, drawY, 0, 3, 3)
 end
 
 ---

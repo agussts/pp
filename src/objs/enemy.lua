@@ -8,13 +8,6 @@ local enemy = {}
 local addedEnemies = {}
 
 ---
--- Obtiene todos los enemigos
---@return (table) Una tabla con todos los enemigos
-enemy.getEnemies = function()
-    return addedEnemies
-end
-
----
 -- Crea un nuevo enemigo
 --@return (enemy) El nuevo enemigo creado
 --@usage local myEnemy = Enemy.new(myEnemyAnimation, 32, 32)
@@ -24,57 +17,117 @@ enemy.new = function(spriteAnim, width, height)
     self.collision = Collisions.new("box")
     self.collision.position = UDim2.new(0, 0, 0, 0)
     self.collision.size = UDim2.new(width, 0, height, 0)
+    self.collision.anchor = {.5, .5}
     self.collision.link = self
-    self.cd = 1
-    self.timer = Timer.new(self.cd)
+
+    self.explosion = Animation.new("assets/sprites/explosion-Sheet.png", 64, 36, 3, 3, .025)
+    self.explosion.anchor = {.5, .5}
+    self.explosion:Pause()
+    self.explosion.loop = false
+    self.explosion.visible = false
+
+    self.attackCd = 1
+    self.timer = Timer.new(self.attackCd)
     self.timer:addToGroup(PlayingTimers)
     self.collision.onHit:Connect(function (collider)
         if not self.timer:check() then return end
-        for i,v in pairs(collider.tags) do
-            if v == "hitbox" then return end
-        end
-        for _,v in pairs(collider.tags) do
-            if v == "player" then
-                self.timer:reset()
-                collider.link.health = collider.link.health - self.damage
-                love.audio.newSource("assets/sfx/hitHurtPlayer.wav", "static"):play()
-            end
+
+        if collider:HasTag("hitbox") then return end
+        if collider:HasTag("player") and collider:HasTag("box") then
+            self.timer:reset()
+            collider.link.health = collider.link.health - self.damage
+            love.audio.newSource("assets/sfx/hitHurtPlayer.wav", "static"):play()
         end
     end)
+
     self.collision:AddTag("enemy")
+    self.followTarget = nil
     self.health = 100
     self.damage = 10
+    self.speed = 150
     table.insert(addedEnemies, self)
     return self
 end
 
+---
+-- Hace que el enemigo siga el UDim2 dado
+--@param UDim2 El UDim2 que el enemigo sigue
 function enemy:follow(targetUDim2)
-    local targetX = targetUDim2.x.offset + (targetUDim2.x.scale * love.graphics.getWidth())
-    local targetY = targetUDim2.y.offset + (targetUDim2.y.scale * love.graphics.getHeight())
-    local selfX = self.collision.position.x.offset + (self.collision.position.x.scale * love.graphics.getWidth()) + (self.collision.size.x.offset / 2)
-    local selfY = self.collision.position.y.offset + (self.collision.position.y.scale * love.graphics.getHeight()) + (self.collision.size.y.offset / 2)
-    local angle = math.atan2(targetY - selfY, targetX - selfX)
-    local speed = 100
-    local vx = math.cos(angle) * speed
-    local vy = math.sin(angle) * speed
-    self.collision.position = UDim2.new(0, self.collision.position.x.offset + vx * love.timer.getDelta(), 0, self.collision.position.y.offset + vy * love.timer.getDelta())
+    if self._destroying then return end
+    self.followTarget = targetUDim2
 end
 
+---
+-- Le hace daño al enemigo
+function enemy:Damage(dmg)
+    if self._destroying then return end
+    self.health = self.health - dmg
+    if self.health <= 0 then
+        self.explosion.visible = true
+        self.sprite.visible = false
+        self.collision:Destroy()
+        self.explosion:Play()
+        self.explosion.OnFinish:Connect(function ()
+            print("yo")
+            self:Destroy()
+        end)
+    end
+end
+
+---
+-- Dibuja el enemigo
 function enemy:draw()
+    if self._destroying then return end
     local x,y = self.collision.position:toPixels()
-    local w,h = self.collision.size:toPixels()
-    self.sprite:draw(x, y, w, h)
+    self.sprite:draw(x - self.sprite.gridWidth, y - self.sprite.gridHeight)
+    self.explosion:draw(x - self.sprite.gridWidth, y - self.sprite.gridHeight)
 end
 
+---
+-- Destruye el enemigo
 function enemy:Destroy()
-    self.collision:Destroy()
+    self._destroying = true
     for i,v in pairs(addedEnemies) do
         if v == self then
             table.remove(addedEnemies, i)
             break
         end
     end
+    for _,v in pairs(self) do
+        if type(v) == "table" and v.Destroy then v:Destroy() end
+        v = nil
+    end
     self = nil
+end
+
+---
+-- Actualiza la animacion y velocidad del enemigo
+--@param dt Delta time
+function enemy:update(dt)
+    if self._destroying then return end
+    if self.followTarget ~= nil and type(self.followTarget) == "table" and self.followTarget.toPixels then
+        local enemyX, enemyY = self.collision.position:toPixels()
+        local targetX, targetY = self.followTarget:toPixels()
+        local dx = targetX - enemyX
+        local dy = targetY - enemyY
+        local distance = math.sqrt(dx*dx + dy*dy)
+        
+        local xSpeed = (dx / distance) * self.speed
+        local ySpeed = (dy / distance) * self.speed
+
+        self.collision.speedX = xSpeed
+        self.collision.speedY = ySpeed
+    end
+
+    self.sprite:update(dt)
+    self.explosion:update(dt)
+end
+
+---
+-- Obtiene todos los enemigos
+--@return (table) Una tabla con todos los enemigos
+enemy.getEnemies = function()
+    return addedEnemies
 end
 
 return enemy

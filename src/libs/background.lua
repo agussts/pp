@@ -1,5 +1,5 @@
 ---
--- @module Background
+-- @classmod Background
 -- Sistema de fondos "tileables" con parallax y escalado automático al cambiar la resolución.
 -- 
 -- Los tamaños de tile (`tileW`, `tileH`) se especifican en **pixeles virtuales**
@@ -91,7 +91,7 @@ end
 -- @tparam[opt=0] number cameraY Posición Y de la cámara en pixeles mundo
 function Background:draw(cameraX, cameraY)
     local winW, winH = love.graphics.getDimensions()
-    local scale = (rawget(_G, "TrueResolution") and TrueResolution.scale) or 1
+    local scale = TrueResolution.scale or 1
 
     -- 1) Tamaño real del tile en pantalla
     local tileWpx = math.max(1, self.tileW * scale)

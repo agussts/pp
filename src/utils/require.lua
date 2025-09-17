@@ -16,6 +16,7 @@ Guis = require("src.guis.gui")
 Block = require("src.objs.block")
 PlayerModule = require("src.objs.player")
 EnemyModule = require("src.objs.enemy")
+Antivirus = require("src.objs.antivirus")
 Door = require("src.objs.door")
 
 GunModule = require("src.guns.dev")

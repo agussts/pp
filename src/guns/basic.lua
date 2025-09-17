@@ -48,17 +48,12 @@ function gun:Fire(x, y)
     local collider
     collider = Collisions.new("hitbox", true)
     collider.onHit:Connect(function (otherCollider)
-        for i,v in pairs(otherCollider.tags) do
-            if v == "player" or v == "projectile" then return end
-        end
-        for i,v in pairs(otherCollider.tags) do
-            if v == "enemy" then
-                audios.hit:clone():play()
-                otherCollider.link.health = otherCollider.link.health - self.damage
-                break
-            elseif v == "box" then
-                audios.boxhit:clone():play()
-            end
+        if otherCollider:HasTag("player") or otherCollider:HasTag("projectile") then return end
+        if otherCollider:HasTag("enemy") then
+            audios.hit:clone():play()
+            otherCollider.link:Damage(self.damage)
+        elseif otherCollider:HasTag("box") then
+            audios.boxhit:clone():play()
         end
         collider:Destroy()
     end)
@@ -66,6 +61,7 @@ function gun:Fire(x, y)
     for _,v in pairs(self.tags) do
         collider:AddTag(v)
     end
+    collider.link = self
     local mouseX, mouseY = Camera.screenToWorld(love.mouse:getPosition())
     mouseX = mouseX
     mouseY = mouseY

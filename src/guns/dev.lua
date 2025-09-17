@@ -15,7 +15,7 @@ gun.new = function()
     local self = basic.new()
     self.name = "dev g"
     self.fireRate = .1
-    self.damage = 10
+    self.damage = 5
     self.ammo = math.huge
     self.maxAmmo = math.huge
 

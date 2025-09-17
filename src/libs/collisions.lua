@@ -10,6 +10,7 @@ local types = {
     "box",
     "hitbox"
 }
+
 --- Crea una nueva colisión
 --@param type El tipo de colision, puede ser "box" o "hitbox"
 --@param enabled Si la colision empieza activada
@@ -28,6 +29,7 @@ collisions.new = function(type, enabled)
     self.onHit = Signal.new()
     self.color = {1, 1, 1, 1}
     self.link = nil
+    self.anchor = {0,0}
 
     self.tags = {}
 
@@ -49,6 +51,14 @@ collisions.new = function(type, enabled)
     end
 
     error("Invalid collision type: " .. tostring(type) .. ". Valid types are: " .. table.concat(types, ", "))
+end
+
+function collisions:_getRenderRect()
+    local x, y = self.position:toPixels()
+    local w, h = self.size:toPixels()
+    x = x - self.anchor[1] * w
+    y = y - self.anchor[2] * h
+    return x, y, w, h
 end
 
 ---
@@ -80,6 +90,17 @@ end
 function collisions:ReplaceTag(tagToReplace, replacement)
     self:RemoveTag(tagToReplace)
     self:AddTag(replacement)
+end
+
+---
+-- Devuelve true o false dependiendo si el colider tiene tag pasado
+--@param tag Tag a revisar
+--@return (boolean) true o false dependiendo de si tiene el tag
+function collisions:HasTag(tag)
+    for _,v in pairs(self.tags) do
+        if v == tag then return true end
+    end
+    return false
 end
 
 ---
@@ -162,12 +183,10 @@ end
 function collisions:check()
     if not self.enabled then return end
     local hitting = {}
-    local x, y = self.position:toPixels()
-    local width, height = self.size:toPixels()
+    local x, y, width, height = self:_getRenderRect()
     for _, otherCollider in pairs(addedCollisions) do
         if otherCollider == self then goto continue end      
-        local otherX, otherY = otherCollider.position:toPixels()
-        local otherWidth, otherHeight = otherCollider.size:toPixels()
+        local otherX, otherY, otherWidth, otherHeight = otherCollider:_getRenderRect()
         if x <= otherX + otherWidth
         and x + width >= otherX
         and y <= otherY + otherHeight
@@ -197,7 +216,9 @@ function collisions:check()
         end
         ::continue::
     end
-    self.position = UDim2.fromOffset(x, y)
+    local storeX = x + self.anchor[1] * width
+    local storeY = y + self.anchor[2] * height
+    self.position = UDim2.fromOffset(storeX, storeY)
     self.position = UDim2.fromScale(self.position:toScale())
     return hitting
 end
@@ -210,8 +231,7 @@ end
 
 function collisions:draw()
     if self.visualized and self.enabled then
-        local x, y = self.position:toPixels()
-        local width, height = self.size:toPixels()
+        local x, y, width, height = self:_getRenderRect()
         love.graphics.setColor(self.color)
         love.graphics.rectangle("line", x, y, width, height)
         love.graphics.setColor(1, 1, 1, 1)

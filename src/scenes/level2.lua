@@ -8,7 +8,7 @@ return function()
         self.bgA.color = {1,.2,1,0.05}
         self.bgB.color = {.2,1,1,0.02}
 
-        Player = PlayerModule.new("assets/sprites/player-Sheet.png", 0.0625, 0.11)
+        Player = PlayerModule.new("assets/sprites/player-Sheet.png")
         Player.collision.position = UDim2.fromScale(.2, .6)
 
         Gun = GunModule.new()
@@ -45,13 +45,12 @@ return function()
 
     scene.draw = function(self)
         local px,py = Player.collision.position:toPixels()
-        local w,h = Player.size:toPixels()
 
         self.bgA:draw(Camera.x, Camera.y)
         self.bgB:draw(Camera.x, Camera.y)
 
         Camera.attach()
-            Player.sprite:draw(px, py, w, h)
+            Player.sprite:draw(px, py)
             for _,v in pairs(Collisions.getCollisions()) do
                 v:draw()
             end

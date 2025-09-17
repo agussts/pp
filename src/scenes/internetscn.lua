@@ -8,9 +8,9 @@ return function()
         self.bgA.color = {1,.2,1,0.05}
         self.bgB.color = {.2,1,1,0.02}
 
-        Player = PlayerModule.new("assets/sprites/player-Sheet.png", 0.0625, 0.11)
+        Player = PlayerModule.new("assets/sprites/player-Sheet.png")
         Player.collision.position = UDim2.fromScale(.2, .6)
-
+        self.player = Player
         self.darkwebWindow = {}
         self.darkwebWindow.image = love.graphics.newImage("assets/sprites/windowthing.png")
         self.darkwebWindow.size = UDim2.fromScale(0.35, .35)
@@ -30,8 +30,9 @@ return function()
         self.leftBlocker = Block.new(nil, -1, -0.1, 0.1, 1.2)
         self.rightBlocker = Block.new(nil, 1.1, -0.1, 0.1, 1.2)
 
-        self.enemy = EnemyModule.new(nil, 0.0625, 0.11)
+        self.enemy = Antivirus.new()
         self.enemy.collision.position = UDim2.fromScale(.5, .5)
+        
         Gun = GunModule.new()
     end
 
@@ -52,6 +53,15 @@ return function()
             Gun:Fire(x, y)
         end
 
+        self.enemy:follow(Player.collision.position)
+        for _,v in pairs(self) do
+            if type(v) == "table" then
+                if v.update then
+                    v:update(dt)
+                end
+            end
+        end
+
         for _,v in pairs(Collisions.getCollisions()) do
             v:UpdateSpeed(dt)
             if v.enabled then v:check() end
@@ -63,14 +73,11 @@ return function()
             Gun.lastFireTime = 0
         end
 
-        Player:Update(dt)
         local px,py = Player.collision.position:toPixels()
         Camera.update(px, py)
     end
 
     scene.draw = function(self)
-        local px,py = Player.collision.position:toPixels()
-        local w,h = Player.size:toPixels()
 
         self.bgA:draw(Camera.x, Camera.y)
         self.bgB:draw(Camera.x, Camera.y)
@@ -82,25 +89,19 @@ return function()
             -- self.darkweb:draw(wx, 0, ww, wh)
 
             for i,v in pairs(self) do
-                if type(v) == "table" and v.draw then 
-                    if v.position and v.size then
-                        if v.image then
+                if type(v) == "table" then 
+                    --Si se puede dibujar, que lo dibuje
+                    if v.draw then
+                        if v.position and v.size then
                             local x,y = v.position:toPixels()
-                            local width, height = v.size:toPixels()
-                            v:draw(x, y, width/v.image:getWidth(), height/v.image:getHeight())
+                            v:draw(x, y)
                         else
-                            local x,y = v.position:toPixels()
-                            local width, height = v.size:toPixels()
-                            print(x, y, width, height)
-                            v:draw(x, y, width, height)
+                            v:draw()
                         end
-                    else
-                        v:draw()
                     end
                 end
             end
 
-            Player.sprite:draw(px, py, w, h)
             for _,v in pairs(Collisions.getCollisions()) do
                 v:draw()
             end
