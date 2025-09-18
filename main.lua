@@ -98,6 +98,28 @@ love.update = function (dt)
 end
 
 love.draw = function () 
+    local sceneTable = Scene.get() or {}
+
+    Camera.attach()
+        for _,v in pairs(sceneTable) do
+            if type(v) == "table" then 
+                --Si se puede dibujar, que lo dibuje
+                if v.draw then
+                    if v.position and v.size then
+                        local x,y = v.position:toPixels()
+                        v:draw(x, y)
+                    else
+                        v:draw()
+                    end
+                end
+            end
+        end
+
+        for _,v in pairs(Collisions.getCollisions()) do
+            v:draw()
+        end
+    Camera.detach()
+    
     Scene.draw()
 
     -- Ordena por zIndex, si son iguales, ordena por el orden de insercion

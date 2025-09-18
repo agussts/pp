@@ -82,30 +82,25 @@ return function()
         self.bgA:draw(Camera.x, Camera.y)
         self.bgB:draw(Camera.x, Camera.y)
 
-        Camera.attach()
-            -- local wx, wy = self.darkwebWindow.position:toPixels()
-            -- local ww, wh = self.darkwebWindow.size:toPixels()
-            -- love.graphics.draw(self.darkwebWindow.image, wx, wy, 0, ww/self.darkwebWindow.image:getWidth(), wh/self.darkwebWindow.image:getHeight())
-            -- self.darkweb:draw(wx, 0, ww, wh)
+        -- Camera.attach()
+        --     for i,v in pairs(self) do
+        --         if type(v) == "table" then 
+        --             --Si se puede dibujar, que lo dibuje
+        --             if v.draw then
+        --                 if v.position and v.size then
+        --                     local x,y = v.position:toPixels()
+        --                     v:draw(x, y)
+        --                 else
+        --                     v:draw()
+        --                 end
+        --             end
+        --         end
+        --     end
 
-            for i,v in pairs(self) do
-                if type(v) == "table" then 
-                    --Si se puede dibujar, que lo dibuje
-                    if v.draw then
-                        if v.position and v.size then
-                            local x,y = v.position:toPixels()
-                            v:draw(x, y)
-                        else
-                            v:draw()
-                        end
-                    end
-                end
-            end
-
-            for _,v in pairs(Collisions.getCollisions()) do
-                v:draw()
-            end
-        Camera.detach()
+        --     for _,v in pairs(Collisions.getCollisions()) do
+        --         v:draw()
+        --     end
+        -- Camera.detach()
 
         -- GUI (ya lo maneja main.lua al final)
     end

@@ -40,6 +40,7 @@ function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDu
     self.reversed = false
     self.anchor = {0, 0}
     self.visible = true
+    self.color = {1, 1, 1, 1}
 
     self.quads = {}
     local frameIndex = 1
@@ -171,7 +172,9 @@ function animations:draw(x, y)
     local quad = self.quads[self.currFrame][3]
     local drawX = x - self.anchor[1] * self.gridWidth
     local drawY = y - self.anchor[2] * self.gridHeight
+    love.graphics.setColor(self.color)
     love.graphics.draw(self.sprite, quad, drawX, drawY, 0, 3, 3)
+    love.graphics.setColor({1, 1, 1, 1})
 end
 
 ---

@@ -26,3 +26,5 @@ Background = require("src.libs.background")
 
 Scene = require("src.scenes.scene")
 Transition = require("src.scenes.transition")
+
+Shaders = require("src.libs.shaders")

@@ -1,11 +1,14 @@
 ---
 -- Modulo para manegar enemigos.
--- Muy basico de momento, no contiene casi nada.
 --@classmod enemy
 
 local enemy = {}
 
 local addedEnemies = {}
+
+local audios = {
+    die = love.audio.newSource("assets/sfx/die.wav", "static")
+}
 
 ---
 -- Crea un nuevo enemigo
@@ -25,6 +28,9 @@ enemy.new = function(spriteAnim, width, height)
     self.explosion:Pause()
     self.explosion.loop = false
     self.explosion.visible = false
+
+    self.flash = 0 -- intensidad [0..1]
+    self.flashDur = .1
 
     self.attackCd = 1
     self.timer = Timer.new(self.attackCd)
@@ -62,13 +68,18 @@ end
 function enemy:Damage(dmg)
     if self._destroying then return end
     self.health = self.health - dmg
+    self.flash = 1
+    Timer.after(self.flashDur, function ()
+        self.flash = 0
+    end):addToGroup(PlayingTimers)
+
     if self.health <= 0 then
         self.explosion.visible = true
         self.sprite.visible = false
         self.collision:Destroy()
         self.explosion:Play()
+        audios.die:clone():play()
         self.explosion.OnFinish:Connect(function ()
-            print("yo")
             self:Destroy()
         end)
     end
@@ -79,7 +90,12 @@ end
 function enemy:draw()
     if self._destroying then return end
     local x,y = self.collision.position:toPixels()
+    if self.flash > 0 then
+        love.graphics.setShader(Shaders.flash)
+        Shaders.flash:send("u_flash", self.flash)
+    end
     self.sprite:draw(x - self.sprite.gridWidth, y - self.sprite.gridHeight)
+    love.graphics.setShader()
     self.explosion:draw(x - self.sprite.gridWidth, y - self.sprite.gridHeight)
 end
 
