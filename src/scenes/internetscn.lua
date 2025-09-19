@@ -54,18 +54,6 @@ return function()
         end
 
         self.enemy:follow(Player.collision.position)
-        for _,v in pairs(self) do
-            if type(v) == "table" then
-                if v.update then
-                    v:update(dt)
-                end
-            end
-        end
-
-        for _,v in pairs(Collisions.getCollisions()) do
-            v:UpdateSpeed(dt)
-            if v.enabled then v:check() end
-        end
 
         if Gun.lastFireTime > 0 then
             Gun.lastFireTime = Gun.lastFireTime - dt
@@ -73,8 +61,6 @@ return function()
             Gun.lastFireTime = 0
         end
 
-        local px,py = Player.collision.position:toPixels()
-        Camera.update(px, py)
     end
 
     scene.draw = function(self)

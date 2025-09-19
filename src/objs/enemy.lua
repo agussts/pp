@@ -41,7 +41,7 @@ enemy.new = function(spriteAnim, width, height)
         if collider:HasTag("hitbox") then return end
         if collider:HasTag("player") and collider:HasTag("box") then
             self.timer:reset()
-            collider.link.health = collider.link.health - self.damage
+            collider.link:Damage(self.damage)
             love.audio.newSource("assets/sfx/hitHurtPlayer.wav", "static"):play()
         end
     end)

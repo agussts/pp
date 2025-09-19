@@ -56,6 +56,11 @@ function Scene.load(name, payload)
     isLoading = false
 end
 
+function Scene.reload(payload)
+  assert(current and current.__name, "No hay escena cargada para recargar")
+  Scene.load(current.__name, payload)
+end
+
 function Scene.update(dt)
     if current and current.update then current:update(dt) end
 end

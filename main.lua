@@ -91,9 +91,26 @@ love.update = function (dt)
         rootGui:calculateRenderProperties()
     end
 
+    local sceneTable = Scene.get() or {}
+
     if Gamestate == "playing" then
+        for _,v in pairs(Collisions.getCollisions()) do
+            v:UpdateSpeed(dt)
+            if v.enabled then v:check() end
+        end
+
+        for _,v in pairs(sceneTable) do
+            if type(v) == "table" then
+                if v.update then
+                    v:update(dt)
+                end
+            end
+        end
+        
         Scene.update(dt)
     end
+    local px,py = Player.collision.position:toPixels()
+    Camera.update(px, py)
     Transition.update(dt)
 end
 

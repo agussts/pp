@@ -36,6 +36,9 @@ player.new = function(spriteName)
     self.health = 100
     self.collision.link = self
     self.speed = 250
+
+    self.flash = 0
+    self.flashDur = .1
     return self
 end
 
@@ -49,8 +52,27 @@ function player:update(dt)
         if love.keyboard.isDown(Config.SavedConfigs[v]) then
             self.collision["speed"..i[1]] = i[2] * self.speed
         end
+        ::continue::
     end
-    ::continue::
+    
+end
+
+function player:Damage(dmg)
+    if self._destroying then return end
+    self.health = self.health - dmg
+    print("health: ".. self.health, "damage: ".. dmg)
+    self.flash = 1
+    Timer.after(self.flashDur, function ()
+        self.flash = 0
+    end):addToGroup(PlayingTimers)
+
+    if self.health <= 0 and not self._dead then
+        self._dead = true
+        Transition.play(function ()
+            Gamestate = "playing"
+            Scene.reload()
+        end)
+    end
 end
 
 function player:draw()
