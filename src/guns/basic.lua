@@ -18,7 +18,7 @@ function gun.new()
     local self = setmetatable({}, { __index = gun })
     self.name = "Basic Gun"
     self.damage = 10
-    self.ammo = 30
+    self.ammo = World.gun.ammo
     self.maxAmmo = 30
     self.fireRate = 0.5
     self.lastFireTime = 0
@@ -42,9 +42,11 @@ function gun:Fire(x, y)
     if self.ammo <= 0 then
         self.lastFireTime = self.rechargeTime
         self.ammo = self.maxAmmo
+        World.gun.ammo = self.maxAmmo
         return
     end
     self.ammo = self.ammo - 1
+    World.gun.ammo = self.ammo
     local collider
     collider = Collisions.new("hitbox", true)
     collider.onHit:Connect(function (otherCollider)

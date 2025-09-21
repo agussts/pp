@@ -37,6 +37,7 @@ local function tmod(a, b) return a - math.floor(a / b) * b end
 function Background.new(imagePath, tileW, tileH, parallaxX, parallaxY)
     local self = setmetatable({}, Background)
     self.image = love.graphics.newImage(imagePath)
+    self.repeatTex = true
     self.image:setWrap("repeat", "repeat")
 
     self.imgW, self.imgH = self.image:getWidth(), self.image:getHeight()
@@ -60,6 +61,12 @@ function Background.new(imagePath, tileW, tileH, parallaxX, parallaxY)
     -- @field quad Quad reutilizable para dibujar
     self.quad = love.graphics.newQuad(0, 0, 1, 1, self.imgW, self.imgH)
     return self
+end
+
+function Background:setRepeat(enabled)
+    self.repeatTex = not not enabled
+    self.image:setWrap(enabled and "repeat" or "clamp",
+                        enabled and "repeat" or "clamp")
 end
 
 --- Cambia el tamaño del tile en pixeles virtuales.
@@ -89,33 +96,43 @@ end
 --- Dibuja el fondo.
 -- @tparam[opt=0] number cameraX Posición X de la cámara en pixeles mundo
 -- @tparam[opt=0] number cameraY Posición Y de la cámara en pixeles mundo
-function Background:draw(cameraX, cameraY)
+function Background:drawBackground()
     local winW, winH = love.graphics.getDimensions()
-    local scale = TrueResolution.scale or 1
+    if not self.repeatTex then
+        love.graphics.setColor(self.color)
+        -- Escala para llenar pantalla (cover).
+        local sx = winW / self.imgW
+        local sy = winH / self.imgH
+        love.graphics.draw(self.image, 0, 0, 0, sx, sy)
+        love.graphics.setColor(1,1,1,1)
+        return
+    else
+        local scale = TrueResolution.scale or 1
 
-    -- 1) Tamaño real del tile en pantalla
-    local tileWpx = math.max(1, self.tileW * scale)
-    local tileHpx = math.max(1, self.tileH * scale)
+        -- 1) Tamaño real del tile en pantalla
+        local tileWpx = math.max(1, self.tileW * scale)
+        local tileHpx = math.max(1, self.tileH * scale)
 
-    -- 2) Escala del sprite base
-    local sx = tileWpx / self.imgW
-    local sy = tileHpx / self.imgH
+        -- 2) Escala del sprite base
+        local sx = tileWpx / self.imgW
+        local sy = tileHpx / self.imgH
 
-    -- 3) Quad que cubre toda la pantalla
-    local quadW = winW / sx
-    local quadH = winH / sy
+        -- 3) Quad que cubre toda la pantalla
+        local quadW = winW / sx
+        local quadH = winH / sy
 
-    -- 4) Offset de textura
-    local offX = (self.scrollX + (cameraX or 0) * self.parallaxX) / sx
-    local offY = (self.scrollY + (cameraY or 0) * self.parallaxY) / sy
-    offX = tmod(offX, self.imgW)
-    offY = tmod(offY, self.imgH)
+        -- 4) Offset de textura
+        local offX = (self.scrollX + (Camera.x or 0) * self.parallaxX) / sx
+        local offY = (self.scrollY + (Camera.y or 0) * self.parallaxY) / sy
+        offX = tmod(offX, self.imgW)
+        offY = tmod(offY, self.imgH)
 
-    self.quad:setViewport(offX, offY, quadW, quadH, self.imgW, self.imgH)
+        self.quad:setViewport(offX, offY, quadW, quadH, self.imgW, self.imgH)
 
-    love.graphics.setColor(self.color)
-    love.graphics.draw(self.image, self.quad, 0, 0, 0, sx, sy)
-    love.graphics.setColor(1,1,1,1)
+        love.graphics.setColor(self.color)
+        love.graphics.draw(self.image, self.quad, 0, 0, 0, sx, sy)
+        love.graphics.setColor(1,1,1,1)
+    end
 end
 
 return Background

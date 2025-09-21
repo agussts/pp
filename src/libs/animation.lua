@@ -42,15 +42,40 @@ function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDu
     self.visible = true
     self.color = {1, 1, 1, 1}
 
+            -- local quad = love.graphics.newQuad(x * gridWidth, y * gridHeight, gridWidth, gridHeight, self.sprite:getDimensions())
+            -- self.quads[frameIndex] = {x + 1, y + 1, quad}
+            -- frameIndex = frameIndex + 1
+
     self.quads = {}
-    local frameIndex = 1
-    for y = 0, rows - 1 do
-        for x = 0, columns - 1 do
-            local quad = love.graphics.newQuad(x * gridWidth, y * gridHeight, gridWidth, gridHeight, self.sprite:getDimensions())
-            self.quads[frameIndex] = {x + 1, y + 1, quad}
-            frameIndex = frameIndex + 1
+    self.holes = {}
+    self.frameCount = 0
+    function self:_rebuildQuads()
+        local frameIndex = 1
+        self.quads = {}
+        for y = 0, rows - 1 do
+            for x = 0, columns - 1 do
+                local col = x+1
+                local row = y+1
+                local key = col.. ","..row
+                if not self.holes[key] then
+                    local quad = love.graphics.newQuad(x * gridWidth, y * gridHeight, gridWidth, gridHeight, self.sprite:getDimensions())
+                    self.quads[frameIndex] = {col, row, quad}
+                    frameIndex = frameIndex + 1
+                end
+                
+            end
+        end
+        self.frameCount = #self.quads
+
+        if self.currFrame > self.frameCount then
+            self.currFrame = math.max(1, self.frameCount)
+        end
+        if self.frameCount == 0 then
+            self.playing = false
         end
     end
+
+    self:_rebuildQuads()
     table.insert(addedAnimations, self)
     return self
 end
@@ -100,51 +125,85 @@ end
 --@usage myAnimation:GoToFrame(2)
 function animations:GoToFrame(frame)
     if self._destroying then return end
-    if frame < 1 or frame > self.columns * self.rows then
+    if frame < 1 or frame > self.frameCount then
         error("Frame out of bounds: " .. tostring(frame))
     end
+
     self.currFrame = frame
     self.elapsedTime = (frame - 1) * self.frameDuration
 end
+
+---
+-- Marca una celda (col, fila) para ignorar al construir/dibujar frames.
+-- @tparam number col Columna (1..columns)
+-- @tparam number row Fila (1..rows)
+function animations:addHole(col, row)
+    if self._destroying then return end
+    assert(col>=1 and col<=self.columns and row>=1 and row<=self.rows,
+        "addHole: fuera de rango")
+    self.holes[col .. "," .. row] = true
+    self:_rebuildQuads()
+end
+
+---
+-- Quita una celda del conjunto de ignoradas.
+-- @tparam number col Columna
+-- @tparam number row Fila
+function animations:removeHole(col, row)
+    if self._destroying then return end
+    self.holes[col .. "," .. row] = nil
+    self:_rebuildQuads()
+end
+
+---
+-- Limpia todas las celdas ignoradas.
+function animations:clearHoles()
+    if self._destroying then return end
+    self.holes = {}
+    self:_rebuildQuads()
+end
+
 
 ---
 --Actualiza el modulo de animacion
 --@param dt Delta time
 --@usage myAnimation:update(dt)
 function animations:update(dt)
-    if not self.playing or self._destroying then return end
-
+    if not self.playing or self.frameCount == 0 or self._destroying then return end
     self.elapsedTime = self.elapsedTime + dt
     if self.elapsedTime >= self.frameDuration then
-        local framesToAdvance = math.floor(self.elapsedTime / self.frameDuration)
+        local steps = math.floor(self.elapsedTime / self.frameDuration)
         self.elapsedTime = self.elapsedTime % self.frameDuration
 
         if self.reversed then
-            self.currFrame = self.currFrame - framesToAdvance
-            if self.currFrame < 1 then
+            self.currFrame = self.currFrame - steps
+            while self.currFrame < 1 do
                 if self.loop then
                     self.OnLoop:Fire()
-                    self.currFrame = self.columns * self.rows + self.currFrame
+                    self.currFrame = self.currFrame + self.frameCount
                 else
                     self.OnFinish:Fire()
                     self.currFrame = 1
                     self.playing = false
+                    break
                 end
             end
         else
-            self.currFrame = self.currFrame + framesToAdvance
-            if self.currFrame > self.columns * self.rows then
+            self.currFrame = self.currFrame + steps
+            while self.currFrame > self.frameCount do
                 if self.loop then
                     self.OnLoop:Fire()
-                    self.currFrame = (self.currFrame - 1) % (self.columns * self.rows) + 1
+                    self.currFrame = ((self.currFrame - 1) % self.frameCount) + 1
                 else
                     self.OnFinish:Fire()
-                    self.currFrame = self.columns * self.rows
+                    self.currFrame = self.frameCount
                     self.playing = false
+                    break
                 end
             end
         end
     end
+
 end
 
 ---
@@ -168,7 +227,7 @@ end
 --@param height La altura del dibujo
 --@usage myAnimation:draw()
 function animations:draw(x, y)
-    if not self.visible or self._destroying then return end
+    if not self.visible or self._destroying or self.frameCount == 0 then return end
     local quad = self.quads[self.currFrame][3]
     local drawX = x - self.anchor[1] * self.gridWidth
     local drawY = y - self.anchor[2] * self.gridHeight

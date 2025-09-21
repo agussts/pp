@@ -12,8 +12,8 @@ return function()
         Player = PlayerModule.new("assets/sprites/player-Sheet.png")
         Player.collision.position = UDim2.fromScale(.5, .5)
 
-        local enemy = EnemyModule.new(nil, 0.0625, 0.11)
-        enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
+        self.enemy = EnemyModule.new(nil, 0.0625, 0.11)
+        self.enemy.collision.position = UDim2.new(0.4, 0, 0.13, 0)
 
         -- Un collider de caja
         local box = Collisions.new("box")
@@ -67,8 +67,8 @@ return function()
     scene.draw = function(self)
         local playerX, playerY = Player.collision.position:toPixels()
 
-        self.bgA:draw(Camera.x, Camera.y)
-        self.bgB:draw(Camera.x, Camera.y)
+        self.bgA:draw()
+        self.bgB:draw()
 
         Camera.attach()
             Player.sprite:draw(playerX, playerY)

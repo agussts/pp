@@ -106,16 +106,16 @@ love.update = function (dt)
                 end
             end
         end
-        
+
         Scene.update(dt)
     end
-    local px,py = Player.collision.position:toPixels()
-    Camera.update(px, py)
     Transition.update(dt)
 end
 
 love.draw = function () 
     local sceneTable = Scene.get() or {}
+
+    Scene.draw()
 
     Camera.attach()
         for _,v in pairs(sceneTable) do
@@ -137,7 +137,6 @@ love.draw = function ()
         end
     Camera.detach()
     
-    Scene.draw()
 
     -- Ordena por zIndex, si son iguales, ordena por el orden de insercion
     local sortedGuis = Guis.getAll()

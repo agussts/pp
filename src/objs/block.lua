@@ -13,7 +13,6 @@ block.__index = block
 function block.new(sprite, x, y, width, height)
     local self = setmetatable({}, block)
     self.sprite = sprite or Animation.new("assets/sprites/xblock.png", 38, 21, 1,  1, 1)
-    self.sprite:Pause()
 
     self.collision = Collisions.new("box")
     self.collision.position = UDim2.fromScale(x, y)

@@ -33,7 +33,8 @@ player.new = function(spriteName)
     self.collision.position = UDim2.new(0, 0, 0, 0)
     self.collision.size = UDim2.new(.04, 0, .075, 0)
     self.collision:AddTag("player")
-    self.health = 100
+    self.health = World.player.health or 100
+    self.maxHealth = 100
     self.collision.link = self
     self.speed = 250
 
@@ -61,6 +62,7 @@ function player:Damage(dmg)
     if self._destroying then return end
     self.health = self.health - dmg
     print("health: ".. self.health, "damage: ".. dmg)
+    World.player.health = self.health
     self.flash = 1
     Timer.after(self.flashDur, function ()
         self.flash = 0
@@ -70,14 +72,21 @@ function player:Damage(dmg)
         self._dead = true
         Transition.play(function ()
             Gamestate = "playing"
+            World.player.health = self.maxHealth
             Scene.reload()
         end)
     end
 end
 
 function player:draw()
+    if self._destroying then return end
     local x,y = self.collision.position:toPixels()
+    if self.flash > 0 then
+        love.graphics.setShader(Shaders.flash)
+        Shaders.flash:send("u_flash", self.flash)
+    end
     self.sprite:draw(x - self.sprite.gridWidth, y - self.sprite.gridHeight)
+    love.graphics.setShader()
 end
 
 return player

@@ -24,7 +24,6 @@ return function()
         self.darkweb.size = UDim2.fromScale(0.35, .35)
 
         self.darkwebDoor = Door.new("darkweb", UDim2.fromScale(-.175, .1), UDim2.fromScale(0.1, .2))
-
         self.topBlocker = Block.new(nil, -1, -.2, 2.2, 0.1)
         self.bottomBlocker = Block.new(nil, -1, 1, 2.2, 0.1)
         self.leftBlocker = Block.new(nil, -1, -0.1, 0.1, 1.2)
@@ -60,13 +59,14 @@ return function()
         else
             Gun.lastFireTime = 0
         end
-
+        local px,py = Player.collision.position:toPixels()
+        Camera.update(px, py)
     end
 
     scene.draw = function(self)
 
-        self.bgA:draw(Camera.x, Camera.y)
-        self.bgB:draw(Camera.x, Camera.y)
+        self.bgA:drawBackground()
+        self.bgB:drawBackground()
 
         -- Camera.attach()
         --     for i,v in pairs(self) do

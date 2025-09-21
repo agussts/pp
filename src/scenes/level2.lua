@@ -22,14 +22,8 @@ return function()
         self.bgB:setScroll(self.bgB.scrollX - 10*dt, self.bgB.scrollY - 20*dt)
 
         if love.mouse.isDown(1) and Gun then
-            local x,y = Player.collision.position:transformToPixels()
+            local x,y = Player.collision.position:toPixels()
             Gun:Fire(x, y)
-        end
-
-        for _,v in pairs(Collisions.getCollisions()) do
-            v.visualized = true
-            v:UpdateSpeed(dt)
-            if v.enabled then v:check() end
         end
 
         if Gun.lastFireTime > 0 then
@@ -38,23 +32,12 @@ return function()
             Gun.lastFireTime = 0
         end
 
-        Player:Update(dt)
-        local px,py = Player.collision.position:toPixels()
-        Camera.update(px, py)
     end
 
     scene.draw = function(self)
-        local px,py = Player.collision.position:toPixels()
 
         self.bgA:draw(Camera.x, Camera.y)
         self.bgB:draw(Camera.x, Camera.y)
-
-        Camera.attach()
-            Player.sprite:draw(px, py)
-            for _,v in pairs(Collisions.getCollisions()) do
-                v:draw()
-            end
-        Camera.detach()
     end
 
     scene.unload = function(self)
