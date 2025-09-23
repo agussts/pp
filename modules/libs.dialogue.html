@@ -31,16 +31,17 @@
   <li><a href="../doc.html">Index</a></li>
 </ul>
 
-<h2>Contents</h2>
-<ul>
-<li><a href="#Methods">Methods</a></li>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/connections.html">connections</a></li>
+  <li><strong>libs.dialogue</strong></li>
 </ul>
-
-
 <h2>Classes</h2>
 <ul class="nowrap">
   <li><a href="../classes/button.html">button</a></li>
-  <li><strong>frame</strong></li>
+  <li><a href="../classes/frame.html">frame</a></li>
   <li><a href="../classes/gui.html">gui</a></li>
   <li><a href="../classes/imagelabel.html">imagelabel</a></li>
   <li><a href="../classes/textlabel.html">textlabel</a></li>
@@ -57,74 +58,27 @@
   <li><a href="../classes/enemy.html">enemy</a></li>
   <li><a href="../classes/player.html">player</a></li>
 </ul>
-<h2>Modules</h2>
-<ul class="nowrap">
-  <li><a href="../modules/connections.html">connections</a></li>
-  <li><a href="../modules/libs.dialogue.html">libs.dialogue</a></li>
-</ul>
 
 </div>
 
 <div id="content">
 
-<h1>Class <code>frame</code></h1>
-<p>Crea un frame basico.</p>
+<h1>Module <code>libs.dialogue</code></h1>
+<p>Sistema de diálogos simple (sin retratos).</p>
 <p>
-Usa componentes de GUI.</p>
-    <h3>See also:</h3>
-    <ul>
-         <a href="../classes/gui.html#">gui</a>
-    </ul>
+  Pausa el gameplay mientras está activo y reanuda al terminar.
+  Uso:
+    Dialogue.start({
+       { who="Broker", text="Bienvenido a la Dark Web." },
+       { who="Prota",  text="..." },
+    })</p>
 
 
-<h2><a href="#Methods">Methods</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" nowrap><a href="#frame:new">frame:new (position, size)</a></td>
-	<td class="summary">Crea un nuevo frame</td>
-	</tr>
-</table>
 
 <br/>
 <br/>
 
 
-    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "frame:new"></a>
-    <strong>frame:new (position, size)</strong>
-    </dt>
-    <dd>
-    Crea un nuevo frame
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">position</span>
-         Posicion del frame
-        </li>
-        <li><span class="parameter">size</span>
-         Tamaño del frame
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-        (frame) Instancia del frame
-    </ol>
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> myFrame = frame.<span class="function-name">new</span>(UDim2.<span class="function-name">fromScale</span>(<span class="number">0.5</span>, <span class="number">0.5</span>), UDim2.<span class="function-name">fromScale</span>(<span class="number">0.3</span>, <span class="number">0.3</span>))</pre>
-    </ul>
-
-</dd>
-</dl>
 
 
 </div> <!-- id="content" -->
