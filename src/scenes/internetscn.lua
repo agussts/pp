@@ -1,7 +1,7 @@
 return function()
     local scene = {}
 
-    scene.load = function(self)
+    scene.load = function(self, payload)
         -- Fondos
         self.bgA = Background.new("assets/sprites/xthingy.png", 32*3, 18*3, 1,1)
         self.bgB = Background.new("assets/sprites/xthingy.png", 32*3, 18*3, 1,1)
@@ -9,7 +9,13 @@ return function()
         self.bgB.color = {.2,1,1,0.02}
 
         Player = PlayerModule.new("assets/sprites/player-Sheet.png")
-        Player.collision.position = UDim2.fromScale(.2, .6)
+        
+        local spawn = UDim2.fromScale(.2, .6)
+        if payload ~= nil then
+            spawn = payload.spawn
+        end
+        Player.collision.position = spawn
+
         self.player = Player
         self.darkwebWindow = {}
         self.darkwebWindow.image = love.graphics.newImage("assets/sprites/windowthing.png")
@@ -24,10 +30,25 @@ return function()
         self.darkweb.size = UDim2.fromScale(0.35, .35)
 
         self.darkwebDoor = Door.new("darkweb", UDim2.fromScale(-.175, .1), UDim2.fromScale(0.1, .2))
-        self.topBlocker = Block.new(nil, -1, -.2, 2.2, 0.1)
-        self.bottomBlocker = Block.new(nil, -1, 1, 2.2, 0.1)
-        self.leftBlocker = Block.new(nil, -1, -0.1, 0.1, 1.2)
-        self.rightBlocker = Block.new(nil, 1.1, -0.1, 0.1, 1.2)
+        -- Top blocker 
+        self.topBlocker = Collisions.new("box")
+        self.topBlocker.position = UDim2.fromScale(-1, -.2)
+        self.topBlocker.size = UDim2.fromScale(2.2, 0.1)
+
+        -- Bottom blocker 
+        self.bottomBlocker = Collisions.new("box")
+        self.bottomBlocker.position = UDim2.fromScale(-1, 1)
+        self.bottomBlocker.size = UDim2.fromScale(2.2, 0.1)
+
+        -- Left blocker 
+        self.leftBlocker = Collisions.new("box")
+        self.leftBlocker.position = UDim2.fromScale(-1, -0.1)
+        self.leftBlocker.size = UDim2.fromScale(0.1, 1.2)
+
+        -- Right blocker
+        self.rightBlocker = Collisions.new("box")
+        self.rightBlocker.position = UDim2.fromScale(1.1, -0.1)
+        self.rightBlocker.size = UDim2.fromScale(0.1, 1.2)
 
         self.enemy = Antivirus.new()
         self.enemy.collision.position = UDim2.fromScale(.5, .5)

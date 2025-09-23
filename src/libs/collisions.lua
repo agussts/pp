@@ -185,7 +185,7 @@ function collisions:check()
     local hitting = {}
     local x, y, width, height = self:_getRenderRect()
     for _, otherCollider in pairs(addedCollisions) do
-        if otherCollider == self then goto continue end      
+        if otherCollider == self or not otherCollider.enabled then goto continue end      
         local otherX, otherY, otherWidth, otherHeight = otherCollider:_getRenderRect()
         if x <= otherX + otherWidth
         and x + width >= otherX

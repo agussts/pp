@@ -1,11 +1,15 @@
 --Requiere modulos
 Config = require("src.utils.config_manager")
 
+--Esencial
 Signal = require("src.libs.signal")
 Timer = require("src.libs.timer")
 Collisions = require("src.libs.collisions")
 UDim2 = require("src.guis.udim2")
 Animation = require("src.libs.animation")
+Fonts = require("src.utils.fonts")
+
+--UI
 Guis = require("src.guis.gui")
 
     Button = require("src.guis.button")
@@ -13,6 +17,11 @@ Guis = require("src.guis.gui")
     Frame = require("src.guis.frame")
     ImageLabel = require("src.guis.imagelabel")
 
+--Styles
+
+    Border = require("src.guis.styles.border")
+
+--Objects
 Block = require("src.objs.block")
 PlayerModule = require("src.objs.player")
 EnemyModule = require("src.objs.enemy")
@@ -28,5 +37,6 @@ Scene = require("src.scenes.scene")
 Transition = require("src.scenes.transition")
 
 Shaders = require("src.libs.shaders")
+Dialogue = require("src.libs.dialogue")
 
 World = require("src.utils.world")

@@ -18,6 +18,7 @@ function gui.new()
     self.visible = true
     self.anchorPoint = {0, 0}
     self.zIndex = 0
+    self.styles = {}
 
     self.parent = nil
     self.children = {}
@@ -31,6 +32,24 @@ function gui.new()
 
     table.insert(addedGuis, self)
     return self
+end
+
+--- Aplica un estilo a este GUI.
+-- styleModule debe exportar: apply(targetGui, opts) -> handle con :Destroy()
+function gui:applyStyle(styleModule, opts)
+    assert(styleModule and type(styleModule.apply)=="function", "applyStyle: estilo inválido")
+    local handle = styleModule.apply(self, opts or {})
+    table.insert(self.styles, handle)
+    return handle
+end
+
+--- Elimina todos los estilos aplicados a este GUI.
+function gui:clearStyles()
+    for i = #self.styles, 1, -1 do
+        local h = self.styles[i]
+        if h and h.Destroy then pcall(h.Destroy, h) end
+        table.remove(self.styles, i)
+    end
 end
 
 ---
@@ -163,6 +182,10 @@ function gui:Destroy()
             break
         end
     end
+    for i,v in ipairs(self.children) do
+        v:Destroy()
+    end
+    self = nil
 end
 
 -- Marca si este GUI (y su árbol) deben sobrevivir a los cambios de escena

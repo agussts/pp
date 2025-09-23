@@ -21,28 +21,39 @@ function timer.group.new()
     return self
 end
 
-function timer.group:addTimer(timer)
-    assert(timer and timer.check, "Invalid timer")
-    if not self.playing then
-        timer:pause()
+function timer.group:addTimer(t)
+    assert(t and t.check, "Invalid timer")
+    -- si el grupo está en pausa, pausa el timer solo si estaba playing
+    if not self.playing and t.playing then
+        t:pause()
     end
-    table.insert(self.timers, timer)
+    table.insert(self.timers, t)
 end
+
 function timer.group:pause()
+    if not self.playing then return end
     self.playing = false
-    self.pauseStart = timer.passedTime
-    for _, timer in ipairs(self.timers) do
-        timer:pause()
+    self.pauseStart = timer.passedTime or 0
+    for _, t in ipairs(self.timers) do
+        if t and t.pause then t:pause() end
     end
 end
+
 function timer.group:continue()
+    if self.playing then return end
     self.playing = true
-    self.pauseEnd = timer.passedTime
-    self.pausedTime = self.pausedTime + (self.pauseEnd - self.pauseStart)
-    for _, timer in ipairs(self.timers) do
-        timer:continue()
+    self.pauseEnd = timer.passedTime or 0
+    local ps = self.pauseStart or self.pauseEnd or 0
+    local delta = self.pauseEnd - ps
+    if delta > 0 then
+        self.pausedTime = (self.pausedTime or 0) + delta
+    end
+    self.pauseStart = nil
+    for _, t in ipairs(self.timers) do
+        if t and t.continue then t:continue() end
     end
 end
+
 
 function timer.group:getTimePassed()
     return timer.passedTime - self.pausedTime
@@ -58,15 +69,16 @@ end
 --@usage myTimer = Timer.new(5)
 function timer.new(time)
     local self = setmetatable({}, { __index = timer })
-    self._currTime = timer.passedTime
+    self._currTime = timer.passedTime or 0
     self.time = time
     self.playing = true
-    self._pauseStart = 0
-    self._pauseEnd = 0
+    self._pauseStart = nil
+    self._pauseEnd = nil
     self._pauseTime = 0
     table.insert(timers, self)
     return self
 end
+
 
 function timer:addToGroup(group)
     assert(group and group.timers, "Invalid group")
@@ -96,20 +108,26 @@ end
 -- Pausa el temporizador.
 --@usage myTimer:pause()
 function timer:pause()
+    if not self.playing then return end
     self.playing = false
-    self._pauseStart = timer.passedTime
+    self._pauseStart = timer.passedTime or 0
 end
 
 ---
 -- Despausa el temporizador.
 --@usage myTimer:continue()
 function timer:continue()
-    self.playing = true
-    self._pauseEnd = timer.passedTime
-    if self._pauseTime == nil then
-        self._pauseTime = 0
+    if self.playing then return end
+    self._pauseEnd = timer.passedTime or 0
+    -- Defaults defensivos
+    local ps = self._pauseStart or self._currTime or self._pauseEnd or 0
+    local delta = self._pauseEnd - ps
+    if delta > 0 then
+        self._pauseTime = (self._pauseTime or 0) + delta
     end
-    self._pauseTime = self._pauseTime + (self._pauseEnd - self._pauseStart)
+    -- limpiar estado de pausa para la próxima
+    self._pauseStart, self._pauseEnd = nil, nil
+    self.playing = true
 end
 
 ---

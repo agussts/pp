@@ -42,10 +42,6 @@ function animations.new(imagePath, gridWidth, gridHeight, columns, rows, frameDu
     self.visible = true
     self.color = {1, 1, 1, 1}
 
-            -- local quad = love.graphics.newQuad(x * gridWidth, y * gridHeight, gridWidth, gridHeight, self.sprite:getDimensions())
-            -- self.quads[frameIndex] = {x + 1, y + 1, quad}
-            -- frameIndex = frameIndex + 1
-
     self.quads = {}
     self.holes = {}
     self.frameCount = 0

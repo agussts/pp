@@ -108,6 +108,7 @@ love.update = function (dt)
         end
 
         Scene.update(dt)
+        Dialogue.updateAll(dt)
     end
     Transition.update(dt)
 end
@@ -141,20 +142,33 @@ love.draw = function ()
     -- Ordena por zIndex, si son iguales, ordena por el orden de insercion
     local sortedGuis = Guis.getAll()
     
+    local function effectiveZ(g)
+        local z = g.zIndex or 0
+        local p = g.parent
+        while p do
+            z = z + (p.zIndex or 0)
+            p = p.parent
+        end
+        return z
+    end
+
     table.sort(sortedGuis, function(a, b)
-        local aZIndex = a.zIndex or 0
-        local bZIndex = b.zIndex or 0
-        if a.parent ~= nil then aZIndex = a.parent.zIndex + aZIndex end
-        if b.parent ~= nil then bZIndex = b.parent.zIndex + bZIndex end
-        return aZIndex < bZIndex
+        -- local aZIndex = a.zIndex or 0
+        -- local bZIndex = b.zIndex or 0
+        -- if a.parent ~= nil then aZIndex = a.parent.zIndex + aZIndex end
+        -- if b.parent ~= nil then bZIndex = b.parent.zIndex + bZIndex end
+        local az, bz = effectiveZ(a), effectiveZ(b)
+        if az ~= bz then
+            return az < bz
+        end
+        -- Desempate estable: más viejo primero (o usa un id incremental si tienes)
+        return tostring(a) < tostring(b)
     end)
 
     --Dibuja interfaz, tiene que ser al final de la funcion para que se renderize sobre todo
 
-    for _,self in pairs(sortedGuis) do
-        if not self.visible then goto continue end
-        self:draw()
-        ::continue::
+    for _,self in ipairs(sortedGuis) do
+        if self.visible then self:draw() end
     end
     Transition.draw()
 end
