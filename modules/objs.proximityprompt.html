@@ -33,13 +33,19 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Methods">Methods</a></li>
+<li><a href="#Functions">Functions</a></li>
 </ul>
 
 
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/connections.html">connections</a></li>
+  <li><a href="../modules/libs.dialogue.html">libs.dialogue</a></li>
+  <li><strong>objs.proximityprompt</strong></li>
+</ul>
 <h2>Classes</h2>
 <ul class="nowrap">
-  <li><strong>button</strong></li>
+  <li><a href="../classes/button.html">button</a></li>
   <li><a href="../classes/frame.html">frame</a></li>
   <li><a href="../classes/gui.html">gui</a></li>
   <li><a href="../classes/imagelabel.html">imagelabel</a></li>
@@ -58,32 +64,31 @@
   <li><a href="../classes/enemy.html">enemy</a></li>
   <li><a href="../classes/player.html">player</a></li>
 </ul>
-<h2>Modules</h2>
-<ul class="nowrap">
-  <li><a href="../modules/connections.html">connections</a></li>
-  <li><a href="../modules/libs.dialogue.html">libs.dialogue</a></li>
-  <li><a href="../modules/objs.proximityprompt.html">objs.proximityprompt</a></li>
-</ul>
 
 </div>
 
 <div id="content">
 
-<h1>Class <code>button</code></h1>
-<p>Boton basico de GUI.</p>
+<h1>Module <code>objs.proximityprompt</code></h1>
+<p>ProximityPrompt: muestra un prompt al acercarte y emite una señal al presionar una tecla.</p>
 <p>
-Usa componentes de Guis.</p>
-    <h3>See also:</h3>
-    <ul>
-         <a href="../classes/gui.html#">gui</a>
-    </ul>
+ Depende de: Guis, Textlabel/PrintfLabel (cualquiera), Frame, Collisions, Signal, UDim2, Connect/Fire.
+ Uso básico:
+   local ProximityPrompt = require("src.libs.proximity_prompt")
+   local pp = ProximityPrompt.new({
+       position = UDim2.fromScale(0.5, 0.5),
+       size     = UDim2.fromScale(0.08, 0.12),
+       text     = "Presiona [E] para hablar",
+       key      = "e",
+   })
+   pp.Triggered:Connect(function(self) print("¡Interactuaste!") end)</p>
 
 
-<h2><a href="#Methods">Methods</a></h2>
+<h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#button:new">button:new (callback)</a></td>
-	<td class="summary">Crea un nuevo boton</td>
+	<td class="name" nowrap><a href="#ProximityPrompt.new">ProximityPrompt.new (key, text)</a></td>
+	<td class="summary">Crea un nuevo prompt de proximidad</td>
 	</tr>
 </table>
 
@@ -91,29 +96,29 @@ Usa componentes de Guis.</p>
 <br/>
 
 
-    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "button:new"></a>
-    <strong>button:new (callback)</strong>
+    <a name = "ProximityPrompt.new"></a>
+    <strong>ProximityPrompt.new (key, text)</strong>
     </dt>
     <dd>
-    Crea un nuevo boton
+    Crea un nuevo prompt de proximidad
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">callback</span>
-         Funcion a llamar cuando se presiona el boton
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+
+        </li>
+        <li><span class="parameter">text</span>
+            <span class="types"><span class="type">stirng</span></span>
+
         </li>
     </ul>
 
-    <h3>Returns:</h3>
-    <ol>
-
-        (button) Instancia del boton
-    </ol>
 
 
 
