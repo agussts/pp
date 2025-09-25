@@ -15,6 +15,13 @@ function Connect(eventName, callback)
         connections[eventName] = {}
     end
     table.insert(connections[eventName], callback)
+    return setmetatable({}, {
+        __index = function(_, key)
+            if key == "Disconnect" then
+                return function() Disconnect(eventName, callback) end
+            end
+        end
+    })
 end
 
 ---

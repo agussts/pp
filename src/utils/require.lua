@@ -28,6 +28,7 @@ PlayerModule = require("src.objs.player")
 EnemyModule = require("src.objs.enemy")
 Antivirus = require("src.objs.antivirus")
 Door = require("src.objs.door")
+ProxPrompt = require("src.objs.proximityprompt")
 
 GunModule = require("src.guns.dev")
     

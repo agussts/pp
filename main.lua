@@ -38,7 +38,7 @@ Connect("keyPressed", function (key)
             --Daño del dash
             local plrDashConnection = Player.collision.onHit:Connect(function (otherCollider)
                 if otherCollider.link ~= nil and otherCollider.link.health ~= nil then
-                    otherCollider.link.health = otherCollider.link.health - 1
+                    otherCollider.link:Damage(1)
                 end
             end)
             --Detiene el dash

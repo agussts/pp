@@ -380,6 +380,7 @@ end
 
 local function createKeybindsMenu(parent)
     local menu = {}
+    local prevConfig = deepCopy(Config.ConfigTable)
     local keybindEntries = {}
 
     local titleText = Textlabel.new("Keybinds")
@@ -429,15 +430,15 @@ local function createKeybindsMenu(parent)
     table.insert(menu, leftBtn)
     table.insert(menu, leftText)
 
-    local rightBtn, rightText = createKeybindEntry("PRIGHT", UDim2.fromScale(0.3, 0.4), "Move right: ")
+    local rightBtn, rightText = createKeybindEntry("PRIGHT", UDim2.fromScale(0.3, 0.35), "Move right: ")
     table.insert(menu, rightBtn)
     table.insert(menu, rightText)
 
-    local upBtn, upText = createKeybindEntry("PUP", UDim2.fromScale(0.3, 0.6), "Move up: ")
+    local upBtn, upText = createKeybindEntry("PUP", UDim2.fromScale(0.3, 0.5), "Move up: ")
     table.insert(menu, upBtn)
     table.insert(menu, upText)
 
-    local downBtn, downText = createKeybindEntry("PDOWN", UDim2.fromScale(0.3, 0.8), "Move down: ")
+    local downBtn, downText = createKeybindEntry("PDOWN", UDim2.fromScale(0.3, 0.65), "Move down: ")
     table.insert(menu, downBtn)
     table.insert(menu, downText)
 
@@ -445,9 +446,77 @@ local function createKeybindsMenu(parent)
     table.insert(menu, dashBtn)
     table.insert(menu, dashText)
 
-    local backBtn, backText = createKeybindEntry("PBACK", UDim2.fromScale(0.7, 0.4), "Back: ")
+    local intrBtn, intrText = createKeybindEntry("PINTR", UDim2.fromScale(0.7, 0.35), "Interact: ")
+    table.insert(menu, intrBtn)
+    table.insert(menu, intrText)
+
+    local backBtn, backText = createKeybindEntry("PBACK", UDim2.fromScale(0.7, 0.5), "Back: ")
     table.insert(menu, backBtn)
     table.insert(menu, backText)
+
+    local back, bckText = createTextButton(
+        parent,
+        UDim2.fromScale(.3, 0.925),
+        UDim2.fromScale(0.3, 0.1),
+        "Back",
+        function ()
+            showMenu("settings")
+        end
+    )
+    table.insert(menu, back)
+    table.insert(menu, bckText)
+
+    local applyBtn, applyText = createTextButton(
+        parent,
+        UDim2.fromScale(0.7, 0.925),
+        UDim2.fromScale(0.3, 0.1),
+        "Apply",
+        function ()
+            Config.saveConfig()
+            prevConfig = deepCopy(Config.ConfigTable)
+            showMenu("settings")
+        end
+    )
+    table.insert(menu, applyBtn)
+    table.insert(menu, applyText)
+
+    local revertBtn, revertText = createTextButton(
+        parent,
+        UDim2.fromScale(0.3, .8),
+        UDim2.fromScale(0.3, 0.1),
+        "Revert Settings",
+        function ()
+            leftText.text = "Move left: "..(prevConfig.PLEFT or "None")
+            rightText.text = "Move right: "..(prevConfig.PRIGHT or "None")
+            upText.text = "Move up: "..(prevConfig.PUP or "None")
+            downText.text = "Move down: "..(prevConfig.PDOWN or "None")
+            dashText.text = "Dash: "..(prevConfig.PDASH or "None")
+            intrText.text = "Interact: "..(prevConfig.PINTR or "None")
+            backText.text = "Back: "..(prevConfig.PBACK or "None")
+            Config.ConfigTable = deepCopy(prevConfig)
+        end
+    )
+    table.insert(menu, revertBtn)
+    table.insert(menu, revertText)
+
+    local revertDefaultsBtn, revertDefaultsText = createTextButton(
+        parent,
+        UDim2.fromScale(0.7, .8),
+        UDim2.fromScale(0.3, 0.1),
+        "Reset to Default",
+        function ()
+            leftText.text = "Move left: a"
+            rightText.text = "Move right: d"
+            upText.text = "Move up: w"
+            downText.text = "Move down: s"
+            dashText.text = "Dash: space"
+            intrText.text = "Interact: e"
+            backText.text = "Back: escape"
+            Config.ConfigTable = deepCopy(Config.DefaultConfigs)
+        end
+    )
+    table.insert(menu, revertDefaultsBtn)
+    table.insert(menu, revertDefaultsText)
 
     return menu
 end

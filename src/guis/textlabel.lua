@@ -19,6 +19,7 @@ function textlabel.new(text)
     self.type = "textlabel"
 
     self.draw = function ()
+        if not self.visible then return end
         local x, y = self:getRenderPosition()
         local width, height = self:getRenderSize()
         love.graphics.setColor(self.textColor or {0,0,0,1})
