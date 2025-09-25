@@ -18,12 +18,18 @@ return function ()
         self.exitSign = Block.new(exitImg, 0, .7, 1, 1)
         self.exitSign.collision.enabled = false
 
-        self.talkMvirus = ProxPrompt.new(nil, "Press [%s] to talk")
+        self.talkMvirus = ProxPrompt.new("Press [%s] to talk")
         self.talkMvirus.collision.position = self.mvirus.collision.position
         self.talkMvirus.collision.size = UDim2.fromScale(.2, .35)
-        self.talkMvirus.Triggered:Connect(function ()
-            print("talked")
-        end)
+        local function talk()
+            local dialogue = Dialogue.start({
+                {who = "???", text = "tgffghfgh"}
+            })
+            dialogue.onFinish:Once(function ()
+                self.talkMvirus.Triggered:Once(talk)
+            end)
+        end
+        self.talkMvirus.Triggered:Once(talk)
     end
     scene.update = function (self, dt)
         local w, h = love.graphics.getDimensions()

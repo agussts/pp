@@ -8,7 +8,7 @@ ConfigManager.SavedConfigs = {}
 ConfigManager.IdealResolution = {width = 640, height = 360}
 
 ConfigManager.Resolutions = {
-    {width = 320, height = 180, scale = 0.5},
+    --{width = 320, height = 180, scale = 0.5},
     {width = 640, height = 360, scale = 1},
     {width = 1280, height = 720, scale = 2},
     {width = 1920, height = 1080, scale = 3},
@@ -16,7 +16,7 @@ ConfigManager.Resolutions = {
 ConfigManager.DefaultConfigs = {
     BORDERLESS = false,
     VSYNC = true,
-    RESOLUTION = 3,
+    RESOLUTION = 2,
     VOLUME = 1,
     PLEFT = "a",
     PRIGHT = "d",

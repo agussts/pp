@@ -1,5 +1,5 @@
 -- Estados del juego
-Gamestates = { "playing", "paused" }
+Gamestates = { "playing", "paused" , "dialogue" }
 Gamestate = "playing"
 
 -- Estados del menu de pausa
@@ -12,7 +12,7 @@ pauseMenuContainer:setPersistent(true)
 pauseMenuContainer.size = UDim2.fromScale(1, 1)
 pauseMenuContainer.bgColor = {0, 0, 0, 0.65}
 pauseMenuContainer.visible = false
-pauseMenuContainer.zIndex = -1
+pauseMenuContainer.zIndex = 500
 
 local listThing = Frame.new()
 listThing.size = UDim2.fromScale(0.4, 1)
@@ -531,6 +531,8 @@ showMenu("")
 -- -------------------------------------------
 
 function PauseMenu()
+    if Gamestate == "dialogue" then return end
+    
     if Gamestate == "playing" then
         PlayingTimers:pause()
         PauseMenuTimers:continue()

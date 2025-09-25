@@ -10,11 +10,26 @@ local Dialogue = {}
 local allDialogues = {}
 Dialogue.__index = Dialogue
 
+-- Al iniciar el diálogo:
+local function enterDialogueState()
+    -- Pausa gameplay, mantiene vivos timers de UI (usamos los del menú como “canal UI”)
+    if PlayingTimers and PlayingTimers.pause then PlayingTimers:pause() end
+    if PauseMenuTimers and PauseMenuTimers.continue then PauseMenuTimers:continue() end
+    Gamestate = "dialogue"
+end
+
+-- Al terminar el diálogo:
+local function exitDialogueState()
+    Gamestate = "playing"
+    if PlayingTimers and PlayingTimers.continue then PlayingTimers:continue() end
+    if PauseMenuTimers and PauseMenuTimers.pause then PauseMenuTimers:pause() end
+end
+
 local function buildUI(self)
     self.root = Frame.new()
     self.root.size = UDim2.fromScale(1,1)
     self.root.bgColor = {0,0,0,0}
-    self.root.zIndex = 999
+    self.root.zIndex = 100
     self.root.anchorPoint = {0,0}
     self.root.visible = true
 
@@ -63,17 +78,18 @@ function Dialogue.start(script, opts)
     self.script = script
     self.idx = 1
     self.cps = (opts and opts.cps) or 40
-    self.onFinish = opts and opts.onFinish
+    self.onFinish = Signal.new()
     self._charIdx = 0
     self._elapsed = 0
     self._fullText = ""
     self._showing = ""
     self._active = true
 
-    if Gamestate == "playing" then
-        PlayingTimers:pause()
-        Gamestate = "paused"
-    end
+    enterDialogueState()
+    -- if Gamestate == "playing" then
+    --     PlayingTimers:pause()
+    --     Gamestate = "paused"
+    -- end
 
     buildUI(self)
     self:applyLine(self.script[self.idx])
@@ -128,6 +144,7 @@ end
 
 function Dialogue:finish()
     if not self._active then return end
+    exitDialogueState()
     self._active = false
     if self._connection then Disconnect("keyPressed", self._connection) end
     if self.root then self.root:Destroy() end
@@ -137,7 +154,7 @@ function Dialogue:finish()
     end
     self.root:Destroy()
     self.textLbl = nil
-    if self.onFinish then pcall(self.onFinish) end
+    self.onFinish:Fire()
 end
 
 function Dialogue.updateAll(dt)

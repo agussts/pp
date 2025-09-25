@@ -23,6 +23,7 @@ love.load = function ()
     --Ajustes antes de empezar renderizacion
     love.graphics.setDefaultFilter("nearest", "nearest", 1)
     Scene.load("internetscn")
+    DevTools.init()
 end
 
 love.keypressed = function (key)
@@ -108,8 +109,8 @@ love.update = function (dt)
         end
 
         Scene.update(dt)
-        Dialogue.updateAll(dt)
     end
+    Dialogue.updateAll(dt)
     Transition.update(dt)
 end
 

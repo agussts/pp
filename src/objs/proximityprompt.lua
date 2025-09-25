@@ -17,7 +17,7 @@ ProximityPrompt.__index = ProximityPrompt
 --- Crea un nuevo prompt de proximidad
 -- @tparam string key
 -- @tparam stirng text
-function ProximityPrompt.new(key, text)
+function ProximityPrompt.new(text, key)
     local self = setmetatable({}, ProximityPrompt)
 
     -- Señal pública

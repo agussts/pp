@@ -10,6 +10,7 @@ local types = {
     "box",
     "hitbox"
 }
+local defaultVisualized = true -- TEMPORAL: CAMBIAR A false DESPUES
 
 --- Crea una nueva colisión
 --@param type El tipo de colision, puede ser "box" o "hitbox"
@@ -24,7 +25,7 @@ collisions.new = function(type, enabled)
     self.size = UDim2.new(0, 0, 0, 0)
     self.speedX = 0
     self.speedY = 0
-    self.visualized = true --TEMPORAL: CAMBIAR A FALSE DESPUES
+    self.visualized = defaultVisualized
     self.enabled = enabled ~= false
     self.onHit = Signal.new()
     self.color = {1, 1, 1, 1}
@@ -132,6 +133,17 @@ end
 collisions.getCollisions = function()
     return addedCollisions
 end
+
+-- Activa/desactiva el render por defecto para colliders NUEVOS
+function collisions.setDefaultVisualized(flag)
+    defaultVisualized = not not flag
+end
+
+-- Consulta del valor global actual
+function collisions.getDefaultVisualized()
+    return defaultVisualized
+end
+
 
 ---
 --Actualiza la posicion del collider segun su velocidad

@@ -42,3 +42,5 @@ Shaders = require("src.libs.shaders")
 Dialogue = require("src.libs.dialogue")
 
 World = require("src.utils.world")
+
+DevTools = require("src.utils.devtools")
