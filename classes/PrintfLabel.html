@@ -39,11 +39,11 @@
 
 <h2>Classes</h2>
 <ul class="nowrap">
-  <li><strong>button</strong></li>
+  <li><a href="../classes/button.html">button</a></li>
   <li><a href="../classes/frame.html">frame</a></li>
   <li><a href="../classes/gui.html">gui</a></li>
   <li><a href="../classes/imagelabel.html">imagelabel</a></li>
-  <li><a href="../classes/PrintfLabel.html">PrintfLabel</a></li>
+  <li><strong>PrintfLabel</strong></li>
   <li><a href="../classes/textlabel.html">textlabel</a></li>
   <li><a href="../classes/udim2.html">udim2</a></li>
   <li><a href="../classes/basicGun.html">basicGun</a></li>
@@ -68,21 +68,18 @@
 
 <div id="content">
 
-<h1>Class <code>button</code></h1>
-<p>Boton basico de GUI.</p>
-<p>
-Usa componentes de Guis.</p>
-    <h3>See also:</h3>
-    <ul>
-         <a href="../classes/gui.html#">gui</a>
-    </ul>
+<h1>Class <code>PrintfLabel</code></h1>
+<p>PrintfLabel: etiqueta de texto con ajuste automático a la resolución
+ Usa el layout de GUI (Guis.new) y se dibuja con love.graphics.printf
+ Escala visualmente con TrueResolution.scale (no cambia el tamaño del font).</p>
+<p></p>
 
 
 <h2><a href="#Methods">Methods</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#button:new">button:new (callback)</a></td>
-	<td class="summary">Crea un nuevo boton</td>
+	<td class="name" nowrap><a href="#printflabel:new">printflabel:new (text)</a></td>
+	<td class="summary">Crea una etiqueta</td>
 	</tr>
 </table>
 
@@ -94,24 +91,26 @@ Usa componentes de Guis.</p>
 
     <dl class="function">
     <dt>
-    <a name = "button:new"></a>
-    <strong>button:new (callback)</strong>
+    <a name = "printflabel:new"></a>
+    <strong>printflabel:new (text)</strong>
     </dt>
     <dd>
-    Crea un nuevo boton
+    Crea una etiqueta
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">callback</span>
-         Funcion a llamar cuando se presiona el boton
+        <li><span class="parameter">text</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Texto inicial
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        (button) Instancia del boton
+           <span class="types"><a class="type" href="../classes/PrintfLabel.html#">PrintfLabel</a></span>
+        instancia
     </ol>
 
 
