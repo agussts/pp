@@ -8,7 +8,7 @@ return function ()
         self.player = Player
         local anim = Animation.new("assets/sprites/mvirus-Sheet.png", 41, 41, 3, 3, .1)
         anim:addHole(3, 3)
-        anim.anchor = {1.6, 1.6}
+        anim.anchor = {.5, .5}
         self.mvirus = Block.new(anim, .575, .7, .06, .1)
         self.mvirus.collision.anchor = {.5, .5}
         self.exit = Door.new("internetscn", UDim2.fromScale(0, .75), UDim2.fromScale(.025, .3), {spawn = UDim2.fromScale(-.125, .4)})
@@ -27,6 +27,10 @@ return function ()
             {who ="gurt", text="hola"},
             {who="prota", text="hola sigma"}
         }, {cps = 50})
+        -- Dialogue.start{
+        --     "hola",
+        --     "holis"
+        -- }
     end
     scene.draw = function (self)
         self.bg:drawBackground()

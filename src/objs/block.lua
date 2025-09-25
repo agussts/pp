@@ -35,7 +35,7 @@ end
 function block:draw()
     local x, y = self.collision.position:toPixels()
     local width, height = self.collision.size:toPixels()
-    self.sprite:draw(x, y, width, height)
+    self.sprite:draw(x, y)
 end
 
 return block

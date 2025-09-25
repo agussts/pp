@@ -10,24 +10,6 @@ local Dialogue = {}
 local allDialogues = {}
 Dialogue.__index = Dialogue
 
-local function newPrintfLabel()
-    local self = Guis.new()
-    self.type = "printf_label"
-    self.text = ""
-    self.color = {1,1,1,1}
-    self.align = "left"
-    self.font  = love.graphics.getFont()
-    self.draw = function ()
-        local x,y = self:getRenderPosition()
-        local w,h = self:getRenderSize()
-        love.graphics.setColor(self.color)
-        local f = self.font or love.graphics.getFont()
-        love.graphics.printf(self.text, f, x, y, w, self.align)
-        love.graphics.setColor(1,1,1,1)
-    end
-    return self
-end
-
 local function buildUI(self)
     self.root = Frame.new()
     self.root.size = UDim2.fromScale(1,1)
@@ -64,7 +46,7 @@ local function buildUI(self)
     self.nameText.font = Fonts.VT323
 
     -- Texto
-    self.textLbl = newPrintfLabel()
+    self.textLbl = PrintfLabel.new("")
     self.textLbl:setParent(self.box)
     self.textLbl.size = UDim2.fromScale(0.95, 0.65)
     self.textLbl.position = UDim2.fromScale(0.025, 0.3)

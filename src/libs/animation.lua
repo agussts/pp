@@ -222,14 +222,33 @@ end
 --@param width El ancho del dibujo
 --@param height La altura del dibujo
 --@usage myAnimation:draw()
-function animations:draw(x, y)
-    if not self.visible or self._destroying or self.frameCount == 0 then return end
+function animations:draw(x, y, width, height)
+    if not self.visible or self._destroying then return end
     local quad = self.quads[self.currFrame][3]
-    local drawX = x - self.anchor[1] * self.gridWidth
-    local drawY = y - self.anchor[2] * self.gridHeight
+
+    -- 1) ¿Escala explícita por tamaño o escala por resolución?
+    local sx, sy
+    local drawW, drawH
+    if width and height then
+        -- Escalar para que el frame ocupe exactamente width x height (en pixeles reales)
+        sx = width  / self.gridWidth
+        sy = height / self.gridHeight
+        drawW, drawH = width, height
+    else
+        -- Escala automática según la resolución "virtual"
+        local scale = (TrueResolution and TrueResolution.scale) or 1
+        sx, sy = scale * 1.5, scale * 1.5
+        drawW, drawH = self.gridWidth * sx, self.gridHeight * sy
+    end
+
+    -- 2) Ancla correcta en función del tamaño real que se dibuja
+    local drawX = x - self.anchor[1] * drawW
+    local drawY = y - self.anchor[2] * drawH
+
+    -- 3) Dibujar
     love.graphics.setColor(self.color)
-    love.graphics.draw(self.sprite, quad, drawX, drawY, 0, 3, 3)
-    love.graphics.setColor({1, 1, 1, 1})
+    love.graphics.draw(self.sprite, quad, drawX, drawY, 0, sx, sy)
+    love.graphics.setColor(1, 1, 1, 1)
 end
 
 ---

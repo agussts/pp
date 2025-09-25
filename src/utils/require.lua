@@ -16,6 +16,7 @@ Guis = require("src.guis.gui")
     Textlabel = require("src.guis.textlabel")
     Frame = require("src.guis.frame")
     ImageLabel = require("src.guis.imagelabel")
+    PrintfLabel = require("src.guis.printf_label")
 
 --Styles
 

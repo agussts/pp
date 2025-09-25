@@ -85,7 +85,7 @@ function player:draw()
         love.graphics.setShader(Shaders.flash)
         Shaders.flash:send("u_flash", self.flash)
     end
-    self.sprite:draw(x - self.sprite.gridWidth, y - self.sprite.gridHeight)
+    self.sprite:draw(x, y)
     love.graphics.setShader()
 end
 
