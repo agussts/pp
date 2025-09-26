@@ -47,10 +47,13 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $lovePath = "build/$env:GAME_NAME.love"
-          $root = Resolve-Path "."
-          $srcDir = Resolve-Path "${{ env.SOURCE_DIR }}"
-          Set-Location $srcDir
+
+          $gameName  = "${{ env.GAME_NAME }}"
+          $lovePath  = "build/$gameName.love"
+
+          $rootPath  = (Resolve-Path ".").Path
+          $srcDir    = (Resolve-Path "${{ env.SOURCE_DIR }}").Path
+          Set-Location -Path $srcDir
 
           $excludes = @(
             ".git", ".github", ".vscode",
@@ -58,32 +61,37 @@ jobs:
             "build", "dist", "tmp"
           )
 
-          $all = Get-ChildItem -Recurse -File | Where-Object {
+          # Archivos RELATIVOS (para que el zip tenga main.lua en la raíz)
+          $relFiles = Get-ChildItem -Recurse -File | Where-Object {
             $keep = $true
             foreach ($ex in $excludes) {
               if ($_.FullName -like "*\$ex*") { $keep = $false; break }
             }
             $keep
-          } | Select-Object -ExpandProperty FullName
+          } | ForEach-Object { (Resolve-Path -Relative $_.FullName) }
 
-          if ($all.Count -eq 0) {
-            Write-Host "No se encontraron archivos para empaquetar. Contenido de $srcDir:"
-            Get-ChildItem -Recurse | Select-Object FullName
-            throw "No hay archivos para el .love (¿SOURCE_DIR correcto? ¿main.lua presente?)"
+          if (-not (Test-Path ".\main.lua")) {
+            Write-Host "⚠️ No se encontró main.lua en ${srcDir}. El .love requiere main.lua en la raíz."
           }
 
-          # Salida absoluta para que funcione estando dentro de SOURCE_DIR
-          $loveAbs = Join-Path (Resolve-Path $root) $lovePath
+          if ($relFiles.Count -eq 0) {
+            Write-Host "No se encontraron archivos para empaquetar. Contenido en $($srcDir):"
+            Get-ChildItem -Recurse | Select-Object FullName
+            throw "No hay archivos para el .love (¿SOURCE_DIR correcto? ¿exclusiones demasiado amplias?)"
+          }
+
+          $loveAbs = Join-Path $rootPath $lovePath
 
           if (-not (Get-Command 7z.exe -ErrorAction SilentlyContinue)) {
-            Compress-Archive -Path $all -DestinationPath $loveAbs -Force
+            Compress-Archive -Path $relFiles -DestinationPath $loveAbs -Force
           } else {
-            & 7z a -tzip "`"$loveAbs`"" $all | Out-Null
+            & 7z a -tzip "`"$loveAbs`"" $relFiles | Out-Null
           }
 
-          Set-Location $root
+          Set-Location -Path $rootPath
           if (-not (Test-Path $lovePath)) { throw "No se generó $lovePath" }
-          Write-Host "OK: generado $lovePath"
+          Write-Host "✅ OK: generado $lovePath"
+
 
       - name: Descargar LÖVE Windows oficial
         shell: pwsh
