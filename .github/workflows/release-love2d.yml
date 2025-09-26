@@ -16,10 +16,9 @@ jobs:
     runs-on: windows-latest
 
     env:
-      GAME_NAME: "pp"         # si vacío, usa el nombre del repo
-      LOVE_VERSION: "11.5"  # tag oficial (zip: love-11.5-win64.zip)
+      GAME_NAME: ""        # si vacío, usa el nombre del repo
+      LOVE_VERSION: "11.5" # tag oficial en GitHub (zip: love-11.5-win64.zip)
       LOVE_WIN_FLAVOR: "win64"
-      SOURCE_DIR: "."       # pon "src" si main.lua vive en otra carpeta
 
     steps:
       - name: Checkout
@@ -38,78 +37,48 @@ jobs:
       - name: Preparar carpetas
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
           New-Item -ItemType Directory -Force -Path build | Out-Null
           New-Item -ItemType Directory -Force -Path dist | Out-Null
           New-Item -ItemType Directory -Force -Path tmp  | Out-Null
 
-      - name: Crear .love (zip del juego desde SOURCE_DIR, con exclusiones)
+      # === Igual que antes, pero simple: crear .love con exclusiones ===
+      - name: Crear .love (con exclusiones)
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
-
-          $gameName = "${{ env.GAME_NAME }}"
-          if ([string]::IsNullOrWhiteSpace($gameName)) {
-            $gameName = "$($env:GITHUB_REPOSITORY.Split('/')[1])"
-          }
-
-          $lovePath = "build/$gameName.love"             # salida RELATIVA
-          $rootPath = (Resolve-Path ".").Path            # repo root absoluto
-          $srcDir   = (Resolve-Path "${{ env.SOURCE_DIR }}").Path
-
-          # Ir a SOURCE_DIR para que las rutas sean relativas (main.lua en raíz del zip)
-          Set-Location -Path $srcDir
-
+          $lovePath = "build/$env:GAME_NAME.love"
           $excludes = @(
             ".git", ".github", ".vscode",
             "README.md", "Makefile", "conf.lua", "config.ld",
             "build", "dist", "tmp"
           )
-
-          # Rutas RELATIVAS a SOURCE_DIR
-          $relFiles = Get-ChildItem -Recurse -File | Where-Object {
+          $all = Get-ChildItem -Recurse -File | Where-Object {
             $keep = $true
             foreach ($ex in $excludes) {
               if ($_.FullName -like "*\$ex*") { $keep = $false; break }
             }
             $keep
-          } | ForEach-Object { (Resolve-Path -Relative $_.FullName) }
+          } | Select-Object -ExpandProperty FullName
 
-          if (-not (Test-Path ".\main.lua")) {
-            Write-Host "⚠️ No se encontró main.lua en $($srcDir). El .love requiere main.lua en la raíz."
+          if (-not (Get-Command 7z.exe -ErrorAction SilentlyContinue)) {
+            Compress-Archive -Path $all -DestinationPath $lovePath -Force
+          } else {
+            & 7z a -tzip "`"$lovePath`"" $all | Out-Null
           }
-
-          if ($relFiles.Count -eq 0) {
-            Write-Host "No se encontraron archivos para empaquetar. Contenido en $($srcDir):"
-            Get-ChildItem -Recurse | Select-Object FullName
-            throw "No hay archivos para el .love (¿SOURCE_DIR correcto? ¿exclusiones demasiado amplias?)"
-          }
-
-          # Ruta absoluta de salida para que Compress-Archive escriba fuera de SOURCE_DIR
-          $loveAbs = Join-Path $rootPath $lovePath
-          $null = New-Item -ItemType Directory -Force -Path (Split-Path $loveAbs)
-
-          # Forzar siempre Compress-Archive (sin 7z) para evitar problemas de comillas/espacios
-          Compress-Archive -Path $relFiles -DestinationPath $loveAbs -Force
-
-          # Volver a raíz del repo y validar
-          Set-Location -Path $rootPath
           if (-not (Test-Path $lovePath)) { throw "No se generó $lovePath" }
           Write-Host "✅ OK: generado $lovePath"
 
       - name: Descargar LÖVE Windows oficial
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
           $url = "https://github.com/love2d/love/releases/download/${{ env.LOVE_VERSION }}/love-${{ env.LOVE_VERSION }}-${{ env.LOVE_WIN_FLAVOR }}.zip"
           $zip = "tmp/love-${{ env.LOVE_VERSION }}-${{ env.LOVE_WIN_FLAVOR }}.zip"
           Invoke-WebRequest -Uri $url -OutFile $zip
           Expand-Archive -Path $zip -DestinationPath tmp -Force
 
-      - name: Construir EXE fusionado (copiando TODO el runtime)
+      # === Aquí el cambio clave: copiar TODO el runtime (todas las DLLs + txt) ===
+      - name: Construir EXE fusionado (runtime completo)
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
           $loveDir = Get-ChildItem -Directory tmp | Where-Object { $_.Name -like "love-*" } | Select-Object -First 1
           if (-not $loveDir) { throw "No se encontró carpeta extraída de LÖVE." }
 
@@ -117,10 +86,10 @@ jobs:
           $out = "dist/${env:GAME_NAME}-win64"
           New-Item -ItemType Directory -Force -Path $out | Out-Null
 
-          # Copiar TODO el contenido del zip oficial (dlls, txts, etc.)
+          # Copia TODO lo que trae el zip oficial (dlls, love.exe, license.txt, readme.txt, etc.)
           Copy-Item -Path "$src\*" -Destination $out -Recurse -Force
 
-          # Fusionar love.exe + juego.love => GAME_NAME.exe
+          # Fusionar love.exe + juego.love => GAME_NAME.exe (ruta entrecomillada por espacios)
           $loveExe  = Join-Path $out "love.exe"
           $gameLove = Join-Path "build" "$env:GAME_NAME.love"
           $gameExe  = Join-Path $out "$env:GAME_NAME.exe"
@@ -128,27 +97,24 @@ jobs:
           if (-not (Test-Path $gameLove)) { throw "Falta $gameLove" }
           cmd /c "copy /b `"$loveExe`"+`"$gameLove`" `"$gameExe`" > NUL"
 
-          # Quitar love.exe (opcional)
+          # Dejar sólo el ejecutable del juego (opcional)
           Remove-Item $loveExe -Force
 
           if (-not (Test-Path $gameExe)) { throw "No se generó $gameExe" }
           Write-Host "EXE generado: $gameExe"
-          Write-Host "Contenido en ${$out}:"
+          Write-Host "Contenido en $($out):"
           Get-ChildItem $out | ForEach-Object { Write-Host $_.Name }
 
       - name: Empaquetar ZIP de Windows
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
           $zipPath = "dist/${env:GAME_NAME}-win64.zip"
           if (-not (Test-Path "dist/${env:GAME_NAME}-win64")) { throw "No existe carpeta dist/${env:GAME_NAME}-win64" }
-
           if (-not (Get-Command 7z.exe -ErrorAction SilentlyContinue)) {
             Compress-Archive -Path "dist/${env:GAME_NAME}-win64/*" -DestinationPath $zipPath -Force
           } else {
             & 7z a -tzip "`"$zipPath`"" "dist/${env:GAME_NAME}-win64/*" | Out-Null
           }
-
           if (-not (Test-Path $zipPath)) { throw "No se generó $zipPath" }
           Write-Host "ZIP listo: $zipPath"
 
@@ -160,7 +126,7 @@ jobs:
             build/${{ env.GAME_NAME }}.love
             dist/${{ env.GAME_NAME }}-win64.zip
 
-      - name: Publicar GitHub Release
+      - name: Publicar GitHub Release (tag desde la UI)
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag_name }}
