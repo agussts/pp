@@ -114,20 +114,26 @@ jobs:
           Write-Host "Contenido en $($out):"
           Get-ChildItem $out | ForEach-Object { Write-Host $_.Name }
 
-      - name: Empaquetar ZIP de Windows
+      - name: Empaquetar ZIP de Windows (sin rutas padre)
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $dir    = "dist/${{ env.GAME_NAME }}-win64"
-          $zipOut = "dist/${{ env.GAME_NAME }}-win64.zip"
-          if (-not (Test-Path $dir)) { throw "No existe carpeta $dir" }
 
-          if (Test-Path $zipOut) { Remove-Item -Force $zipOut }
-          $items = Get-ChildItem -Path $dir -Recurse
-          Compress-Archive -Path $items -DestinationPath $zipOut -Force
+          $outDir  = "dist/${{ env.GAME_NAME }}-win64"
+          $zipRel  = "dist/${{ env.GAME_NAME }}-win64.zip"
+          $root    = (Resolve-Path ".").Path
+          $zipAbs  = Join-Path $root $zipRel
 
-          if (-not (Test-Path $zipOut)) { throw "No se generó $zipOut" }
-          Write-Host "ZIP listo: $zipOut"
+          if (-not (Test-Path $outDir)) { throw "No existe carpeta $outDir" }
+          if (Test-Path $zipRel) { Remove-Item -Force $zipRel }
+
+          Push-Location $outDir
+          Compress-Archive -Path * -DestinationPath $zipAbs -Force
+          Pop-Location
+
+          if (-not (Test-Path $zipRel)) { throw "No se generó $zipRel" }
+          Write-Host "ZIP listo: $zipRel"
+
 
 
       - name: Subir artifacts (CI)
