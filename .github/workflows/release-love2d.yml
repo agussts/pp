@@ -48,11 +48,16 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
 
-          $gameName  = "${{ env.GAME_NAME }}"
-          $lovePath  = "build/$gameName.love"
+          $gameName = "${{ env.GAME_NAME }}"
+          if ([string]::IsNullOrWhiteSpace($gameName)) {
+            $gameName = "$($env:GITHUB_REPOSITORY.Split('/')[1])"
+          }
 
-          $rootPath  = (Resolve-Path ".").Path
-          $srcDir    = (Resolve-Path "${{ env.SOURCE_DIR }}").Path
+          $lovePath = "build/$gameName.love"             # salida RELATIVA
+          $rootPath = (Resolve-Path ".").Path            # repo root absoluto
+          $srcDir   = (Resolve-Path "${{ env.SOURCE_DIR }}").Path
+
+          # Ir a SOURCE_DIR para que las rutas sean relativas (main.lua en raíz del zip)
           Set-Location -Path $srcDir
 
           $excludes = @(
@@ -61,7 +66,7 @@ jobs:
             "build", "dist", "tmp"
           )
 
-          # Archivos RELATIVOS (para que el zip tenga main.lua en la raíz)
+          # Rutas RELATIVAS a SOURCE_DIR
           $relFiles = Get-ChildItem -Recurse -File | Where-Object {
             $keep = $true
             foreach ($ex in $excludes) {
@@ -71,7 +76,7 @@ jobs:
           } | ForEach-Object { (Resolve-Path -Relative $_.FullName) }
 
           if (-not (Test-Path ".\main.lua")) {
-            Write-Host "⚠️ No se encontró main.lua en ${srcDir}. El .love requiere main.lua en la raíz."
+            Write-Host "⚠️ No se encontró main.lua en $($srcDir). El .love requiere main.lua en la raíz."
           }
 
           if ($relFiles.Count -eq 0) {
@@ -80,18 +85,17 @@ jobs:
             throw "No hay archivos para el .love (¿SOURCE_DIR correcto? ¿exclusiones demasiado amplias?)"
           }
 
+          # Ruta absoluta de salida para que Compress-Archive escriba fuera de SOURCE_DIR
           $loveAbs = Join-Path $rootPath $lovePath
+          $null = New-Item -ItemType Directory -Force -Path (Split-Path $loveAbs)
 
-          if (-not (Get-Command 7z.exe -ErrorAction SilentlyContinue)) {
-            Compress-Archive -Path $relFiles -DestinationPath $loveAbs -Force
-          } else {
-            & 7z a -tzip "`"$loveAbs`"" $relFiles | Out-Null
-          }
+          # Forzar siempre Compress-Archive (sin 7z) para evitar problemas de comillas/espacios
+          Compress-Archive -Path $relFiles -DestinationPath $loveAbs -Force
 
+          # Volver a raíz del repo y validar
           Set-Location -Path $rootPath
           if (-not (Test-Path $lovePath)) { throw "No se generó $lovePath" }
           Write-Host "✅ OK: generado $lovePath"
-
 
       - name: Descargar LÖVE Windows oficial
         shell: pwsh
@@ -129,7 +133,7 @@ jobs:
 
           if (-not (Test-Path $gameExe)) { throw "No se generó $gameExe" }
           Write-Host "EXE generado: $gameExe"
-          Write-Host "Contenido en ${out}:"
+          Write-Host "Contenido en ${$out}:"
           Get-ChildItem $out | ForEach-Object { Write-Host $_.Name }
 
       - name: Empaquetar ZIP de Windows
