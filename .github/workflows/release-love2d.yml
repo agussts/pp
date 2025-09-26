@@ -1,7 +1,11 @@
 name: Release LÖVE2D (Windows x64 + .love)
 
 on:
-  workflow_dispatch:  # Se ejecuta sólo manualmente desde la pestaña Actions
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Tag para el release (ej: v1.0.0)"
+        required: true
 
 permissions:
   contents: write  # necesario para crear el Release
@@ -12,9 +16,8 @@ jobs:
     runs-on: windows-latest
 
     env:
-      # Nombre del juego (si está vacío, se usa el nombre del repo)
-      GAME_NAME: "proyecto personal"
-      LOVE_VERSION: "11.5"   # Tag oficial de LÖVE en GitHub
+      GAME_NAME: ""        # Si está vacío, se usará el nombre del repo
+      LOVE_VERSION: "11.5" # Tag oficial de LÖVE en GitHub
       LOVE_WIN_FLAVOR: "win64"
 
     steps:
@@ -31,13 +34,6 @@ jobs:
             "GAME_NAME=${{ env.GAME_NAME }}" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
           }
 
-      - name: Mostrar configuración
-        shell: pwsh
-        run: |
-          Write-Host "GAME_NAME=$env:GAME_NAME"
-          Write-Host "LOVE_VERSION=${{ env.LOVE_VERSION }}"
-          Write-Host "LOVE_WIN_FLAVOR=${{ env.LOVE_WIN_FLAVOR }}"
-
       - name: Preparar carpetas
         shell: pwsh
         run: |
@@ -49,13 +45,11 @@ jobs:
         shell: pwsh
         run: |
           $lovePath = "build/$env:GAME_NAME.love"
-          # Exclusiones solicitadas
           $excludes = @(
             ".git", ".github", ".vscode",
             "README.md", "Makefile", "conf.lua", "config.ld",
             "build", "dist", "tmp"
           )
-          # Recopilar archivos válidos
           $all = Get-ChildItem -Recurse -File | Where-Object {
             $keep = $true
             foreach ($ex in $excludes) {
@@ -65,7 +59,6 @@ jobs:
           } | ForEach-Object { $_.FullName }
 
           if (-not (Get-Command 7z.exe -ErrorAction SilentlyContinue)) {
-            Write-Host "7zip no encontrado, usando Compress-Archive."
             Compress-Archive -Path $all -DestinationPath $lovePath -Force
           } else {
             & 7z a -tzip $lovePath $all | Out-Null
@@ -79,19 +72,15 @@ jobs:
           $zip = "tmp/love-${{ env.LOVE_VERSION }}-${{ env.LOVE_WIN_FLAVOR }}.zip"
           Invoke-WebRequest -Uri $url -OutFile $zip
           Expand-Archive -Path $zip -DestinationPath tmp -Force
-          Write-Host "Descargado y extraído: $url"
 
       - name: Construir EXE auto-contenido
         shell: pwsh
         run: |
           $loveDir = Get-ChildItem -Directory tmp | Where-Object { $_.Name -like "love-*" } | Select-Object -First 1
-          if (-not $loveDir) { throw "No se encontró carpeta de LÖVE extraída." }
-
-          $src = Join-Path $loveDir.FullName ""
+          $src = $loveDir.FullName
           $out = "dist/${env:GAME_NAME}-win64"
           New-Item -ItemType Directory -Force -Path $out | Out-Null
 
-          # Copiar runtime de LÖVE
           Copy-Item -Recurse -Force (Join-Path $src "love.exe") $out
           Copy-Item -Recurse -Force (Join-Path $src "SDL2.dll") $out
           Copy-Item -Recurse -Force (Join-Path $src "love.dll") $out
@@ -99,17 +88,13 @@ jobs:
           Copy-Item -Recurse -Force (Join-Path $src "msvcp*.dll") $out -ErrorAction SilentlyContinue
           Copy-Item -Recurse -Force (Join-Path $src "msvcr*.dll") $out -ErrorAction SilentlyContinue
           Copy-Item -Recurse -Force (Join-Path $src "OpenAL32.dll") $out -ErrorAction SilentlyContinue
-          Copy-Item -Recurse -Force (Join-Path $src "license.txt") $out -ErrorAction SilentlyContinue
 
-          # Combinar love.exe + juego.love => GAME_NAME.exe
           $loveExe = Join-Path $out "love.exe"
           $gameLove = Join-Path "build" "$env:GAME_NAME.love"
           $gameExe = Join-Path $out "$env:GAME_NAME.exe"
 
           cmd /c "copy /b `"$loveExe`"+`"$gameLove`" `"$gameExe`" > NUL"
           Remove-Item $loveExe -Force
-
-          Write-Host "Generado EXE: $gameExe"
 
       - name: Empaquetar ZIP de Windows
         shell: pwsh
@@ -120,7 +105,6 @@ jobs:
           } else {
             & 7z a -tzip $zipPath "dist/${env:GAME_NAME}-win64/*" | Out-Null
           }
-          Write-Host "ZIP listo: $zipPath"
 
       - name: Subir artifacts (CI)
         uses: actions/upload-artifact@v4
@@ -133,6 +117,7 @@ jobs:
       - name: Publicar GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.event.inputs.tag_name }}
           files: |
             build/${{ env.GAME_NAME }}.love
             dist/${{ env.GAME_NAME }}-win64.zip
