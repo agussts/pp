@@ -76,6 +76,8 @@ jobs:
       - name: Construir EXE fusionado (copiando TODO el runtime)
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
+
           $loveDir = Get-ChildItem -Directory tmp | Where-Object { $_.Name -like "love-*" } | Select-Object -First 1
           if (-not $loveDir) { throw "No se encontró carpeta extraída de LÖVE." }
 
@@ -84,7 +86,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path $out | Out-Null
 
           # Copiar TODO lo que viene en el zip oficial (dlls, txts, etc.)
-          Copy-Item -Recurse -Force (Join-Path $src "*") $out
+          Copy-Item -Path (Join-Path $src '*') -Destination $out -Recurse -Force
 
           # Fusionar love.exe + juego.love => GAME_NAME.exe
           $loveExe = Join-Path $out "love.exe"
@@ -97,8 +99,9 @@ jobs:
           Remove-Item $loveExe -Force
 
           Write-Host "EXE generado: $gameExe"
-          Write-Host "Contenido en $out:"
+          Write-Host "Contenido en ${out}:"
           Get-ChildItem $out | ForEach-Object { Write-Host $_.Name }
+
 
       - name: Empaquetar ZIP de Windows
         shell: pwsh
@@ -118,6 +121,7 @@ jobs:
           path: |
             build/${{ env.GAME_NAME }}.love
             dist/${{ env.GAME_NAME }}-win64.zip
+
 
       - name: Publicar GitHub Release (requiere el tag ingresado)
         uses: softprops/action-gh-release@v2
