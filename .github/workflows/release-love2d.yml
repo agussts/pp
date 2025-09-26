@@ -45,27 +45,33 @@ jobs:
       - name: Crear .love (con exclusiones)
         shell: pwsh
         run: |
-          $lovePath = "build/$env:GAME_NAME.love"
-          $excludes = @(
-            ".git", ".github", ".vscode",
-            "README.md", "Makefile", "conf.lua", "config.ld",
-            "build", "dist", "tmp"
-          )
-          $all = Get-ChildItem -Recurse -File | Where-Object {
-            $keep = $true
-            foreach ($ex in $excludes) {
-              if ($_.FullName -like "*\$ex*") { $keep = $false; break }
-            }
-            $keep
-          } | Select-Object -ExpandProperty FullName
+          $ErrorActionPreference = 'Stop'
 
-          if (-not (Get-Command 7z.exe -ErrorAction SilentlyContinue)) {
-            Compress-Archive -Path $all -DestinationPath $lovePath -Force
-          } else {
-            & 7z a -tzip "`"$lovePath`"" $all | Out-Null
-          }
+          $game = if ([string]::IsNullOrWhiteSpace("${{ env.GAME_NAME }}")) {
+            "$($env:GITHUB_REPOSITORY.Split('/')[1])"
+          } else { "${{ env.GAME_NAME }}" }
+
+          $lovePath = "build/$game.love"
+          $staging  = "tmp\pkg-love"
+
+          # staging limpio
+          if (Test-Path $staging) { Remove-Item -Recurse -Force $staging }
+          New-Item -ItemType Directory -Force -Path $staging | Out-Null
+
+          # Copiar TODO menos tus exclusiones (robocopy devuelve códigos no-cero benignos)
+          $rc = robocopy . $staging /E /NFL /NDL /NJH /NJS /NP `
+                /XD .git .github .vscode build dist tmp `
+                /XF README.md Makefile conf.lua config.ld
+          $exitCode = $LASTEXITCODE
+          if ($exitCode -ge 8) { throw "robocopy falló con código $exitCode" }
+
+          # Comprimir staging completo en .love
+          if (Test-Path $lovePath) { Remove-Item -Force $lovePath }
+          Compress-Archive -Path "$staging\*" -DestinationPath $lovePath -Force
+
           if (-not (Test-Path $lovePath)) { throw "No se generó $lovePath" }
           Write-Host "✅ OK: generado $lovePath"
+
 
       - name: Descargar LÖVE Windows oficial
         shell: pwsh
@@ -88,7 +94,7 @@ jobs:
 
           # Copia TODO lo que trae el zip oficial (dlls, love.exe, license.txt, readme.txt, etc.)
           Copy-Item -Path "$src\*" -Destination $out -Recurse -Force
-
+          
           # Fusionar love.exe + juego.love => GAME_NAME.exe (ruta entrecomillada por espacios)
           $loveExe  = Join-Path $out "love.exe"
           $gameLove = Join-Path "build" "$env:GAME_NAME.love"
@@ -108,15 +114,18 @@ jobs:
       - name: Empaquetar ZIP de Windows
         shell: pwsh
         run: |
-          $zipPath = "dist/${env:GAME_NAME}-win64.zip"
-          if (-not (Test-Path "dist/${env:GAME_NAME}-win64")) { throw "No existe carpeta dist/${env:GAME_NAME}-win64" }
-          if (-not (Get-Command 7z.exe -ErrorAction SilentlyContinue)) {
-            Compress-Archive -Path "dist/${env:GAME_NAME}-win64/*" -DestinationPath $zipPath -Force
-          } else {
-            & 7z a -tzip "`"$zipPath`"" "dist/${env:GAME_NAME}-win64/*" | Out-Null
-          }
-          if (-not (Test-Path $zipPath)) { throw "No se generó $zipPath" }
-          Write-Host "ZIP listo: $zipPath"
+          $ErrorActionPreference = 'Stop'
+          $dir    = "dist/${{ env.GAME_NAME }}-win64"
+          $zipOut = "dist/${{ env.GAME_NAME }}-win64.zip"
+          if (-not (Test-Path $dir)) { throw "No existe carpeta $dir" }
+
+          if (Test-Path $zipOut) { Remove-Item -Force $zipOut }
+          $items = Get-ChildItem -Path $dir -Recurse
+          Compress-Archive -Path $items -DestinationPath $zipOut -Force
+
+          if (-not (Test-Path $zipOut)) { throw "No se generó $zipOut" }
+          Write-Host "ZIP listo: $zipOut"
+
 
       - name: Subir artifacts (CI)
         uses: actions/upload-artifact@v4
