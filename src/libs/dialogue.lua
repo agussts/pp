@@ -84,6 +84,7 @@ function Dialogue.start(script, opts)
     self._fullText = ""
     self._showing = ""
     self._active = true
+    self._ignoreFirstPress = true
 
     enterDialogueState()
     -- if Gamestate == "playing" then
@@ -95,7 +96,11 @@ function Dialogue.start(script, opts)
     self:applyLine(self.script[self.idx])
 
     self._connection = function(key)
-        if key == "space" or key == "return" or key == "kpenter" then
+        if key == "space" or key == "return" or key == "kpenter" or key == Config.SavedConfigs.PINTR then
+            if self._ignoreFirstPress then
+                self._ignoreFirstPress = false
+                return
+            end
             self:advanceOrSkip()
         end
     end

@@ -23,7 +23,22 @@ return function ()
         self.talkMvirus.collision.size = UDim2.fromScale(.2, .35)
         local function talk()
             local dialogue = Dialogue.start({
-                {who = "???", text = "tgffghfgh"}
+                {who = "???", text = "tgffghfgh"},
+                {who = "???", text = "brr brr patapim"},
+                {who = "???", text = "tralalero tralala"},
+                {who = "???", text = "brr brr patapim"},
+                {who = "???", text = "tralalero tralala"},
+                {who = "???", text = "cappuccino assasino"},
+                {who = "???", text = "lirili larila"},
+                {who = "???", text = "..."},
+                {who = "???", text = "tung tung tunh sahur"},
+                {who = "???", text = "ta ta sahur"},
+                {who = "???", text = "din din din din dum"},
+                {who = "???", text = "ma di din din dum"},
+                {who = "???", text = "lirili larila"},
+                {who = "???", text = "orcalero orcala"},
+                {who = "???", text = "ballerina ballerina ballerina"},
+                {who = "???", text = "aaahhh"},
             })
             dialogue.onFinish:Once(function ()
                 self.talkMvirus.Triggered:Once(talk)

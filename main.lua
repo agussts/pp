@@ -21,6 +21,7 @@ Scene.register("darkweb", darkweb)
 
 love.load = function ()
     --Ajustes antes de empezar renderizacion
+    print(love.getVersion())
     love.graphics.setDefaultFilter("nearest", "nearest", 1)
     Scene.load("internetscn")
     DevTools.init()
@@ -124,7 +125,7 @@ love.draw = function ()
             if type(v) == "table" then 
                 --Si se puede dibujar, que lo dibuje
                 if v.draw then
-                    if v.position and v.size then
+                    if v.position then
                         local x,y = v.position:toPixels()
                         v:draw(x, y)
                     else

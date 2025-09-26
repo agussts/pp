@@ -17,19 +17,20 @@ return function()
         Player.collision.position = spawn
 
         self.player = Player
-        self.darkwebWindow = {}
-        self.darkwebWindow.image = love.graphics.newImage("assets/sprites/windowthing.png")
-        self.darkwebWindow.size = UDim2.fromScale(0.35, .35)
-        self.darkwebWindow.position = UDim2.fromScale(-.3,0)
-        self.darkwebWindow.draw = function(self, x, y, sx, sy)
-            love.graphics.draw(self.image, x, y, 0, sx, sy)
-        end
+        local windowAnim = Animation.new("assets/sprites/windowthing.png", 106, 83, 1, 1, 1)
+        windowAnim.anchor = {.5, .5}
+        windowAnim:Pause()
+        self.darkwebWindow = Block.new(windowAnim, -.175, .1, .1, .1)
+        self.darkwebWindow.collision.enabled = false
 
-        self.darkweb = Animation.new("assets/sprites/darkweb-Sheet.png", 60, 40, 5, 1, .25)
-        self.darkweb.position = UDim2.fromScale(-.3,0)
-        self.darkweb.size = UDim2.fromScale(0.35, .35)
+        local doorAnim = Animation.new("assets/sprites/darkwebdoor-Sheet.png", 76, 76, 3, 3, .35)
+        doorAnim.anchor = {.5, .5}
+        doorAnim:addHole(3,3)
+        self.darkweb = Block.new(doorAnim, -.175, .1, .1, .1)
+        self.darkweb.collision.enabled = false
 
         self.darkwebDoor = Door.new("darkweb", UDim2.fromScale(-.175, .1), UDim2.fromScale(0.1, .2))
+        self.darkwebDoor.collision.anchor = {.5, .5}
         -- Top blocker 
         self.topBlocker = Collisions.new("box")
         self.topBlocker.position = UDim2.fromScale(-1, -.2)
@@ -65,8 +66,7 @@ return function()
         self.bgB:setScroll(self.bgB.scrollX - 25*dt, self.bgB.scrollY + 50*dt)
         self.bgA.color[4] = 0.035 + 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
         self.bgB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
-        self.darkweb:update(dt)
-        self.darkwebWindow.position = UDim2.new(self.darkwebWindow.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100, 0)
+        self.darkwebWindow.collision.position = UDim2.new(self.darkwebWindow.collision.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100 + .1, 0)
 
         if love.mouse.isDown(1) and Gun then
             local x,y = Player.collision.position:toPixels()
