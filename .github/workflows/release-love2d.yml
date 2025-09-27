@@ -16,7 +16,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      GAME_NAME: ""        # si vacío, usa el nombre del repo
+      GAME_NAME: "pp"        # si vacío, usa el nombre del repo
       LOVE_VERSION: "11.5" # tag oficial en GitHub (zip: love-11.5-win64.zip)
       LOVE_WIN_FLAVOR: "win64"
 
@@ -41,7 +41,6 @@ jobs:
           New-Item -ItemType Directory -Force -Path dist | Out-Null
           New-Item -ItemType Directory -Force -Path tmp  | Out-Null
 
-      # === Igual que antes, pero simple: crear .love con exclusiones ===
       - name: Crear .love (con exclusiones)
         shell: pwsh
         run: |
@@ -64,15 +63,15 @@ jobs:
           $code = $LASTEXITCODE
           if ($code -ge 8) { throw "robocopy falló con código $code" }
           Write-Host "robocopy OK (exit code $code)"
-          $global:LASTEXITCODE = 0   # ← ← ← neutraliza el código heredado
+          $global:LASTEXITCODE = 0
 
           if (Test-Path $lovePath) { Remove-Item -Force $lovePath }
           Compress-Archive -Path "$staging\*" -DestinationPath $lovePath -Force
           if (-not (Test-Path $lovePath)) { throw "No se generó $lovePath" }
 
           Write-Host "✅ OK: generado $lovePath"
-          $global:LASTEXITCODE = 0   # ← ← ← por si Compress-Archive dejara code ≠0
-          exit 0                     # ← ← ← asegura que el step termine en éxito
+          $global:LASTEXITCODE = 0
+          exit 0
 
 
 
@@ -84,7 +83,6 @@ jobs:
           Invoke-WebRequest -Uri $url -OutFile $zip
           Expand-Archive -Path $zip -DestinationPath tmp -Force
 
-      # === Aquí el cambio clave: copiar TODO el runtime (todas las DLLs + txt) ===
       - name: Construir EXE fusionado (runtime completo)
         shell: pwsh
         run: |
@@ -154,3 +152,107 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  build-macos:
+    name: Build & Attach (macOS .app)
+    runs-on: macos-latest
+
+    env:
+      GAME_NAME: "pp"        # si vacío, usa el nombre del repo
+      LOVE_VERSION: "11.5" # tag oficial (zip: love-11.5-macos.zip)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Derivar GAME_NAME desde el repo (si no está seteado)
+        run: |
+          if [ -z "${GAME_NAME}" ]; then
+            echo "GAME_NAME=$(basename "$GITHUB_REPOSITORY")" >> $GITHUB_ENV
+          else
+            echo "GAME_NAME=${GAME_NAME}" >> $GITHUB_ENV
+          fi
+
+      - name: Preparar carpetas
+        run: |
+          mkdir -p build dist tmp
+
+      - name: Crear .love (con exclusiones)
+        run: |
+          EXCLUDES=(
+            .git/\* .github/\* .vscode/\*
+            README.md Makefile conf.lua config.ld
+            build/\* dist/\* tmp/\*
+          )
+          cd "$GITHUB_WORKSPACE"
+          rm -f "build/${GAME_NAME}.love"
+          # zip relativo para que main.lua quede en la raíz del .love
+          zip -9 -r "build/${GAME_NAME}.love" . -x "${EXCLUDES[@]}"
+
+      - name: Descargar LÖVE macOS oficial
+        run: |
+          curl -L -o tmp/love-macos.zip \
+            "https://github.com/love2d/love/releases/download/${LOVE_VERSION}/love-${LOVE_VERSION}-macos.zip"
+          unzip -q tmp/love-macos.zip -d tmp
+
+      # Para probar si funciona mac
+      - name: Construir .app fusionada y ajustar Info.plist
+        run: |
+          APP="dist/${GAME_NAME}.app"
+          cp -R "tmp/love.app" "${APP}"
+          cp "build/${GAME_NAME}.love" "${APP}/Contents/Resources/"
+
+          PLIST="${APP}/Contents/Info.plist"
+          # CFBundleName
+          /usr/libexec/PlistBuddy -c "Set :CFBundleName ${GAME_NAME}" "${PLIST}" || true
+          # CFBundleIdentifier (simple, sin espacios/raros)
+          SAFE_ID=$(echo "${GAME_NAME}" | tr -cd '[:alnum:]')
+          /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier com.${GITHUB_REPOSITORY_OWNER}.${SAFE_ID}" "${PLIST}" || true
+          # Quitar asociación global de .love
+          /usr/libexec/PlistBuddy -c "Delete :UTExportedTypeDeclarations" "${PLIST}" || true
+
+      - name: Verificar bundle (.app) y plist
+        run: |
+          APP="dist/${GAME_NAME}.app"
+          test -f "$APP/Contents/Resources/${GAME_NAME}.love"
+          PLIST="$APP/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleName" "$PLIST" | grep -q "${GAME_NAME}"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$PLIST" || true
+          echo "Bundle OK."
+
+      - name: Smoke test del binario (sin GUI)
+        run: |
+          APP="dist/${GAME_NAME}.app"
+          chmod +x "$APP/Contents/MacOS/love"
+          "$APP/Contents/MacOS/love" --version
+          "$APP/Contents/MacOS/love" --help | head -n 10
+          
+      - name: Smoke test ejecutando el juego (sale solo)
+        run: |
+          set -e
+          APP="dist/${GAME_NAME}.app"
+          # Ejecuta el binario de LÖVE dentro del bundle con la variable de CI
+          CI_SMOKETEST=1 "$APP/Contents/MacOS/love"
+          echo "Smoke test OK."
+
+
+      - name: Empaquetar ZIP de macOS (.app)
+        run: |
+          # ditto preserva recursos/symlinks y añade la carpeta .app como raíz
+          ditto -c -k --sequesterRsrc --keepParent "dist/${GAME_NAME}.app" "dist/${GAME_NAME}-macos.zip"
+          test -f "dist/${GAME_NAME}-macos.zip"
+
+      - name: Subir artifact (macOS)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.GAME_NAME }}-macos
+          path: dist/${{ env.GAME_NAME }}-macos.zip
+
+      - name: Añadir asset macOS al Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag_name }}
+          files: dist/${{ env.GAME_NAME }}-macos.zip
+          generate_release_notes: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

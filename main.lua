@@ -19,6 +19,11 @@ Scene.register("level2", Level2)
 Scene.register("internetscn", internetscn)
 Scene.register("darkweb", darkweb)
 
+if os.getenv("CI_SMOKETEST") == "1" then
+  print("CI smoketest OK, LÖVE "..(love.getVersion()))
+  love.event.quit(0)
+end
+
 love.load = function ()
     --Ajustes antes de empezar renderizacion
     print(love.getVersion())
