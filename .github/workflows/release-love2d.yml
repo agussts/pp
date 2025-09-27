@@ -221,19 +221,23 @@ jobs:
 
       - name: Smoke test del binario (sin GUI)
         run: |
+          set -e
           APP="dist/${GAME_NAME}.app"
-          chmod +x "$APP/Contents/MacOS/love"
-          "$APP/Contents/MacOS/love" --version
-          "$APP/Contents/MacOS/love" --help | head -n 10
-          
+          B="$APP/Contents/MacOS/love"
+          chmod +x "$B"
+          # Debe imprimir y salir inmediatamente
+          "$B" --version
+          # Evita pipes: imprime help pero descártalo
+          "$B" --help > /dev/null
+
+
       - name: Smoke test ejecutando el juego (sale solo)
+        timeout-minutes: 1
         run: |
           set -e
           APP="dist/${GAME_NAME}.app"
-          # Ejecuta el binario de LÖVE dentro del bundle con la variable de CI
-          CI_SMOKETEST=1 "$APP/Contents/MacOS/love"
-          echo "Smoke test OK."
-
+          B="$APP/Contents/MacOS/love"
+          CI_SMOKETEST=1 "$B"
 
       - name: Empaquetar ZIP de macOS (.app)
         run: |
