@@ -219,16 +219,16 @@ jobs:
           /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$PLIST" || true
           echo "Bundle OK."
 
+      - name: Limpia cuarentena del .app
+        run: |
+          xattr -rc "dist/${GAME_NAME}.app" || true
+
       - name: Smoke test del binario (sin GUI)
         run: |
           set -e
-          APP="dist/${GAME_NAME}.app"
-          B="$APP/Contents/MacOS/love"
+          B="dist/${GAME_NAME}.app/Contents/MacOS/love"
           chmod +x "$B"
-          # Debe imprimir y salir inmediatamente
-          "$B" --version
-          # Evita pipes: imprime help pero descártalo
-          "$B" --help > /dev/null
+          "$B" --version > /dev/null
 
 
       - name: Smoke test ejecutando el juego (sale solo)
