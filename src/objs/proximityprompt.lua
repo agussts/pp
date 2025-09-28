@@ -1,29 +1,26 @@
----
--- ProximityPrompt: muestra un prompt al acercarte y emite una señal al presionar una tecla.
+--- ProximityPrompt: muestra un prompt al acercarte y emite una señal al presionar una tecla.
 -- Depende de: Guis, Textlabel/PrintfLabel (cualquiera), Frame, Collisions, Signal, UDim2, Connect/Fire.
--- Uso básico:
---   local ProximityPrompt = require("src.libs.proximity_prompt")
---   local pp = ProximityPrompt.new({
---       position = UDim2.fromScale(0.5, 0.5),
---       size     = UDim2.fromScale(0.08, 0.12),
---       text     = "Presiona [E] para hablar",
---       key      = "e",
---   })
---   pp.Triggered:Connect(function(self) print("¡Interactuaste!") end)
+-- El prompt se activa al detectar la colisión del jugador y se oculta al salir.
+-- @module ProximityPrompt
 
 local ProximityPrompt = {}
 ProximityPrompt.__index = ProximityPrompt
 
---- Crea un nuevo prompt de proximidad
--- @tparam string key
--- @tparam stirng text
+--- Crea un nuevo prompt de proximidad.
+-- @tparam string text Texto a mostrar. Debe contener un `%s` si quieres interpolar la tecla (ej: `"Presiona %s para hablar"`).
+-- @tparam string key Tecla que activa la interacción. Si se omite, usa `Config.SavedConfigs.PINTR`.
+-- @treturn ProximityPrompt La nueva instancia del prompt.
+-- @usage
+-- local prompt = ProximityPrompt.new("Presiona %s para interactuar", "e")
+-- prompt.Triggered:Connect(function() print("¡Interacción!") end)
 function ProximityPrompt.new(text, key)
     local self = setmetatable({}, ProximityPrompt)
 
-    -- Señal pública
+    --- Señal que se dispara cuando se presiona la tecla de interacción estando dentro.
+    -- @signal Triggered
     self.Triggered = Signal.new()
 
-    -- Colision (hitbox que no bloquea)
+    -- Colisión (hitbox que no bloquea)
     self.collision = Collisions.new("hitbox")
     self.collision.position = UDim2.fromScale(0.5, 0.5)
     self.collision.size     = UDim2.fromScale(0.06, 0.12)
@@ -32,12 +29,14 @@ function ProximityPrompt.new(text, key)
 
     -- Estado
     self.key     = key or Config.SavedConfigs.PINTR
-    if text and type(text) == "string" then assert(text:find("%%s") ~= nil, "Must include %s in string to insert key.") end
+    if text and type(text) == "string" then
+        assert(text:find("%%s") ~= nil, "Must include %s in string to insert key.")
+    end
     self.text    = string.format(text, self.key:upper()) or ("Press ["..self.key:upper().."] to interact")
     self._inside = false
     self._keyConn = nil
 
-    -- UI (simple: una cajita y un label centrado abajo)
+    -- UI (caja inferior con un label centrado)
     self._ui = {}
     self._ui.box = Frame.new()
     self._ui.box.size = UDim2.fromScale(0.6, 0.12)
@@ -59,7 +58,8 @@ function ProximityPrompt.new(text, key)
     return self
 end
 
--- Muestra/oculta el UI del prompt
+--- Muestra u oculta la UI del prompt.
+-- @tparam boolean show Si es `true`, se muestra; si es `false`, se oculta.
 function ProximityPrompt:_showUI(show)
     local vis = not not show
     if self._ui and self._ui.box then
@@ -75,23 +75,25 @@ function ProximityPrompt:_showUI(show)
     end
 end
 
--- Enlaza la tecla mientras el jugador está dentro
+--- Enlaza la tecla de interacción mientras el jugador está dentro.
 function ProximityPrompt:_bindKey()
     if self._keyConn then return end
     self._keyConn = Connect("keyPressed", function(key)
         if not self._inside then return end
         if key ~= self.key then return end
-        -- dispara señal
         self.Triggered:Fire(self)
     end)
 end
 
+--- Desenlaza la tecla de interacción.
 function ProximityPrompt:_unbindKey()
     if not self._keyConn then return end
     self._keyConn:Disconnect()
     self._keyConn = nil
 end
 
+--- Actualiza el estado del prompt.
+-- Debe llamarse en el `update()` de la escena para detectar si el jugador entra/sale del área.
 function ProximityPrompt:update()
     if not Player or not Player.collision then return end
 
@@ -115,6 +117,8 @@ function ProximityPrompt:update()
     end
 end
 
+--- Cambia el texto mostrado en el prompt.
+-- @tparam string newText El nuevo texto.
 function ProximityPrompt:setText(newText)
     self.text = newText or self.text
     if self._ui and self._ui.label then
@@ -122,16 +126,18 @@ function ProximityPrompt:setText(newText)
     end
 end
 
+--- Cambia la tecla usada para interactuar.
+-- @tparam string newKey La nueva tecla.
 function ProximityPrompt:setKey(newKey)
     if newKey and #newKey > 0 then
         self.key = newKey:lower()
         if self.text and self.text:find("%[.-%]") then
-            -- si el texto tenía [X], lo actualizamos
             self:setText(self.text:gsub("%[.-%]", "["..self.key:upper().."]", 1))
         end
     end
 end
 
+--- Destruye el prompt y limpia recursos asociados (UI, colisión, señales).
 function ProximityPrompt:Destroy()
     -- UI
     if self._ui then
@@ -140,7 +146,7 @@ function ProximityPrompt:Destroy()
     end
     self._ui = nil
 
-    -- Colision
+    -- Colisión
     if self.collision and self.collision.Destroy then
         self.collision:Destroy()
     end

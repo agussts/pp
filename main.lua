@@ -6,10 +6,6 @@ PlayingTimers = Timer.group.new()
 PauseMenuTimers = Timer.group.new()
 PauseMenuTimers:pause()
 
---Requiere funciones
-require("src.utils.pausemenu")
-require("src.libs.connections")
-
 local testScene = require("src.scenes.testscene")
 local Level2 = require("src.scenes.level2")
 local internetscn = require("src.scenes.internetscn")
@@ -26,7 +22,6 @@ end
 
 love.load = function ()
     --Ajustes antes de empezar renderizacion
-    print(love.getVersion())
     love.graphics.setDefaultFilter("nearest", "nearest", 1)
     Scene.load("internetscn")
     DevTools.init()
@@ -118,6 +113,7 @@ love.update = function (dt)
     end
     Dialogue.updateAll(dt)
     Transition.update(dt)
+    --MathQuiz.updateAll(dt)
 end
 
 love.draw = function () 

@@ -3,13 +3,14 @@ Config = require("src.utils.config_manager")
 
 --Esencial
 Signal = require("src.libs.signal")
+require("src.libs.connections") -- no necesita variable para identificar, ya que es global
 Timer = require("src.libs.timer")
 Collisions = require("src.libs.collisions")
 UDim2 = require("src.guis.udim2")
 Animation = require("src.libs.animation")
 Fonts = require("src.utils.fonts")
 
---UI
+--GUI
 Guis = require("src.guis.gui")
 
     Button = require("src.guis.button")
@@ -17,6 +18,11 @@ Guis = require("src.guis.gui")
     Frame = require("src.guis.frame")
     ImageLabel = require("src.guis.imagelabel")
     PrintfLabel = require("src.guis.printf_label")
+
+--UI (no preguntes la diferencia)
+
+ShardsHUD = require("src.ui.shards_hud")
+require("src.ui.pausemenu") -- lo mismo que connections.lua
 
 --Styles
 
@@ -29,18 +35,26 @@ EnemyModule = require("src.objs.enemy")
 Antivirus = require("src.objs.antivirus")
 Door = require("src.objs.door")
 ProxPrompt = require("src.objs.proximityprompt")
+Shard = require("src.objs.shard")
 
 GunModule = require("src.guns.dev")
     
 Camera = require("src.libs.camera")
 Background = require("src.libs.background")
 
+-- Scenes
 Scene = require("src.scenes.scene")
 Transition = require("src.scenes.transition")
 
 Shaders = require("src.libs.shaders")
 Dialogue = require("src.libs.dialogue")
+WrittenDialogues = require("src.utils.writtendialogues")
 
 World = require("src.utils.world")
+
+-- Minigames
+
+MathQuiz = require("src.minigames.mathquiz")
+
 
 DevTools = require("src.utils.devtools")

@@ -31,35 +31,35 @@ return function()
 
         self.darkwebDoor = Door.new("darkweb", UDim2.fromScale(-.175, .1), UDim2.fromScale(0.1, .2))
         self.darkwebDoor.collision.anchor = {.5, .5}
-        -- Top blocker 
-        self.topBlocker = Collisions.new("box")
-        self.topBlocker.position = UDim2.fromScale(-1, -.2)
-        self.topBlocker.size = UDim2.fromScale(2.2, 0.1)
 
-        -- Bottom blocker 
-        self.bottomBlocker = Collisions.new("box")
-        self.bottomBlocker.position = UDim2.fromScale(-1, 1)
-        self.bottomBlocker.size = UDim2.fromScale(2.2, 0.1)
+        -- Si la misión ya estaba activa al entrar a esta escena, prepara todo:
+        if World.shards.active and not World.shards.done then
+            self:spawnShardsAndHUD()
+        end
 
-        -- Left blocker 
-        self.leftBlocker = Collisions.new("box")
-        self.leftBlocker.position = UDim2.fromScale(-1, -0.1)
-        self.leftBlocker.size = UDim2.fromScale(0.1, 1.2)
-
-        -- Right blocker
-        self.rightBlocker = Collisions.new("box")
-        self.rightBlocker.position = UDim2.fromScale(1.1, -0.1)
-        self.rightBlocker.size = UDim2.fromScale(0.1, 1.2)
-
-        self.enemy = Antivirus.new()
-        self.enemy.collision.position = UDim2.fromScale(.5, .5)
-        
         Gun = GunModule.new()
     end
 
-    scene.start = function(self)
-        -- setup inicial si hace falta
-    end
+    function scene:spawnShardsAndHUD()
+        -- HUD con objetivo
+        self.hud = ShardsHUD.new(World.shards.needed)
+        -- Spawnear shards en posiciones del mapa (ejemplos)
+        self.shards = {}
+        for _, def in ipairs(World.getRemainingShardPositions()) do
+            local pos, sprite, id = def[1], def[2], def[3]
+            table.insert(self.shards, Shard.new(pos, sprite, id))
+        end
+
+        -- Marca que ya están vivos en esta escena
+        World.shards.spawned = true
+
+        -- Actualiza HUD cuando juntes uno:
+        self._colConn = Connect("shard_collected", function(count, needed)
+            if self.hud and self.hud.setCount then
+                self.hud:setCount(count, needed)
+            end
+        end)
+  end
 
     scene.update = function(self, dt)
         self.bgA:setScroll(self.bgA.scrollX + 50*dt, self.bgA.scrollY - 25*dt)
@@ -68,18 +68,23 @@ return function()
         self.bgB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
         self.darkwebWindow.collision.position = UDim2.new(self.darkwebWindow.collision.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100 + .1, 0)
 
+        if self.shards then
+            for _,s in ipairs(self.shards) do
+                s:update(dt)
+            end
+        end
+
         if love.mouse.isDown(1) and Gun then
             local x,y = Player.collision.position:toPixels()
             Gun:Fire(x, y)
         end
-
-        self.enemy:follow(Player.collision.position)
 
         if Gun.lastFireTime > 0 then
             Gun.lastFireTime = Gun.lastFireTime - dt
         else
             Gun.lastFireTime = 0
         end
+
         local px,py = Player.collision.position:toPixels()
         Camera.update(px, py)
     end
@@ -89,6 +94,13 @@ return function()
         self.bgA:drawBackground()
         self.bgB:drawBackground()
 
+        if self.shards then
+            Camera.attach()
+                for _,s in ipairs(self.shards) do
+                    s:draw()
+                end
+            Camera.detach()
+        end
         -- Camera.attach()
         --     for i,v in pairs(self) do
         --         if type(v) == "table" then 

@@ -21,31 +21,40 @@ return function ()
         self.talkMvirus = ProxPrompt.new("Press [%s] to talk")
         self.talkMvirus.collision.position = self.mvirus.collision.position
         self.talkMvirus.collision.size = UDim2.fromScale(.2, .35)
-        local function talk()
-            local dialogue = Dialogue.start({
-                {who = "???", text = "tgffghfgh"},
-                {who = "???", text = "brr brr patapim"},
-                {who = "???", text = "tralalero tralala"},
-                {who = "???", text = "brr brr patapim"},
-                {who = "???", text = "tralalero tralala"},
-                {who = "???", text = "cappuccino assasino"},
-                {who = "???", text = "lirili larila"},
-                {who = "???", text = "..."},
-                {who = "???", text = "tung tung tunh sahur"},
-                {who = "???", text = "ta ta sahur"},
-                {who = "???", text = "din din din din dum"},
-                {who = "???", text = "ma di din din dum"},
-                {who = "???", text = "lirili larila"},
-                {who = "???", text = "orcalero orcala"},
-                {who = "???", text = "ballerina ballerina ballerina"},
-                {who = "???", text = "aaahhh"},
-            })
-            dialogue.onFinish:Once(function ()
-                self.talkMvirus.Triggered:Once(talk)
-            end)
-        end
-        self.talkMvirus.Triggered:Once(talk)
+
+        self._talkConn = self.talkMvirus.Triggered:Connect(function ()
+            self:startMVirusDial()
+        end)
     end
+
+    function scene:startMVirusDial()
+        local script
+        if not World.flags.metmvirus then
+            -- Primera vez: mensaje completo
+            script = WrittenDialogues.mvirusFirst
+            local dlg = Dialogue.start(script, 42)
+            dlg.onFinish:Connect(function()
+                World.flags.metmvirus = true
+                World.startShardsQuest()     -- -> internetscn spawnea shards
+            end)
+        else
+            if World.shards.done then
+                -- “Turn-in” (si ya juntaste los 3)
+                script = WrittenDialogues.shardsDone
+                local dlg = Dialogue.start(script, 42)
+                dlg.onFinish:Connect(function()
+                    -- cerrar misión, dar recompensa, marcar reset/next-step:
+                    World.shards.active = false
+                    World.shards.spawned = false 
+                end)
+            else
+                -- Recordatorio corto si ya aceptaste pero no terminaste
+                script = WrittenDialogues.mviruspostFirst
+                Dialogue.start(script, 42)
+            end
+        end
+  end
+
     scene.update = function (self, dt)
         local w, h = love.graphics.getDimensions()
         Camera.update(w/2, h/2)
