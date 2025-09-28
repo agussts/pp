@@ -1,0 +1,259 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+
+<ul>
+  <li><a href="../doc.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/connections.html">connections</a></li>
+  <li><strong>Dialogue</strong></li>
+  <li><a href="../modules/MathQuiz.html">MathQuiz</a></li>
+  <li><a href="../modules/ProximityPrompt.html">ProximityPrompt</a></li>
+  <li><a href="../modules/ui.shards_hud.html">ui.shards_hud</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/button.html">button</a></li>
+  <li><a href="../classes/frame.html">frame</a></li>
+  <li><a href="../classes/gui.html">gui</a></li>
+  <li><a href="../classes/imagelabel.html">imagelabel</a></li>
+  <li><a href="../classes/PrintfLabel.html">PrintfLabel</a></li>
+  <li><a href="../classes/textlabel.html">textlabel</a></li>
+  <li><a href="../classes/udim2.html">udim2</a></li>
+  <li><a href="../classes/basicGun.html">basicGun</a></li>
+  <li><a href="../classes/devGun.html">devGun</a></li>
+  <li><a href="../classes/spamGun.html">spamGun</a></li>
+  <li><a href="../classes/animations.html">animations</a></li>
+  <li><a href="../classes/Background.html">Background</a></li>
+  <li><a href="../classes/camera.html">camera</a></li>
+  <li><a href="../classes/collisions.html">collisions</a></li>
+  <li><a href="../classes/signal.html">signal</a></li>
+  <li><a href="../classes/timer.html">timer</a></li>
+  <li><a href="../classes/enemy.html">enemy</a></li>
+  <li><a href="../classes/player.html">player</a></li>
+  <li><a href="../classes/Shard.html">Shard</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>Dialogue</code></h1>
+<p>Sistema de diálogos simple (sin retratos).</p>
+<p>
+  Pausa el gameplay mientras está activo y reanuda al terminar.
+  Muestra un cuadro inferior con el nombre del hablante y el texto,
+  escribiendo caracter por caracter (typewriter).</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#start">start (script[, cps=40])</a></td>
+	<td class="summary">Empieza un diálogo.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#applyLine">applyLine (line)</a></td>
+	<td class="summary">Aplica una línea del diálogo.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#_update">_update (dt)</a></td>
+	<td class="summary">Actualiza la animación de typewriter para una instancia.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#advanceOrSkip">advanceOrSkip ()</a></td>
+	<td class="summary">Avanza al final de la línea actual o a la siguiente línea.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#finish">finish ()</a></td>
+	<td class="summary">Termina el diálogo y limpia la UI.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#updateAll">updateAll (dt)</a></td>
+	<td class="summary">Actualiza todos los diálogos activos.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "start"></a>
+    <strong>start (script[, cps=40])</strong>
+    </dt>
+    <dd>
+    Empieza un diálogo.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">script</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         Lista de líneas, cada una con campos `who` (string) y `text` (string).
+        </li>
+        <li><span class="parameter">cps</span>
+            <span class="types"><span class="type">number</span></span>
+         Caracteres por segundo (velocidad de typewriter).
+         (<em>default</em> 40)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">Dialogue</span></span>
+        La instancia del diálogo creado.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">Dialogue.<span class="function-name">start</span>({
+  { who = <span class="string">"NPC"</span>, text = <span class="string">"Bienvenido."</span> },
+  { who = <span class="string">"Jugador"</span>, text = <span class="string">"Gracias!"</span> },
+})</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "applyLine"></a>
+    <strong>applyLine (line)</strong>
+    </dt>
+    <dd>
+    Aplica una línea del diálogo.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">line</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         Una tabla con campos `who` y `text`
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "_update"></a>
+    <strong>_update (dt)</strong>
+    </dt>
+    <dd>
+    Actualiza la animación de typewriter para una instancia.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">dt</span>
+            <span class="types"><span class="type">number</span></span>
+         Delta time
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "advanceOrSkip"></a>
+    <strong>advanceOrSkip ()</strong>
+    </dt>
+    <dd>
+    Avanza al final de la línea actual o a la siguiente línea.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "finish"></a>
+    <strong>finish ()</strong>
+    </dt>
+    <dd>
+    Termina el diálogo y limpia la UI.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "updateAll"></a>
+    <strong>updateAll (dt)</strong>
+    </dt>
+    <dd>
+    Actualiza todos los diálogos activos.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">dt</span>
+            <span class="types"><span class="type">number</span></span>
+         Delta time
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2025-09-28 23:22:05 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>

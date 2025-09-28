@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+
+<ul>
+  <li><a href="../doc.html">Index</a></li>
+</ul>
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Fields">Fields</a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/connections.html">connections</a></li>
+  <li><a href="../modules/Dialogue.html">Dialogue</a></li>
+  <li><a href="../modules/MathQuiz.html">MathQuiz</a></li>
+  <li><strong>ProximityPrompt</strong></li>
+  <li><a href="../modules/ui.shards_hud.html">ui.shards_hud</a></li>
+</ul>
+<h2>Classes</h2>
+<ul class="nowrap">
+  <li><a href="../classes/button.html">button</a></li>
+  <li><a href="../classes/frame.html">frame</a></li>
+  <li><a href="../classes/gui.html">gui</a></li>
+  <li><a href="../classes/imagelabel.html">imagelabel</a></li>
+  <li><a href="../classes/PrintfLabel.html">PrintfLabel</a></li>
+  <li><a href="../classes/textlabel.html">textlabel</a></li>
+  <li><a href="../classes/udim2.html">udim2</a></li>
+  <li><a href="../classes/basicGun.html">basicGun</a></li>
+  <li><a href="../classes/devGun.html">devGun</a></li>
+  <li><a href="../classes/spamGun.html">spamGun</a></li>
+  <li><a href="../classes/animations.html">animations</a></li>
+  <li><a href="../classes/Background.html">Background</a></li>
+  <li><a href="../classes/camera.html">camera</a></li>
+  <li><a href="../classes/collisions.html">collisions</a></li>
+  <li><a href="../classes/signal.html">signal</a></li>
+  <li><a href="../classes/timer.html">timer</a></li>
+  <li><a href="../classes/enemy.html">enemy</a></li>
+  <li><a href="../classes/player.html">player</a></li>
+  <li><a href="../classes/Shard.html">Shard</a></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>ProximityPrompt</code></h1>
+<p>ProximityPrompt: muestra un prompt al acercarte y emite una señal al presionar una tecla.</p>
+<p>
+ Depende de: Guis, Textlabel/PrintfLabel (cualquiera), Frame, Collisions, Signal, UDim2, Connect/Fire.
+ El prompt se activa al detectar la colisión del jugador y se oculta al salir.</p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#new">new (text, key)</a></td>
+	<td class="summary">Crea un nuevo prompt de proximidad.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#_showUI">_showUI (show)</a></td>
+	<td class="summary">Muestra u oculta la UI del prompt.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#_bindKey">_bindKey ()</a></td>
+	<td class="summary">Enlaza la tecla de interacción mientras el jugador está dentro.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#_unbindKey">_unbindKey ()</a></td>
+	<td class="summary">Desenlaza la tecla de interacción.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#update">update ()</a></td>
+	<td class="summary">Actualiza el estado del prompt.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setText">setText (newText)</a></td>
+	<td class="summary">Cambia el texto mostrado en el prompt.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#setKey">setKey (newKey)</a></td>
+	<td class="summary">Cambia la tecla usada para interactuar.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Destroy">Destroy ()</a></td>
+	<td class="summary">Destruye el prompt y limpia recursos asociados (UI, colisión, señales).</td>
+	</tr>
+</table>
+<h2><a href="#Fields">Fields</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#self.Triggered">self.Triggered</a></td>
+	<td class="summary">Señal que se dispara cuando se presiona la tecla de interacción estando dentro.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "new"></a>
+    <strong>new (text, key)</strong>
+    </dt>
+    <dd>
+    Crea un nuevo prompt de proximidad.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">text</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Texto a mostrar. Debe contener un `%s` si quieres interpolar la tecla (ej: `"Presiona %s para hablar"`).
+        </li>
+        <li><span class="parameter">key</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Tecla que activa la interacción. Si se omite, usa `Config.SavedConfigs.PINTR`.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">ProximityPrompt</span></span>
+        La nueva instancia del prompt.
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> prompt = ProximityPrompt.<span class="function-name">new</span>(<span class="string">"Presiona %s para interactuar"</span>, <span class="string">"e"</span>)
+prompt.Triggered:<span class="function-name">Connect</span>(<span class="keyword">function</span>() <span class="global">print</span>(<span class="string">"¡Interacción!"</span>) <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "_showUI"></a>
+    <strong>_showUI (show)</strong>
+    </dt>
+    <dd>
+    Muestra u oculta la UI del prompt.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">show</span>
+            <span class="types"><span class="type">boolean</span></span>
+         Si es `true`, se muestra; si es `false`, se oculta.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "_bindKey"></a>
+    <strong>_bindKey ()</strong>
+    </dt>
+    <dd>
+    Enlaza la tecla de interacción mientras el jugador está dentro.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "_unbindKey"></a>
+    <strong>_unbindKey ()</strong>
+    </dt>
+    <dd>
+    Desenlaza la tecla de interacción.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "update"></a>
+    <strong>update ()</strong>
+    </dt>
+    <dd>
+    Actualiza el estado del prompt.
+ Debe llamarse en el `update()` de la escena para detectar si el jugador entra/sale del área.
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setText"></a>
+    <strong>setText (newText)</strong>
+    </dt>
+    <dd>
+    Cambia el texto mostrado en el prompt.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">newText</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         El nuevo texto.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "setKey"></a>
+    <strong>setKey (newKey)</strong>
+    </dt>
+    <dd>
+    Cambia la tecla usada para interactuar.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">newKey</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         La nueva tecla.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Destroy"></a>
+    <strong>Destroy ()</strong>
+    </dt>
+    <dd>
+    Destruye el prompt y limpia recursos asociados (UI, colisión, señales).
+
+
+
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "self.Triggered"></a>
+    <strong>self.Triggered</strong>
+    </dt>
+    <dd>
+    Señal que se dispara cuando se presiona la tecla de interacción estando dentro.
+
+
+
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
+<i style="float:right;">Last updated 2025-09-28 23:22:05 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
