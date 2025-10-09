@@ -56,7 +56,7 @@ function Shard:Collect()
 
     MathQuiz.start({
         rounds = 3,      -- cuántas preguntas
-        timePer = 10,    -- segundos por pregunta
+        timePer = 25,    -- segundos por pregunta
         onWin = function()
             World.onShardCollected(self.id)
             self:Destroy()
@@ -70,12 +70,19 @@ function Shard:Collect()
 end
 
 function Shard:update(dt)
+    function Shard:update(dt)
     if self._destroying then return end
-    self._t = self._t + dt
-    -- bobbing sutil vertical (en pixels), aplicamos como offset temporal
-    local x,y = self.collision.position:toPixels()
-    local off = math.sin(self._t * BOB_SPEED) * BOB_PIX
-    self._drawX, self._drawY = x, y + off
+        self._t = self._t + dt
+
+        -- bobbing vertical
+        local x,y = self.collision.position:toPixels()
+        local off = math.sin(self._t * 2.2) * 5
+        self._drawX, self._drawY = x, y + off
+
+        -- brillo sutil (alpha)
+        local a = 0.85 + 0.15 * math.sin(self._t * 3.0)
+        self.sprite.color = {1, 1, 1, a} -- añadido
+    end
 end
 
 function Shard:draw()

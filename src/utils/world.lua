@@ -54,5 +54,27 @@ function world.getRemainingShardPositions()
     return remaining
 end
 
+function world.getShardHideouts()
+    return {
+        {
+            id   = 1,
+            kind = "cachebox",
+            pos  = UDim2.fromScale(0.30, 0.62),
+            size = UDim2.fromScale(0.08, 0.12),
+        },
+        {
+            id   = 2,
+            kind = "router",
+            pos  = UDim2.fromScale(0.55, 0.45),
+        },
+        {
+            id   = 3,
+            kind = "firewall",
+            gatePos  = UDim2.fromScale(0.74, 0.68),
+            gateSize = UDim2.fromScale(0.06, 0.24),
+            shardPos = UDim2.fromScale(0.78, 0.70),
+        },
+    }
+end
 
 return world

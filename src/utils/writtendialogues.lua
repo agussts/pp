@@ -3,19 +3,19 @@ local dialogues = {}
 dialogues.mvirusFirst = {
     { who="???", text="New face. Looking for work?" },
     { who="YOU", text="I... guess. What kind of work?" },
-    { who="???", text="Data shards. Three should do. Outside this hole." },
+    { who="???", text="Find me some Data shards. Three should do. Outside this place." },
     { who="YOU", text="Where do I start?" },
     { who="???", text="Follow the noise. Bring them back here." },
 }
 
 dialogues.mviruspostFirst = {
-{ who="???", text="Three shards. Outside. Don't get traced." },
+    { who="???", text="Three shards. Outside. Don't get traced." },
 }
 
 dialogues.shardsDone = {
-{ who="???", text="All three? Good. Hand them over." },
-{ who="YOU", text="Here." },
-{ who="???", text="Not bad. Come back when you want real trouble." },
+    { who="???", text="All three? Good. Hand them over." },
+    { who="YOU", text="Here." },
+    { who="???", text="Not bad. Come back when you're ready for real trouble." },
 }
 
 

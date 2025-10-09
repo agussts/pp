@@ -67,7 +67,7 @@ local function buildUI(self)
     self.textLbl.size = UDim2.fromScale(0.95, 0.65)
     self.textLbl.position = UDim2.fromScale(0.025, 0.3)
     self.textLbl.anchorPoint = {0,0}
-    self.textLbl.color = {1,1,1,1}
+    self.textLbl.textColor = {1,1,1,1}
     self.textLbl.zIndex = 5
     self.textLbl.font = Fonts.VT323
 end
@@ -159,7 +159,6 @@ end
 --- Termina el diálogo y limpia la UI.
 function Dialogue:finish()
     if not self._active then return end
-    exitDialogueState()
     self._active = false
     if self._connection then Disconnect("keyPressed", self._connection) end
     if self.root then self.root:Destroy() end
@@ -167,7 +166,7 @@ function Dialogue:finish()
     if not PlayingTimers.playing then
         PlayingTimers:continue()
     end
-    self.root:Destroy()
+    exitDialogueState()
     self.textLbl = nil
     self.onFinish:Fire()
 end

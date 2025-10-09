@@ -36,6 +36,10 @@ Antivirus = require("src.objs.antivirus")
 Door = require("src.objs.door")
 ProxPrompt = require("src.objs.proximityprompt")
 Shard = require("src.objs.shard")
+CacheBox   = require("src.objs.cachebox")
+FirewallGate = require("src.objs.firewall_gate")
+RouterNode = require("src.objs.router_node")
+
 
 GunModule = require("src.guns.dev")
     
@@ -45,6 +49,7 @@ Background = require("src.libs.background")
 -- Scenes
 Scene = require("src.scenes.scene")
 Transition = require("src.scenes.transition")
+TiledLite = require("src.libs.tiledlite")
 
 Shaders = require("src.libs.shaders")
 Dialogue = require("src.libs.dialogue")

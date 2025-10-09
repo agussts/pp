@@ -51,9 +51,11 @@ function gun:Fire(x, y)
     collider = Collisions.new("hitbox", true)
     collider.onHit:Connect(function (otherCollider)
         if otherCollider:HasTag("player") or otherCollider:HasTag("projectile") then return end
+        if otherCollider.link and otherCollider.link.Damage then
+            otherCollider.link:Damage(self.damage)
+        end
         if otherCollider:HasTag("enemy") then
             audios.hit:clone():play()
-            otherCollider.link:Damage(self.damage)
         elseif otherCollider:HasTag("box") then
             audios.boxhit:clone():play()
         end

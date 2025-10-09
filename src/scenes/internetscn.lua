@@ -1,13 +1,17 @@
 return function()
     local scene = {}
 
+    local function mkBeacon(posUDim2)
+        return { pos = posUDim2, t = 0, visible = true }
+    end
+
     scene.load = function(self, payload)
         -- Fondos
         self.bgA = Background.new("assets/sprites/xthingy.png", 32*3, 18*3, 1,1)
         self.bgB = Background.new("assets/sprites/xthingy.png", 32*3, 18*3, 1,1)
         self.bgA.color = {1,.2,1,0.05}
         self.bgB.color = {.2,1,1,0.02}
-
+        self.map = TiledLite.load("assets/maps/test.lua")
         Player = PlayerModule.new("assets/sprites/player-Sheet.png")
         
         local spawn = UDim2.fromScale(.2, .6)
@@ -35,25 +39,52 @@ return function()
         -- Si la misión ya estaba activa al entrar a esta escena, prepara todo:
         if World.shards.active and not World.shards.done then
             self:spawnShardsAndHUD()
+            self.beacons = {
+                cache   = mkBeacon(UDim2.fromScale(0.28, 0.53)), -- encima del dumpster
+                router  = mkBeacon(UDim2.fromScale(0.52, 0.36)), -- encima del panel
+                firewall= mkBeacon(UDim2.fromScale(0.79, 0.60)), -- encima del shard detrás
+            }
         end
 
         Gun = GunModule.new()
     end
 
     function scene:spawnShardsAndHUD()
-        -- HUD con objetivo
+        --- HUD
         self.hud = ShardsHUD.new(World.shards.needed)
-        -- Spawnear shards en posiciones del mapa (ejemplos)
-        self.shards = {}
-        for _, def in ipairs(World.getRemainingShardPositions()) do
-            local pos, sprite, id = def[1], def[2], def[3]
-            table.insert(self.shards, Shard.new(pos, sprite, id))
+
+        -- Colecciones
+        self.cacheBoxes = {}
+        self.firewalls  = {}
+        self.nodes      = {}
+        self.shards     = {}
+
+        local layout = World.getShardHideouts()
+        for _,def in ipairs(layout) do
+            if not World.shards.collectedIds[def.id] then
+                if def.kind == "cachebox" then
+                    -- Rompe caja -> aparece Shard que lanza MathQuiz
+                    local box = CacheBox.new(def.pos, def.size, function()
+                        table.insert(self.shards, Shard.new(def.pos, "assets/sprites/shard.png", def.id))
+                    end)
+                    table.insert(self.cacheBoxes, box)
+
+                elseif def.kind == "firewall" then
+                    local fw = FirewallGate.new(def.gatePos, def.gateSize, 1.6, 0.65)
+                    table.insert(self.firewalls, fw)
+                    -- Shard visible detrás de la barrera
+                    table.insert(self.shards, Shard.new(def.shardPos, "assets/sprites/shard.png", def.id))
+
+                elseif def.kind == "router" then
+                    local node = RouterNode.new(def.id, def.pos)
+                    table.insert(self.nodes, node)
+                end
+            end
         end
 
-        -- Marca que ya están vivos en esta escena
         World.shards.spawned = true
 
-        -- Actualiza HUD cuando juntes uno:
+        -- Actualizar HUD al recolectar
         self._colConn = Connect("shard_collected", function(count, needed)
             if self.hud and self.hud.setCount then
                 self.hud:setCount(count, needed)
@@ -68,10 +99,12 @@ return function()
         self.bgB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
         self.darkwebWindow.collision.position = UDim2.new(self.darkwebWindow.collision.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100 + .1, 0)
 
-        if self.shards then
-            for _,s in ipairs(self.shards) do
-                s:update(dt)
-            end
+        for _,b in ipairs(self.cacheBoxes or {}) do b:update(dt) end
+        for _,f in ipairs(self.firewalls or {})  do f:update(dt) end
+        for _,n in ipairs(self.nodes or {})      do n:update(dt) end
+        for _,s in ipairs(self.shards or {})     do s:update(dt) end
+        for _,b in pairs(self.beacons or {}) do
+            if b.visible then b.t = b.t + dt end
         end
 
         if love.mouse.isDown(1) and Gun then
@@ -89,39 +122,34 @@ return function()
         Camera.update(px, py)
     end
 
+    local function drawBeacon(b)
+        if not b.visible then return end
+        local x, y = b.pos:toPixels()
+        local bob = math.sin(b.t * 3.5) * 6
+        love.graphics.setColor(1, 1, 0.2, 0.9)
+        -- “!” simple
+        love.graphics.rectangle("fill", x-2, y-16 + bob, 4, 10)  -- palo
+        love.graphics.rectangle("fill", x-2, y   + bob, 4, 4)    -- punto
+        love.graphics.setColor(1,1,1,1)
+    end
+
     scene.draw = function(self)
 
         self.bgA:drawBackground()
         self.bgB:drawBackground()
+        self.map:drawMap()
 
         if self.shards then
             Camera.attach()
-                for _,s in ipairs(self.shards) do
-                    s:draw()
-                end
+                for _,f in ipairs(self.firewalls or {})  do f:draw() end
+                for _,b in ipairs(self.cacheBoxes or {}) do b:draw() end
+                for _,s in ipairs(self.shards or {})     do s:draw() end
+                for _,n in ipairs(self.nodes or {})      do n:draw() end
+                drawBeacon(self.beacons.cache)
+                drawBeacon(self.beacons.router)
+                drawBeacon(self.beacons.firewall)
             Camera.detach()
         end
-        -- Camera.attach()
-        --     for i,v in pairs(self) do
-        --         if type(v) == "table" then 
-        --             --Si se puede dibujar, que lo dibuje
-        --             if v.draw then
-        --                 if v.position and v.size then
-        --                     local x,y = v.position:toPixels()
-        --                     v:draw(x, y)
-        --                 else
-        --                     v:draw()
-        --                 end
-        --             end
-        --         end
-        --     end
-
-        --     for _,v in pairs(Collisions.getCollisions()) do
-        --         v:draw()
-        --     end
-        -- Camera.detach()
-
-        -- GUI (ya lo maneja main.lua al final)
     end
 
     return scene

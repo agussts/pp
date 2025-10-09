@@ -1,10 +1,20 @@
 ---
 -- HUD simple que muestra "Shards: X/Y".
--- Persiste entre escenas.
+--@classmod ShardsHUD
 local ShardsHUD = {}
+local _singleton = nil --evita duplicados
 
 -- @tparam number totalShards cantidad objetivo (puede cambiarse luego)
 function ShardsHUD.new(totalShards)
+    if _singleton then
+        -- Reusar HUD existente, actualizando total si es necesario
+        if totalShards and totalShards ~= _singleton.total then
+            _singleton.total = totalShards
+            local curr = World.shards.collected or 0
+            _singleton.label.text = ("Shards: %d/%d"):format(curr, _singleton.total)
+        end
+        return _singleton
+    end
     local self = {}
 
     self.total = totalShards or 3
@@ -13,6 +23,7 @@ function ShardsHUD.new(totalShards)
     self.root = Frame.new()
     self.root.size = UDim2.fromScale(1,1)
     self.root.bgColor = {0,0,0,0}
+    self.root:setPersistent(true)
 
     -- etiqueta
     self.label = Textlabel.new("")
@@ -49,7 +60,8 @@ function ShardsHUD.new(totalShards)
         if self.root and self.root.Destroy then self.root:Destroy() end
     end
 
-    return self
+    _singleton = self
+    return _singleton
 end
 
 return ShardsHUD
