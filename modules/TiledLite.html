@@ -40,8 +40,8 @@
 <h2>Modules</h2>
 <ul class="nowrap">
   <li><a href="../modules/connections.html">connections</a></li>
-  <li><strong>Dialogue</strong></li>
-  <li><a href="../modules/TiledLite.html">TiledLite</a></li>
+  <li><a href="../modules/Dialogue.html">Dialogue</a></li>
+  <li><strong>TiledLite</strong></li>
   <li><a href="../modules/MathQuiz.html">MathQuiz</a></li>
   <li><a href="../modules/ProximityPrompt.html">ProximityPrompt</a></li>
 </ul>
@@ -73,39 +73,44 @@
 
 <div id="content">
 
-<h1>Module <code>Dialogue</code></h1>
-<p>Sistema de diálogos simple (sin retratos).</p>
+<h1>Module <code>TiledLite</code></h1>
+<p>TiledLite (Lua): cargador ligero de mapas Tiled exportados como archivo Lua.</p>
 <p>
-  Pausa el gameplay mientras está activo y reanuda al terminar.
-  Muestra un cuadro inferior con el nombre del hablante y el texto,
-  escribiendo caracter por caracter (typewriter).</p>
+ Integra con UDim2/Collisions/Camera y permite spawnear objetos desde capas.
+ Requisitos en Tiled:
+   • Exporta como **Lua** (el archivo devuelve `return { ... }`)
+   • Mapa ortogonal; tilesets embebidos o con imagen relativa al mapa
+   • Capas de tiles y capas de objetos (rectángulos para colisión/objetos)
+   • Propiedad opcional por capa de tiles: `parallax` (0..1, p.ej. 0.35, 0.7, 1)
+<p> Uso:
+   local TiledLite = require("src.utils.tiledlite")
+   self.map = TiledLite.load("assets/maps/internet01.lua", {
+       collisionLayers = {"Colliders"}
+   })
+   self.map:spawnObjects({
+       shard = function(obj) ... end,
+       door  = function(obj) ... end,
+   })
+   -- En draw:
+   Camera.attach()
+       self.map:draw(Camera.x, Camera.y)
+   Camera.detach()
+</p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#start">start (script[, cps=40])</a></td>
-	<td class="summary">Empieza un diálogo.</td>
+	<td class="name" nowrap><a href="#load">load (luaPath[, opts])</a></td>
+	<td class="summary">Carga un mapa de Tiled exportado como **Lua**.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#applyLine">applyLine (line)</a></td>
-	<td class="summary">Aplica una línea del diálogo.</td>
+	<td class="name" nowrap><a href="#spawnObjects">spawnObjects (factories)</a></td>
+	<td class="summary">Recorre capas de objetos y llama a una “factory” por `type`.</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#_update">_update (dt)</a></td>
-	<td class="summary">Actualiza la animación de typewriter para una instancia.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#advanceOrSkip">advanceOrSkip ()</a></td>
-	<td class="summary">Avanza al final de la línea actual o a la siguiente línea.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#finish">finish ()</a></td>
-	<td class="summary">Termina el diálogo y limpia la UI.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#updateAll">updateAll (dt)</a></td>
-	<td class="summary">Actualiza todos los diálogos activos.</td>
+	<td class="name" nowrap><a href="#drawMap">drawMap ([camX=0[, camY=0]])</a></td>
+	<td class="summary">Dibuja capas de tiles con parallax por capa (resolución virtual correcta).</td>
 	</tr>
 </table>
 
@@ -117,57 +122,52 @@
 
     <dl class="function">
     <dt>
-    <a name = "start"></a>
-    <strong>start (script[, cps=40])</strong>
+    <a name = "load"></a>
+    <strong>load (luaPath[, opts])</strong>
     </dt>
     <dd>
-    Empieza un diálogo.
+    Carga un mapa de Tiled exportado como **Lua**.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">script</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-         Lista de líneas, cada una con campos `who` (string) y `text` (string).
+        <li><span class="parameter">luaPath</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Ruta (LOVE FS) al archivo .lua exportado por Tiled.
         </li>
-        <li><span class="parameter">cps</span>
-            <span class="types"><span class="type">number</span></span>
-         Caracteres por segundo (velocidad de typewriter).
-         (<em>default</em> 40)
+        <li><span class="parameter">opts</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         { collisionLayers={"Colliders"} }
+         (<em>optional</em>)
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Dialogue</span></span>
-        La instancia del diálogo creado.
+           <span class="types"><span class="type">TiledLite</span></span>
+        instancia del mapa
     </ol>
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">Dialogue.<span class="function-name">start</span>({
-  { who = <span class="string">"NPC"</span>, text = <span class="string">"Bienvenido."</span> },
-  { who = <span class="string">"Jugador"</span>, text = <span class="string">"Gracias!"</span> },
-})</pre>
-    </ul>
 
 </dd>
     <dt>
-    <a name = "applyLine"></a>
-    <strong>applyLine (line)</strong>
+    <a name = "spawnObjects"></a>
+    <strong>spawnObjects (factories)</strong>
     </dt>
     <dd>
-    Aplica una línea del diálogo.
+    Recorre capas de objetos y llama a una “factory” por `type`.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">line</span>
+        <li><span class="parameter">factories</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-         Una tabla con campos `who` y `text`
+         Mapa { [type]=function(obj) end, ... }
+ Obj incluye:
+   obj.sx,obj.sy,obj.sw,obj.sh (en escala), obj.props (tabla de propiedades)
         </li>
     </ul>
 
@@ -177,67 +177,25 @@
 
 </dd>
     <dt>
-    <a name = "_update"></a>
-    <strong>_update (dt)</strong>
+    <a name = "drawMap"></a>
+    <strong>drawMap ([camX=0[, camY=0]])</strong>
     </dt>
     <dd>
-    Actualiza la animación de typewriter para una instancia.
+    Dibuja capas de tiles con parallax por capa (resolución virtual correcta).
+ Dibuja usando coords del mapa (ideal) y las escala a la resolución actual.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">dt</span>
+        <li><span class="parameter">camX</span>
             <span class="types"><span class="type">number</span></span>
-         Delta time
+          cámara en pixeles **pantalla**
+         (<em>default</em> 0)
         </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "advanceOrSkip"></a>
-    <strong>advanceOrSkip ()</strong>
-    </dt>
-    <dd>
-    Avanza al final de la línea actual o a la siguiente línea.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "finish"></a>
-    <strong>finish ()</strong>
-    </dt>
-    <dd>
-    Termina el diálogo y limpia la UI.
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "updateAll"></a>
-    <strong>updateAll (dt)</strong>
-    </dt>
-    <dd>
-    Actualiza todos los diálogos activos.
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">dt</span>
+        <li><span class="parameter">camY</span>
             <span class="types"><span class="type">number</span></span>
-         Delta time
+          cámara en pixeles **pantalla**
+         (<em>default</em> 0)
         </li>
     </ul>
 
