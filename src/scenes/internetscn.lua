@@ -12,9 +12,12 @@ return function()
         self.bgA.color = {1,.2,1,0.05}
         self.bgB.color = {.2,1,1,0.02}
         self.map = TiledLite.load("assets/maps/test.lua")
+        self.map:spawnAll(self)
+        self.map.worldLayer = -1
+
         Player = PlayerModule.new("assets/sprites/player-Sheet.png")
         
-        local spawn = UDim2.fromScale(.2, .6)
+        local spawn = UDim2.fromScale(0,0)
         if payload ~= nil then
             spawn = payload.spawn
         end
@@ -26,15 +29,19 @@ return function()
         windowAnim:Pause()
         self.darkwebWindow = Block.new(windowAnim, -.175, .1, .1, .1)
         self.darkwebWindow.collision.enabled = false
+        self.darkwebWindow.worldLayer = -10
 
         local doorAnim = Animation.new("assets/sprites/darkwebdoor-Sheet.png", 76, 76, 3, 3, .35)
         doorAnim.anchor = {.5, .5}
         doorAnim:addHole(3,3)
         self.darkweb = Block.new(doorAnim, -.175, .1, .1, .1)
         self.darkweb.collision.enabled = false
+        self.darkweb.worldLayer = -5
 
         self.darkwebDoor = Door.new("darkweb", UDim2.fromScale(-.175, .1), UDim2.fromScale(0.1, .2))
         self.darkwebDoor.collision.anchor = {.5, .5}
+        
+        --self.enemy = Antivirus.new()
 
         -- Si la misión ya estaba activa al entrar a esta escena, prepara todo:
         if World.shards.active and not World.shards.done then
@@ -93,6 +100,8 @@ return function()
   end
 
     scene.update = function(self, dt)
+        self.enemigo2:follow(Player.collision.position)
+
         self.bgA:setScroll(self.bgA.scrollX + 50*dt, self.bgA.scrollY - 25*dt)
         self.bgB:setScroll(self.bgB.scrollX - 25*dt, self.bgB.scrollY + 50*dt)
         self.bgA.color[4] = 0.035 + 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
@@ -122,35 +131,23 @@ return function()
         Camera.update(px, py)
     end
 
-    local function drawBeacon(b)
-        if not b.visible then return end
-        local x, y = b.pos:toPixels()
-        local bob = math.sin(b.t * 3.5) * 6
-        love.graphics.setColor(1, 1, 0.2, 0.9)
-        -- “!” simple
-        love.graphics.rectangle("fill", x-2, y-16 + bob, 4, 10)  -- palo
-        love.graphics.rectangle("fill", x-2, y   + bob, 4, 4)    -- punto
-        love.graphics.setColor(1,1,1,1)
-    end
-
     scene.draw = function(self)
 
         self.bgA:drawBackground()
         self.bgB:drawBackground()
-        self.map:drawMap()
 
         if self.shards then
             Camera.attach()
+                self.map:drawGround()
                 for _,f in ipairs(self.firewalls or {})  do f:draw() end
                 for _,b in ipairs(self.cacheBoxes or {}) do b:draw() end
                 for _,s in ipairs(self.shards or {})     do s:draw() end
                 for _,n in ipairs(self.nodes or {})      do n:draw() end
-                drawBeacon(self.beacons.cache)
-                drawBeacon(self.beacons.router)
-                drawBeacon(self.beacons.firewall)
             Camera.detach()
         end
     end
-
+    scene.unload = function (self)
+        self.map = nil
+    end
     return scene
 end

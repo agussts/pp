@@ -1,39 +1,37 @@
---- TiledLite (Lua): cargador ligero de mapas Tiled exportados como archivo Lua.
--- Integra con UDim2/Collisions/Camera y permite spawnear objetos desde capas.
--- Requisitos en Tiled:
---   • Exporta como **Lua** (el archivo devuelve `return { ... }`)
---   • Mapa ortogonal; tilesets embebidos o con imagen relativa al mapa
---   • Capas de tiles y capas de objetos (rectángulos para colisión/objetos)
---   • Propiedad opcional por capa de tiles: `parallax` (0..1, p.ej. 0.35, 0.7, 1)
+-- TiledLite (Lua): cargador y spawner automático para mapas Tiled exportados como **Lua**.
+-- Integra con UDim2/Collisions y tu sistema de cámara (no maneja cámara internamente).
+-- Características:
+--   • Capas "tilelayer": precompiladas a SpriteBatch. Propiedad de capa opcional: parallax (0..1).
+--   • Capas "objectgroup": spawnea objetos automáticamente con fábricas por defecto:
+--       - type="player_spawn"  → recoloca/crea Player
+--       - type="door"          → Door.new(...), props: to, spawnx, spawny
+--       - type="enemy"         → EnemyModule.new(...), props: health, damage, speed
+--       - type="shard"         → Shard.new(...), props: id, sprite
+--       - type="prop"          → Block con sprite estático (decoración), props: sprite
+--   • Si el objeto tiene "name" en Tiled, se asigna como scene[name] para acceso directo.
+--   • Colisiones desde layers nombradas en opts.collisionLayers (p.ej. {"Colliders"}).
 --
--- Uso:
+-- Uso mínimo:
 --   local TiledLite = require("src.utils.tiledlite")
---   self.map = TiledLite.load("assets/maps/internet01.lua", {
---       collisionLayers = {"Colliders"}
---   })
---   self.map:spawnObjects({
---       shard = function(obj) ... end,
---       door  = function(obj) ... end,
---   })
---   -- En draw:
+--   self.map = TiledLite.load("assets/maps/internet01.lua", { collisionLayers = {"Colliders"} })
+--   self.map:spawnAll(self)   -- spawnea todo con fábricas por defecto
+--   -- draw:
+--   self.map:drawParallaxBackground()   -- antes de Camera.attach(), solo si usas parallax<1
 --   Camera.attach()
---       self.map:draw(Camera.x, Camera.y)
+--       self.map:draw()                 -- capas con parallax==1 (mundo)
 --   Camera.detach()
 --
 -- @module TiledLite
 
-
 local TiledLite = {}
 TiledLite.__index = TiledLite
 
--- === Utilidades internas ===================================================
+-- ===== Utilidades internas =================================================
 
 local bitlib = rawget(_G, "bit") or rawget(_G, "bit32")
 
---- AND bit a prueba de entorno (LuaJIT/bit32 o sin libs)
 local function band(a, b)
     if bitlib and bitlib.band then return bitlib.band(a, b) end
-    -- fallback simple (lento, pero suficiente para 3 flags)
     local res, bitv = 0, 1
     while a > 0 or b > 0 do
         if (a % 2 == 1) and (b % 2 == 1) then res = res + bitv end
@@ -44,12 +42,6 @@ end
 
 local FLIP_H, FLIP_V, FLIP_D = 0x80000000, 0x40000000, 0x20000000
 
---- Decodifica flags de Tiled en un GID (flip horizontal/vertical/diagonal).
--- @tparam integer gid
--- @treturn integer clean_gid GID sin flags
--- @treturn boolean flip_h
--- @treturn boolean flip_v
--- @treturn boolean flip_d (no soportado)
 local function gidDecode(gid)
     local fh = band(gid, FLIP_H) ~= 0
     local fv = band(gid, FLIP_V) ~= 0
@@ -61,24 +53,20 @@ local function gidDecode(gid)
     return clean, fh, fv, fd
 end
 
---- Directorio padre de una ruta (simple).
 local function dirname(path)
     return path:match("^(.*)/[^/]-$") or ""
 end
 
---- Une rutas (`a/b`), manejando "//".
 local function join(a, b)
     if not a or a == "" then return b end
     return (a .. "/" .. b):gsub("//+", "/")
 end
 
---- Convierte pixeles a escala UDim2 respecto a la **resolución ideal**.
 local function toScale(xpx, ypx)
     local W, H = Config.IdealResolution.width, Config.IdealResolution.height
     return xpx / W, ypx / H
 end
 
---- Lee el archivo Lua de Tiled (debe hacer `return { ... }`).
 local function loadLuaMap(path)
     local chunk, err = love.filesystem.load(path)
     assert(chunk, "TiledLite: no se pudo cargar '" .. tostring(path) .. "': " .. tostring(err))
@@ -87,8 +75,6 @@ local function loadLuaMap(path)
     return data, dirname(path)
 end
 
---- Obtiene una propiedad de Tiled desde `tbl.properties`.
--- Soporta tanto `{ {name=, value=}, ... }` como `{ name = value, ... }`.
 local function getProp(tbl, key)
     local props = tbl and tbl.properties
     if not props then return nil end
@@ -102,11 +88,10 @@ local function getProp(tbl, key)
     return nil
 end
 
---- Construye un tileset (imagen + quads).
 local function buildTileset(ts, baseDir)
     local imgPath = ts.image
     if imgPath and baseDir ~= "" then
-        imgPath = join(baseDir, imgPath)  -- relativo al mapa
+        imgPath = join(baseDir, imgPath)
     end
     local image = love.graphics.newImage(imgPath)
     image:setFilter("nearest", "nearest", 1)
@@ -140,7 +125,6 @@ local function buildTileset(ts, baseDir)
     }
 end
 
--- helper interno: escala de pantalla vs resolución ideal
 local function screenScale()
     local sw, sh = love.graphics.getDimensions()
     local sx = sw / Config.IdealResolution.width
@@ -148,12 +132,11 @@ local function screenScale()
     return sx, sy
 end
 
--- === API ===================================================================
+-- ===== API base (carga y dibujo) ===========================================
 
 --- Carga un mapa de Tiled exportado como **Lua**.
--- @tparam string luaPath Ruta (LOVE FS) al archivo .lua exportado por Tiled.
+-- @tparam string luaPath
 -- @tparam[opt] table opts { collisionLayers={"Colliders"} }
--- @treturn TiledLite instancia del mapa
 function TiledLite.load(luaPath, opts)
     opts = opts or {}
     local self = setmetatable({}, TiledLite)
@@ -165,20 +148,18 @@ function TiledLite.load(luaPath, opts)
     self.mapWpx = map.width  * map.tilewidth
     self.mapHpx = map.height * map.tileheight
 
-    -- Tilesets
+    -- tilesets
     self.tilesets = {}
     for _, ts in ipairs(map.tilesets or {}) do
         assert(not ts.source, "TiledLite: usa tilesets embebidos o con 'image' directo en el mapa Lua")
         table.insert(self.tilesets, buildTileset(ts, baseDir))
     end
-
-    -- Pre-índice de rango GID → tileset
     self._tsByGid = {}
     for i, ts in ipairs(self.tilesets) do
         table.insert(self._tsByGid, {ts.firstgid, ts.lastgid, i})
     end
 
-    -- Capas
+    -- capas → spritebatches
     self.layers = {}
     for _, layer in ipairs(map.layers or {}) do
         if layer.type == "tilelayer" then
@@ -186,7 +167,6 @@ function TiledLite.load(luaPath, opts)
             for i, ts in ipairs(self.tilesets) do
                 batches[i] = love.graphics.newSpriteBatch(ts.image, layer.width * layer.height)
             end
-
             local lw, lh = layer.width, layer.height
             for ly = 0, lh - 1 do
                 for lx = 0, lw - 1 do
@@ -195,8 +175,7 @@ function TiledLite.load(luaPath, opts)
                     if gid and gid ~= 0 then
                         local clean, fh, fv, fd = gidDecode(gid)
                         if not fd then
-                            -- Encuentra tileset
-                            local tsIndex = nil
+                            local tsIndex
                             for _, range in ipairs(self._tsByGid) do
                                 if clean >= range[1] and clean <= range[2] then tsIndex = range[3]; break end
                             end
@@ -217,13 +196,13 @@ function TiledLite.load(luaPath, opts)
                     end
                 end
             end
-
             table.insert(self.layers, {
-                kind = "tiles",
-                name = layer.name or ("layer" .. (#self.layers + 1)),
-                opacity = layer.opacity or 1,
+                kind     = "tiles",
+                name     = layer.name or ("layer" .. (#self.layers + 1)),
+                opacity  = layer.opacity or 1,
                 parallax = tonumber(getProp(layer, "parallax")) or 1,
-                batches = batches,
+                batches  = batches,
+                data     = layer, -- guardo props de capa por si usas "role"
             })
 
         elseif layer.type == "objectgroup" then
@@ -235,7 +214,7 @@ function TiledLite.load(luaPath, opts)
         end
     end
 
-    -- Colisiones desde capas designadas
+    -- colisiones desde capas designadas
     self.collisionLayerNames = opts.collisionLayers or {"Colliders"}
     for _, L in ipairs(self.layers) do
         if L.kind == "objects" then
@@ -250,7 +229,6 @@ function TiledLite.load(luaPath, opts)
                             c.size     = UDim2.fromScale(sw, sh)
                             c.anchor   = {0, 0}
                             c:AddTag("world")
-                            c.visualized = false
                         end
                     end
                 end
@@ -261,76 +239,165 @@ function TiledLite.load(luaPath, opts)
     return self
 end
 
---- Recorre capas de objetos y llama a una “factory” por `type`.
--- @tparam table factories Mapa { [type]=function(obj) end, ... }
--- Obj incluye:
---   obj.sx,obj.sy,obj.sw,obj.sh (en escala), obj.props (tabla de propiedades)
-function TiledLite:spawnObjects(factories)
+--- Dibuja (solo capas con parallax==1) dentro de Camera.attach().
+function TiledLite:draw()
+    local scale = (TrueResolution and TrueResolution.scale) or 1
+    love.graphics.push()
+    love.graphics.scale(scale, scale)
+    for _, L in ipairs(self.layers) do
+        if L.kind == "tiles" and (L.parallax or 1) == 1 then
+            love.graphics.setColor(1, 1, 1, L.opacity or 1)
+            for i, _ in ipairs(self.tilesets) do
+                local sb = L.batches[i]
+                if sb then love.graphics.draw(sb, 0, 0) end
+            end
+            love.graphics.setColor(1, 1, 1, 1)
+        end
+    end
+    love.graphics.pop()
+end
+
+--- Dibuja capas con parallax != 1 como fondos (antes de Camera.attach()).
+function TiledLite:drawParallaxBackground()
+    local scale = (TrueResolution and TrueResolution.scale) or 1
+    local camX, camY = (Camera and Camera.x) or 0, (Camera and Camera.y) or 0
+    for _, L in ipairs(self.layers) do
+        if L.kind == "tiles" and (L.parallax or 1) ~= 1 then
+            local p = L.parallax
+            love.graphics.push()
+            love.graphics.scale(scale, scale)
+            love.graphics.translate(
+                math.floor((1 - p) * camX / scale + 0.5),
+                math.floor((1 - p) * camY / scale + 0.5)
+            )
+            love.graphics.setColor(1, 1, 1, L.opacity or 1)
+            for i, _ in ipairs(self.tilesets) do
+                local sb = L.batches[i]
+                if sb then love.graphics.draw(sb, 0, 0) end
+            end
+            love.graphics.setColor(1, 1, 1, 1)
+            love.graphics.pop()
+        end
+    end
+end
+
+-- ===== Spawner automático (fábricas por defecto) ===========================
+
+--- Fábricas por defecto internas. Puedes sobreescribir con TiledLite.setDefaultFactory().
+local DefaultFactories = {}
+
+-- player_spawn
+DefaultFactories.player_spawn = function(o, scn)
+    if not Player then
+        Player = PlayerModule.new("assets/sprites/player-Sheet.png")
+        scn.player = Player
+    end
+    Player.collision.position = UDim2.fromScale(o.sx, o.sy)
+    return Player
+end
+
+-- door (props: to, spawnx, spawny)
+DefaultFactories.door = function(o, scn)
+    local to     = (o.props and o.props.to) or "darkweb"
+    local spawnX = tonumber(o.props and o.props.spawnx) or 0.2
+    local spawnY = tonumber(o.props and o.props.spawny) or 0.6
+    local sizeW  = (o.sw and o.sw > 0) and o.sw or 0.06
+    local sizeH  = (o.sh and o.sh > 0) and o.sh or 0.12
+    local d = Door.new(to, UDim2.fromScale(o.sx, o.sy), UDim2.fromScale(sizeW, sizeH), {
+        spawn = UDim2.fromScale(spawnX, spawnY)
+    })
+    d.collision.anchor = {0.5, 0.5}
+    return d
+end
+
+-- enemy (props: health, damage, speed)
+DefaultFactories.enemy = function(o, scn)
+    local w = (o.sw and o.sw > 0) and o.sw or 0.0625
+    local h = (o.sh and o.sh > 0) and o.sh or 0.11
+    local e
+    if o.props then
+        if o.props.kind == "antivirus" then
+            e = Antivirus.new()
+            e.collision.position = UDim2.fromScale(o.sx, o.sy)
+        else
+            e = EnemyModule.new(nil, w, h)
+        end
+        e.collision.position = UDim2.fromScale(o.sx, o.sy)
+        if o.props.health then e.health = tonumber(o.props.health) or e.health end
+        if o.props.damage then e.damage = tonumber(o.props.damage) or e.damage end
+        if o.props.speed  then e.speed  = tonumber(o.props.speed)  or e.speed  end
+    end
+    return e
+end
+
+-- shard (props: id, sprite). Respeta quest activa.
+DefaultFactories.shard = function(o, scn)
+    if not (World.shards.active and not World.shards.done) then return nil end
+    local id = o.props and o.props.id
+    local sprite = (o.props and o.props.sprite) or "assets/sprites/shard.png"
+    local s = Shard.new(UDim2.fromScale(o.sx, o.sy), sprite, id)
+    return s
+end
+
+-- prop (decoración estática) (props: sprite)
+DefaultFactories.prop = function(o, scn)
+    local img = (o.props and o.props.sprite) or "assets/sprites/prop.png"
+    local wpx = o.width or 16
+    local hpx = o.height or 16
+    local a = Animation.new(img, wpx, hpx, 1, 1, 1)
+    a:Pause()
+    a.anchor = {0.5, 0.5}
+    local blk = Block.new(a, o.sx, o.sy, (o.sw > 0 and o.sw or 0.01), (o.sh > 0 and o.sh or 0.01))
+    blk.collision.enabled = false
+    return blk
+end
+
+--- Permite registrar/overrides de fábricas por defecto.
+function TiledLite.setDefaultFactory(typeName, fn)
+    DefaultFactories[typeName] = fn
+end
+
+--- Recorre capas de objetos y spawnea usando fábricas (defaults + overrides).
+-- @tparam table factories Opcional. Se fusiona con los defaults (override por clave).
+function TiledLite:spawnObjects(factories, scene)
     factories = factories or {}
+    -- mezcla (override) de defaults con user factories
+    local merged = {}
+    for k, v in pairs(DefaultFactories) do merged[k] = v end
+    for k, v in pairs(factories) do merged[k] = v end
+
     for _, L in ipairs(self.layers) do
         if L.kind == "objects" then
             for _, obj in ipairs(L.data.objects or {}) do
                 local t = obj.type or obj.class or ""
-                local f = factories[t]
+                local f = merged[t]
                 if f then
                     obj.sx, obj.sy = toScale(obj.x, obj.y)
                     obj.sw, obj.sh = toScale(obj.width or 0, obj.height or 0)
                     obj.props = {}
                     if obj.properties then
                         if obj.properties[1] and obj.properties[1].name then
-                            for _, p in ipairs(obj.properties) do
-                                obj.props[p.name] = p.value
-                            end
+                            for _, p in ipairs(obj.properties) do obj.props[p.name] = p.value end
                         else
-                            for k, v in pairs(obj.properties) do
-                                obj.props[k] = v
-                            end
+                            for k, v in pairs(obj.properties) do obj.props[k] = v end
                         end
                     end
-                    f(obj)
+                    local inst = f(obj, scene)
+                    -- si tiene name en Tiled, asigna a scene[name]
+                    if inst and obj.name and scene then
+                        scene[obj.name] = inst
+                    end
                 end
             end
         end
     end
 end
 
---- Dibuja capas de tiles con parallax por capa (resolución virtual correcta).
--- Dibuja usando coords del mapa (ideal) y las escala a la resolución actual.
--- @tparam[opt=0] number camX  cámara en pixeles **pantalla**
--- @tparam[opt=0] number camY  cámara en pixeles **pantalla**
-function TiledLite:drawMap(camX, camY)
-    camX, camY = camX or 0, camY or 0
-
-    -- Relación pantalla/ideal: todo el mapa se dibuja escalado a esto.
-    local sx, sy = screenScale()
-
-    for _, L in ipairs(self.layers) do
-        if L.kind == "tiles" then
-            local p = L.parallax or 1
-
-            -- NOTA: tras escalar, cualquier translate debe estar en coords del mapa,
-            -- por eso dividimos el offset de cámara (que viene en pixeles de pantalla)
-            -- entre la escala.
-            love.graphics.push()
-            love.graphics.scale(sx, sy)
-            love.graphics.translate(
-                math.floor((1 - p) * camX / sx + 0.5),
-                math.floor((1 - p) * camY / sy + 0.5)
-            )
-
-            love.graphics.setColor(1, 1, 1, L.opacity or 1)
-            for i, ts in ipairs(self.tilesets) do
-                local sb = L.batches[i]
-                if sb then
-                    -- Ojo: el spritebatch ya fue creado en coords del mapa (ideal),
-                    -- NO le pongas escala aquí: ya estamos en un contexto escalado.
-                    love.graphics.draw(sb, 0, 0)
-                end
-            end
-            love.graphics.setColor(1, 1, 1, 1)
-            love.graphics.pop()
-        end
-    end
+--- Llamada “cero código extra” para spawnear TODO con defaults.
+-- @tparam table scene La escena receptora (para asignar scene[name])
+-- @tparam[opt] table factories Overrides puntuales si quieres cambiar algo.
+function TiledLite:spawnAll(scene, factories)
+    self:spawnObjects(factories, scene)
 end
 
 return TiledLite

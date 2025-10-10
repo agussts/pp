@@ -34,21 +34,9 @@ end
 Connect("keyPressed", function (key)
     if Gamestate == "playing" then
         if key == Config.SavedConfigs.PDASH then
-            --Funcionamiento de dash
-            Player.speed = Player.speed * 3
-            Player.collision:ChangeType("hitbox")
-            --Daño del dash
-            local plrDashConnection = Player.collision.onHit:Connect(function (otherCollider)
-                if otherCollider.link ~= nil and otherCollider.link.health ~= nil then
-                    otherCollider.link:Damage(1)
-                end
-            end)
-            --Detiene el dash
-            Timer.after(0.2, function()
-                Player.speed = Player.speed / 3
-                plrDashConnection:Disconnect()
-                Player.collision:ChangeType("box")
-            end):addToGroup(PlayingTimers)
+            if Player and Player.Dash then
+                Player:Dash()
+            end
         end
     end
     if key == Config.SavedConfigs.PBACK then
@@ -122,20 +110,53 @@ love.draw = function ()
     Scene.draw()
 
     Camera.attach()
-        for _,v in pairs(sceneTable) do
-            if type(v) == "table" then 
-                --Si se puede dibujar, que lo dibuje
-                if v.draw then
-                    if v.position then
-                        local x,y = v.position:toPixels()
-                        v:draw(x, y)
-                    else
-                        v:draw()
+        local drawList = {}
+
+        for _, v in pairs(sceneTable) do
+            if type(v) == "table" and v.draw and v.visible ~= false then
+                -- Excluir explícitamente algún objeto, si quisieras:
+                if v._worldDraw ~= false then
+                    local layer = v.worldLayer or 0
+
+                    -- ¿Usamos orden por Y?
+                    local depthByY = v.depthByY
+                    if depthByY == nil then
+                        -- Por default, si tiene collision.position, lo tratamos con depth por Y
+                        depthByY = (v.collision and v.collision.position and v.collision.position.toPixels) and true or false
                     end
+
+                    local yForDepth = 0
+                    if depthByY then
+                        if v.getDepthY then
+                            yForDepth = tonumber(v:getDepthY()) or 0
+                        elseif v.collision and v.collision.position and v.collision.position.toPixels then
+                            local _, yp = v.collision.position:toPixels()
+                            yForDepth = yp or 0
+                        elseif v.position and v.position.toPixels then
+                            local _, yp = v.position:toPixels()
+                            yForDepth = yp or 0
+                        end
+                    end
+
+                    drawList[#drawList + 1] = { obj = v, z = layer, y = yForDepth }
                 end
             end
         end
 
+        table.sort(drawList, function(a, b)
+            if a.z == b.z then return a.y < b.y end
+            return a.z < b.z
+        end)
+
+        for i = 1, #drawList do
+            local o = drawList[i].obj
+            -- Llamamos sin (x,y); todos tus objetos usan su propia collision/position
+            -- Si tienes alguno que esperaba (x,y), Lua le pasará nils, pero en tu repo los draw no lo necesitan.
+            o:draw()
+        end
+        -- ================================================
+
+        -- Debug de colisiones (si lo usas)
         for _,v in pairs(Collisions.getCollisions()) do
             v:draw()
         end

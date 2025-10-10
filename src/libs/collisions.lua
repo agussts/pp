@@ -206,23 +206,28 @@ function collisions:check()
             table.insert(hitting, otherCollider)
             self.onHit:Fire(otherCollider)
             if self.type == "box" and otherCollider.type == "box" then
-                local dx = math.min(x + width, otherX + otherWidth) - math.max(x, otherX)
-                local dy = math.min(y + height, otherY + otherHeight) - math.max(y, otherY)
-                if dx <= 0 or dy <= 0 then goto continue end
+                -- filtro: si cualquiera de los dos decide NO bloquear al otro, no se resuelve el empuje
+                local blockA = (not self.blockFilter) or self.blockFilter(self, otherCollider)
+                local blockB = (not otherCollider.blockFilter) or otherCollider.blockFilter(otherCollider, self)
+                if blockA and blockB then
+                    local dx = math.min(x + width, otherX + otherWidth) - math.max(x, otherX)
+                    local dy = math.min(y + height, otherY + otherHeight) - math.max(y, otherY)
+                    if dx <= 0 or dy <= 0 then goto continue end
 
-                if dx < dy then
-                    if x < otherX then
-                        x = otherX - width
+                    if dx < dy then
+                        if x < otherX then
+                            x = otherX - width
+                        else
+                            x = otherX + otherWidth
+                        end
                     else
-                        x = otherX + otherWidth
+                        if y < otherY then
+                            y = otherY - height
+                        else
+                            y = otherY + otherHeight
+                        end
+                        self.speedY = 0 
                     end
-                else
-                    if y < otherY then
-                        y = otherY - height
-                    else
-                        y = otherY + otherHeight
-                    end
-                    self.speedY = 0 
                 end
             end
         end
