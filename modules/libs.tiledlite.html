@@ -41,7 +41,7 @@
 <ul class="nowrap">
   <li><a href="../modules/connections.html">connections</a></li>
   <li><a href="../modules/Dialogue.html">Dialogue</a></li>
-  <li><strong>TiledLite</strong></li>
+  <li><strong>libs.tiledlite</strong></li>
   <li><a href="../modules/MathQuiz.html">MathQuiz</a></li>
   <li><a href="../modules/ProximityPrompt.html">ProximityPrompt</a></li>
 </ul>
@@ -73,44 +73,32 @@
 
 <div id="content">
 
-<h1>Module <code>TiledLite</code></h1>
-<p>TiledLite (Lua): cargador ligero de mapas Tiled exportados como archivo Lua.</p>
-<p>
- Integra con UDim2/Collisions/Camera y permite spawnear objetos desde capas.
- Requisitos en Tiled:
-   • Exporta como **Lua** (el archivo devuelve `return { ... }`)
-   • Mapa ortogonal; tilesets embebidos o con imagen relativa al mapa
-   • Capas de tiles y capas de objetos (rectángulos para colisión/objetos)
-   • Propiedad opcional por capa de tiles: `parallax` (0..1, p.ej. 0.35, 0.7, 1)
-<p> Uso:
-   local TiledLite = require("src.utils.tiledlite")
-   self.map = TiledLite.load("assets/maps/internet01.lua", {
-       collisionLayers = {"Colliders"}
-   })
-   self.map:spawnObjects({
-       shard = function(obj) ... end,
-       door  = function(obj) ... end,
-   })
-   -- En draw:
-   Camera.attach()
-       self.map:draw(Camera.x, Camera.y)
-   Camera.detach()
-</p>
+<h1>Module <code>libs.tiledlite</code></h1>
+<p>Carga un mapa de Tiled exportado como **Lua**.</p>
+<p></p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#load">load (luaPath[, opts])</a></td>
-	<td class="summary">Carga un mapa de Tiled exportado como **Lua**.</td>
+	<td class="name" nowrap><a href="#TiledLite:draw">TiledLite:draw ()</a></td>
+	<td class="summary">Dibuja (solo capas con parallax==1) dentro de Camera.attach().</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#spawnObjects">spawnObjects (factories)</a></td>
-	<td class="summary">Recorre capas de objetos y llama a una “factory” por `type`.</td>
+	<td class="name" nowrap><a href="#TiledLite:drawParallaxBackground">TiledLite:drawParallaxBackground ()</a></td>
+	<td class="summary">Dibuja capas con parallax != 1 como fondos (antes de Camera.attach()).</td>
 	</tr>
 	<tr>
-	<td class="name" nowrap><a href="#drawMap">drawMap ([camX=0[, camY=0]])</a></td>
-	<td class="summary">Dibuja capas de tiles con parallax por capa (resolución virtual correcta).</td>
+	<td class="name" nowrap><a href="#TiledLite.setDefaultFactory">TiledLite.setDefaultFactory (typeName, fn)</a></td>
+	<td class="summary">Permite registrar/overrides de fábricas por defecto.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TiledLite:spawnObjects">TiledLite:spawnObjects (factories)</a></td>
+	<td class="summary">Recorre capas de objetos y spawnea usando fábricas (defaults + overrides).</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#TiledLite:spawnAll">TiledLite:spawnAll (scene[, factories])</a></td>
+	<td class="summary">Llamada “cero código extra” para spawnear TODO con defaults.</td>
 	</tr>
 </table>
 
@@ -122,52 +110,69 @@
 
     <dl class="function">
     <dt>
-    <a name = "load"></a>
-    <strong>load (luaPath[, opts])</strong>
+    <a name = "TiledLite:draw"></a>
+    <strong>TiledLite:draw ()</strong>
     </dt>
     <dd>
-    Carga un mapa de Tiled exportado como **Lua**.
+    Dibuja (solo capas con parallax==1) dentro de Camera.attach().
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">luaPath</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         Ruta (LOVE FS) al archivo .lua exportado por Tiled.
-        </li>
-        <li><span class="parameter">opts</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-         { collisionLayers={"Colliders"} }
-         (<em>optional</em>)
-        </li>
-    </ul>
 
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">TiledLite</span></span>
-        instancia del mapa
-    </ol>
 
 
 
 
 </dd>
     <dt>
-    <a name = "spawnObjects"></a>
-    <strong>spawnObjects (factories)</strong>
+    <a name = "TiledLite:drawParallaxBackground"></a>
+    <strong>TiledLite:drawParallaxBackground ()</strong>
     </dt>
     <dd>
-    Recorre capas de objetos y llama a una “factory” por `type`.
+    Dibuja capas con parallax != 1 como fondos (antes de Camera.attach()).
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TiledLite.setDefaultFactory"></a>
+    <strong>TiledLite.setDefaultFactory (typeName, fn)</strong>
+    </dt>
+    <dd>
+    Permite registrar/overrides de fábricas por defecto.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">typeName</span>
+
+        </li>
+        <li><span class="parameter">fn</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "TiledLite:spawnObjects"></a>
+    <strong>TiledLite:spawnObjects (factories)</strong>
+    </dt>
+    <dd>
+    Recorre capas de objetos y spawnea usando fábricas (defaults + overrides).
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">factories</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
-         Mapa { [type]=function(obj) end, ... }
- Obj incluye:
-   obj.sx,obj.sy,obj.sw,obj.sh (en escala), obj.props (tabla de propiedades)
+         Opcional. Se fusiona con los defaults (override por clave).
         </li>
     </ul>
 
@@ -177,25 +182,23 @@
 
 </dd>
     <dt>
-    <a name = "drawMap"></a>
-    <strong>drawMap ([camX=0[, camY=0]])</strong>
+    <a name = "TiledLite:spawnAll"></a>
+    <strong>TiledLite:spawnAll (scene[, factories])</strong>
     </dt>
     <dd>
-    Dibuja capas de tiles con parallax por capa (resolución virtual correcta).
- Dibuja usando coords del mapa (ideal) y las escala a la resolución actual.
+    Llamada “cero código extra” para spawnear TODO con defaults.
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">camX</span>
-            <span class="types"><span class="type">number</span></span>
-          cámara en pixeles **pantalla**
-         (<em>default</em> 0)
+        <li><span class="parameter">scene</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         La escena receptora (para asignar scene[name])
         </li>
-        <li><span class="parameter">camY</span>
-            <span class="types"><span class="type">number</span></span>
-          cámara en pixeles **pantalla**
-         (<em>default</em> 0)
+        <li><span class="parameter">factories</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         Overrides puntuales si quieres cambiar algo.
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -211,7 +214,7 @@
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="http://github.com/lunarmodules/LDoc">LDoc 1.5.0</a></i>
-<i style="float:right;">Last updated 2025-10-09 22:17:20 </i>
+<i style="float:right;">Last updated 2025-10-10 02:02:21 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>
