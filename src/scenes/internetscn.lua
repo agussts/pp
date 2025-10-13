@@ -13,11 +13,11 @@ return function()
         self.bgB.color = {.2,1,1,0.02}
         self.map = TiledLite.load("assets/maps/test.lua")
         self.map:spawnAll(self)
-        self.map.worldLayer = -1
+        self.map.worldLayer = -10
 
         Player = PlayerModule.new("assets/sprites/player-Sheet.png")
         
-        local spawn = UDim2.fromScale(0,0)
+        local spawn = self.playerspawn
         if payload ~= nil then
             spawn = payload.spawn
         end
@@ -27,21 +27,41 @@ return function()
         local windowAnim = Animation.new("assets/sprites/windowthing.png", 106, 83, 1, 1, 1)
         windowAnim.anchor = {.5, .5}
         windowAnim:Pause()
-        self.darkwebWindow = Block.new(windowAnim, -.175, .1, .1, .1)
+        self.darkwebWindow = Block.new(windowAnim, .64, .97, .1, .1)
         self.darkwebWindow.collision.enabled = false
         self.darkwebWindow.worldLayer = -10
 
         local doorAnim = Animation.new("assets/sprites/darkwebdoor-Sheet.png", 76, 76, 3, 3, .35)
         doorAnim.anchor = {.5, .5}
         doorAnim:addHole(3,3)
-        self.darkweb = Block.new(doorAnim, -.175, .1, .1, .1)
+        self.darkweb = Block.new(doorAnim, .64, .97, .1, .1)
         self.darkweb.collision.enabled = false
         self.darkweb.worldLayer = -5
 
-        self.darkwebDoor = Door.new("darkweb", UDim2.fromScale(-.175, .1), UDim2.fromScale(0.1, .2))
+        self.darkwebDoor = Door.new("darkweb", UDim2.fromScale(.64, .97), UDim2.fromScale(0.1, 0.2))
         self.darkwebDoor.collision.anchor = {.5, .5}
         
-        --self.enemy = Antivirus.new()
+
+        local anim = Animation.new("assets/sprites/trashdumpbarsf.png", 180, 180, 1, 1, 1)
+        anim.anchor = {.5, .5}
+        anim:Pause()
+        self.trashDumpBarsF = Block.new(anim, 1.1, 0.4)
+        self.trashDumpBarsF.collision.enabled = false
+        self.trashDumpBarsF.worldLayer = -4
+
+        local anim = Animation.new("assets/sprites/trashdumpbarsb.png", 180, 180, 1, 1, 1)
+        anim.anchor = {.5, .5}
+        anim:Pause()
+        self.trashDumpBarsB = Block.new(anim, 1.1, 0.4)
+        self.trashDumpBarsB.collision.enabled = false
+        self.trashDumpBarsB.worldLayer = -5.5
+
+        local anim = Animation.new("assets/sprites/trashdumptrash.png", 180, 180, 1, 1, 1)
+        anim.anchor = {.5, .5}
+        anim:Pause()
+        self.trashDumpTrash = Block.new(anim, 1.1, 0.4)
+        self.trashDumpTrash.collision.enabled = false
+        self.trashDumpTrash.worldLayer = -5
 
         -- Si la misión ya estaba activa al entrar a esta escena, prepara todo:
         if World.shards.active and not World.shards.done then
@@ -54,6 +74,7 @@ return function()
         end
 
         Gun = GunModule.new()
+        self.gun = Gun
     end
 
     function scene:spawnShardsAndHUD()
@@ -100,13 +121,12 @@ return function()
   end
 
     scene.update = function(self, dt)
-        self.enemigo2:follow(Player.collision.position)
 
         self.bgA:setScroll(self.bgA.scrollX + 50*dt, self.bgA.scrollY - 25*dt)
         self.bgB:setScroll(self.bgB.scrollX - 25*dt, self.bgB.scrollY + 50*dt)
         self.bgA.color[4] = 0.035 + 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
         self.bgB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
-        self.darkwebWindow.collision.position = UDim2.new(self.darkwebWindow.collision.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100 + .1, 0)
+        self.darkwebWindow.collision.position = UDim2.new(self.darkwebWindow.collision.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100 + .97, 0)
 
         for _,b in ipairs(self.cacheBoxes or {}) do b:update(dt) end
         for _,f in ipairs(self.firewalls or {})  do f:update(dt) end
@@ -114,17 +134,6 @@ return function()
         for _,s in ipairs(self.shards or {})     do s:update(dt) end
         for _,b in pairs(self.beacons or {}) do
             if b.visible then b.t = b.t + dt end
-        end
-
-        if love.mouse.isDown(1) and Gun then
-            local x,y = Player.collision.position:toPixels()
-            Gun:Fire(x, y)
-        end
-
-        if Gun.lastFireTime > 0 then
-            Gun.lastFireTime = Gun.lastFireTime - dt
-        else
-            Gun.lastFireTime = 0
         end
 
         local px,py = Player.collision.position:toPixels()
@@ -138,7 +147,6 @@ return function()
 
         if self.shards then
             Camera.attach()
-                self.map:drawGround()
                 for _,f in ipairs(self.firewalls or {})  do f:draw() end
                 for _,b in ipairs(self.cacheBoxes or {}) do b:draw() end
                 for _,s in ipairs(self.shards or {})     do s:draw() end

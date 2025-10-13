@@ -92,12 +92,12 @@ local function updateOverlayText()
     local fps = love.timer.getFPS()
     local px, py = 0, 0
     if Player and Player.collision and Player.collision.position then
-        px, py = Player.collision.position:toPixels()
+        px, py = Player.collision.position.x.scale, Player.collision.position.y.scale
     end
     local collCount = #Collisions.getCollisions()
     local camx, camy = Camera.x or 0, Camera.y or 0
-    DevTools._overlayGui.label.text =
-        ("FPS: %d\nPlayer: (%.1f, %.1f)\nCamera: (%.1f, %.1f)\nColliders: %d\nHitboxes: %s")
+    DevTools._overlayGui.label.text=
+        ("FPS: %d\nPlayer: (%.3f, %.3f)\nCamera: (%.1f, %.1f)\nColliders: %d\nHitboxes: %s")
         :format(fps, px, py, camx, camy, collCount, DevTools.hitboxesOn and "ON" or "OFF")
 end
 

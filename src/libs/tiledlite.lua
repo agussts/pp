@@ -286,14 +286,9 @@ end
 --- Fábricas por defecto internas. Puedes sobreescribir con TiledLite.setDefaultFactory().
 local DefaultFactories = {}
 
--- player_spawn
-DefaultFactories.player_spawn = function(o, scn)
-    if not Player then
-        Player = PlayerModule.new("assets/sprites/player-Sheet.png")
-        scn.player = Player
-    end
-    Player.collision.position = UDim2.fromScale(o.sx, o.sy)
-    return Player
+-- UDim2
+DefaultFactories.udim2 = function (o, scn)
+    return UDim2.fromScale(o.sx, o.sy)
 end
 
 -- door (props: to, spawnx, spawny)
