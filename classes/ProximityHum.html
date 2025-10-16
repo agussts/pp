@@ -33,7 +33,7 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Functions">Functions</a></li>
+<li><a href="#Methods">Methods</a></li>
 </ul>
 
 
@@ -47,7 +47,7 @@
   <li><a href="../classes/textlabel.html">textlabel</a></li>
   <li><a href="../classes/udim2.html">udim2</a></li>
   <li><a href="../classes/basicGun.html">basicGun</a></li>
-  <li><strong>devGun</strong></li>
+  <li><a href="../classes/devGun.html">devGun</a></li>
   <li><a href="../classes/spamGun.html">spamGun</a></li>
   <li><a href="../classes/animations.html">animations</a></li>
   <li><a href="../classes/Background.html">Background</a></li>
@@ -57,7 +57,7 @@
   <li><a href="../classes/timer.html">timer</a></li>
   <li><a href="../classes/enemy.html">enemy</a></li>
   <li><a href="../classes/player.html">player</a></li>
-  <li><a href="../classes/ProximityHum.html">ProximityHum</a></li>
+  <li><strong>ProximityHum</strong></li>
   <li><a href="../classes/Shard.html">Shard</a></li>
   <li><a href="../classes/ShardsHUD.html">ShardsHUD</a></li>
 </ul>
@@ -74,20 +74,26 @@
 
 <div id="content">
 
-<h1>Class <code>devGun</code></h1>
-<p>Pistola de desarrollo, para pruebas y desarrollo</p>
-<p></p>
-    <h3>See also:</h3>
-    <ul>
-         <a href="../classes/basicGun.html#">basicGun</a>
-    </ul>
+<h1>Class <code>ProximityHum</code></h1>
+<p>ProximityHum: zumbido/loop con volumen según cercanía (en escala UDim2).</p>
+<p>
+ Depende de: Timer, UDim2, Player (posición en UDim2), PlayingTimers.
+ Uso:
+   local hum = ProximityHum.new(UDim2.fromScale(1.1, 0.4), { sound="assets/sfx/shard_hum.wav", maxDistScale=0.35 })
+   hum:setPos(UDim2.fromScale(1.2, 0.4))
+   hum:setEnabled(false)       -- fade a 0, sigue vivo
+   hum:stopAndDestroy()        -- fade a 0 y destruye al llegar a silencio</p>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Methods">Methods</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#gun.new">gun.new ()</a></td>
-	<td class="summary">Crea una nueva pistola de desarrollo</td>
+	<td class="name" nowrap><a href="#proximityhum:new">proximityhum:new (pos, sound, maxDistScale, maxVol, smooth)</a></td>
+	<td class="summary">Crea un hum de proximidad.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#proximityhum:stopAndDestroy">proximityhum:stopAndDestroy ()</a></td>
+	<td class="summary">Hace fade a 0 y destruye al llegar a silencio.</td>
 	</tr>
 </table>
 
@@ -95,30 +101,64 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
 
     <dl class="function">
     <dt>
-    <a name = "gun.new"></a>
-    <strong>gun.new ()</strong>
+    <a name = "proximityhum:new"></a>
+    <strong>proximityhum:new (pos, sound, maxDistScale, maxVol, smooth)</strong>
     </dt>
     <dd>
-    Crea una nueva pistola de desarrollo
+    Crea un hum de proximidad.
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><span class="type">UDim2</span></span>
+         posición en escala (centro de la “fuente”)
+        </li>
+        <li><span class="parameter">sound</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         ruta del sonido (loop)
+        </li>
+        <li><span class="parameter">maxDistScale</span>
+            <span class="types"><span class="type">number</span></span>
+         distancia máxima en escala (0.3 = 30% ancho pantalla)
+        </li>
+        <li><span class="parameter">maxVol</span>
+            <span class="types"><span class="type">number</span></span>
+         volumen máximo (0-1)
+        </li>
+        <li><span class="parameter">smooth</span>
+            <span class="types"><span class="type">number</span></span>
+         suavizado (10-20 recomendado)
+        </li>
+    </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-        (devGun) La nueva pistola de desarrollo creada
+           <span class="types"><a class="type" href="../classes/ProximityHum.html#">ProximityHum</a></span>
+
     </ol>
 
 
 
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example"><span class="keyword">local</span> myDevGun = DevGun.<span class="function-name">new</span>()</pre>
-    </ul>
+
+</dd>
+    <dt>
+    <a name = "proximityhum:stopAndDestroy"></a>
+    <strong>proximityhum:stopAndDestroy ()</strong>
+    </dt>
+    <dd>
+    Hace fade a 0 y destruye al llegar a silencio.
+
+
+
+
+
+
 
 </dd>
 </dl>
