@@ -10,9 +10,6 @@ local audios = {
 local Shard = {}
 Shard.__index = Shard
 
--- opcional: pequeño “bobbing” visual
-local BOB_SPEED = 2.2
-local BOB_PIX   = 5
 ---
 -- Crea una nueva instancia de Shard
 -- @tparam UDim2 pos posición en escala
@@ -21,6 +18,7 @@ local BOB_PIX   = 5
 function Shard.new(pos, spritePath, id)
     local self = setmetatable({}, Shard)
     self.id = id
+    self.onCollect = Signal.new()
 
     -- Visual (puedes cambiar por Animation.new si tienes sheet)
     self.sprite = Animation.new(spritePath or "assets/sprites/shard.png", 25, 25, 1, 1, 1)
@@ -43,6 +41,7 @@ function Shard.new(pos, spritePath, id)
     self._conn = self.collision.onHit:Connect(function(other)
         if self._destroying then return end
         if other:HasTag("player") then
+            self.onCollect:Fire()
             self:Collect()
         end
     end)
@@ -53,7 +52,7 @@ end
 function Shard:Collect()
     if self._busy then return end
     self._busy = true
-
+    audios.pickup:play()
     MathQuiz.start({
         rounds = 3,      -- cuántas preguntas
         timePer = 25,    -- segundos por pregunta

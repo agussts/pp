@@ -97,7 +97,7 @@ end
 function ProximityPrompt:update()
     if not Player or not Player.collision then return end
 
-    local collisions = self.collision:check()
+    local collisions = self.collision:check() or {}
     local inside = false
     for _,v in pairs(collisions) do
         if v:HasTag("player") then

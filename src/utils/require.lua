@@ -39,6 +39,7 @@ Shard = require("src.objs.shard")
 CacheBox   = require("src.objs.cachebox")
 FirewallGate = require("src.objs.firewall_gate")
 RouterNode = require("src.objs.router_node")
+ProximityHum = require("src.objs.proximity_hum")
 
 
 GunModule = require("src.guns.dev")

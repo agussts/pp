@@ -11,7 +11,7 @@ return function ()
         anim.anchor = {.5, .5}
         self.mvirus = Block.new(anim, .575, .7, .06, .1)
         self.mvirus.collision.anchor = {.5, .5}
-        self.exit = Door.new("internetscn", UDim2.fromScale(0, .75), UDim2.fromScale(.025, .3), {spawn = UDim2.fromScale(.64, 1.2)})
+        self.exit = Door.new("internetscn", UDim2.fromScale(0, .75), UDim2.fromScale(.025, .3), {spawn = UDim2.fromScale(.73, 1)})
 
         local exitImg = Animation.new("assets/sprites/exit.png", 48, 57, 1, 1, 1)
         exitImg:Pause()
