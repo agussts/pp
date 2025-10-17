@@ -10,10 +10,13 @@ local testScene = require("src.scenes.testscene")
 local Level2 = require("src.scenes.level2")
 local internetscn = require("src.scenes.internetscn")
 local darkweb = require("src.scenes.darkweb")
+local datacenter = require("src.scenes.datacenter")
 Scene.register("testScene", testScene)
 Scene.register("level2", Level2)
 Scene.register("internetscn", internetscn)
 Scene.register("darkweb", darkweb)
+Scene.register("datacenter", datacenter)
+
 
 if os.getenv("CI_SMOKETEST") == "1" then
   print("CI smoketest OK, LÖVE "..(love.getVersion()))

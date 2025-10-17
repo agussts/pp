@@ -87,7 +87,9 @@ end
 ---
 -- Dibuja el enemigo
 function enemy:draw()
+    print("yo")
     if self._destroying then return end
+    print("drawing enemy")
     local x,y = self.collision.position:toPixels()
     if self.flash > 0 then
         love.graphics.setShader(Shaders.flash)

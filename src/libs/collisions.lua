@@ -30,6 +30,7 @@ collisions.new = function(type, enabled)
     self.onHit = Signal.new()
     self.color = {1, 1, 1, 1}
     self.link = nil
+    self.anchored = false
     self.anchor = {0,0}
 
     self.tags = {}
@@ -205,7 +206,7 @@ function collisions:check()
         and y + height >= otherY then
             table.insert(hitting, otherCollider)
             self.onHit:Fire(otherCollider)
-            if self.type == "box" and otherCollider.type == "box" then
+            if not self.anchored and self.type == "box" and otherCollider.type == "box" then
                 -- filtro: si cualquiera de los dos decide NO bloquear al otro, no se resuelve el empuje
                 local blockA = (not self.blockFilter) or self.blockFilter(self, otherCollider)
                 local blockB = (not otherCollider.blockFilter) or otherCollider.blockFilter(otherCollider, self)

@@ -1,6 +1,6 @@
 return function()
     local scene = {}
-    local DataCenter = require("src.features.datacenter")
+    --local DataCenter = require("src.features.datacenterhelper")
 
     -- Helper minimalista: activa interacción de la pila de basura
     local function setupTrashInteraction(self)
@@ -114,6 +114,8 @@ return function()
         self.darkwebDoor = Door.new("darkweb", UDim2.fromScale(.64, .97), UDim2.fromScale(0.1, 0.2))
         self.darkwebDoor.collision.anchor = {.5, .5}
         
+        self.datacenterDoor = Door.new("datacenter", UDim2.fromScale(1, 6), UDim2.fromScale(0.1, 0.2))
+        self.datacenterDoor.collision.anchor = {.5, .5}
 
         local anim = Animation.new("assets/sprites/trashdumpbarsf.png", 180, 180, 1, 1, 1)
         anim.anchor = {.5, .5}
@@ -145,7 +147,7 @@ return function()
         Gun = GunModule.new()
         self.gun = Gun
         setupTrashInteraction(self)
-        DataCenter.attach(self, self.map)
+        --DataCenter.attach(self, self.map)
     end
 
     scene.update = function(self, dt)
@@ -159,17 +161,17 @@ return function()
         if self._trashPrompt then self._trashPrompt:update() end
 
         local px,py = Player.collision.position:toPixels()
-        DataCenter.update(self, dt)
+        --DataCenter.update(self, dt)
         Camera.update(px, py)
     end
 
     scene.draw = function(self)
         self.bgA:drawBackground()
         self.bgB:drawBackground()
-        Camera.attach() DataCenter.draw(self) Camera.detach()
+       -- Camera.attach() DataCenter.draw(self) Camera.detach()
     end
     scene.unload = function (self)
-        DataCenter.detach(self)
+        --DataCenter.detach(self)
         for _,v in pairs(self) do
             if type(v) == "table" and v.Destroy then v:Destroy() elseif type(v) == "table" and v.Disconnect then v:Disconnect() end
             v = nil

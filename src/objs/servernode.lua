@@ -14,7 +14,10 @@ local audios = {
 }
 
 --- Crea un servidor destructible.
--- @tparam 
+-- @tparam UDim2 pos Posición del servidor.
+-- @tparam number hp Vida del servidor (default 40).
+-- @tparam number points Puntos al destruir (default 20).
+-- @treturn ServerNode El servidor creado.
 function ServerNode.new(pos, hp, points)
     local self = setmetatable({}, ServerNode)
 
