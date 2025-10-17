@@ -48,7 +48,6 @@ function RouterNode:update()
 end
 
 function RouterNode:draw()
-    function RouterNode:draw()
     local x, y = self.pos:toPixels()
     if self._done then
         self.anim.color = {0.6, 1, 0.6, 1}
@@ -66,8 +65,6 @@ function RouterNode:draw()
         love.graphics.rectangle("line", px, py, w*pulse, h*pulse)
         love.graphics.setColor(1,1,1,1)
     end
-end
-
 end
 
 function RouterNode:Destroy()

@@ -28,11 +28,13 @@ function ProximityPrompt.new(text, key)
     self.collision:AddTag("proximity")
 
     -- Estado
-    self.key     = key or Config.SavedConfigs.PINTR
-    if text and type(text) == "string" then
-        assert(text:find("%%s") ~= nil, "Must include %s in string to insert key.")
+    self.key = key or Config.SavedConfigs.PINTR
+    if type(text) == "string" then
+        assert(text:find("%%s"), "Must include %s in string to insert key.")
+        self.text = string.format(text, self.key:upper())
+    else
+        self.text = ("Press [%s] to interact"):format(self.key:upper())
     end
-    self.text    = string.format(text, self.key:upper()) or ("Press ["..self.key:upper().."] to interact")
     self._inside = false
     self._keyConn = nil
 

@@ -313,7 +313,6 @@ DefaultFactories.enemy = function(o, scn)
     if o.props then
         if o.props.kind == "antivirus" then
             e = Antivirus.new()
-            e.collision.position = UDim2.fromScale(o.sx, o.sy)
         else
             e = EnemyModule.new(nil, w, h)
         end

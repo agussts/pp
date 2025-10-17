@@ -79,6 +79,13 @@ local function ensureOverlay()
     DevTools._overlayGui = { box = box, label = label }
 end
 
+local function toggleNoclip()
+    print("[Dev] Noclip toggled.")
+    Player.collision.blockFilter = function ()
+        return false
+    end
+end
+
 local function toggleOverlay()
     ensureOverlay()
     DevTools.overlayOn = not DevTools.overlayOn
@@ -117,6 +124,8 @@ local function onKeyPressed(key)
         killPlayer()
     elseif key == "o" then
         toggleOverlay()
+    elseif key == "n" then
+        toggleNoclip()
     end
 end
 

@@ -10,7 +10,7 @@ return {
   tilewidth = 32,
   tileheight = 32,
   nextlayerid = 4,
-  nextobjectid = 53,
+  nextobjectid = 55,
   properties = {},
   tilesets = {
     {
@@ -320,7 +320,7 @@ return {
         {
           id = 29,
           name = "hall",
-          type = "dc_barrier",
+          type = "dc_gate_in",
           shape = "rectangle",
           x = 928,
           y = 704,
@@ -335,7 +335,7 @@ return {
         {
           id = 30,
           name = "exit",
-          type = "dc_barrier",
+          type = "dc_gate_out",
           shape = "rectangle",
           x = 928,
           y = 768,
@@ -343,10 +343,7 @@ return {
           height = 32,
           rotation = 0,
           visible = true,
-          properties = {
-            ["enabled"] = false,
-            ["id"] = "exit"
-          }
+          properties = {}
         },
         {
           id = 31,
@@ -360,7 +357,7 @@ return {
           rotation = 0,
           visible = true,
           properties = {
-            ["message"] = "%s"
+            ["text"] = "%s"
           }
         },
         {
@@ -470,7 +467,7 @@ return {
         {
           id = 40,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 642,
           y = 271,
@@ -478,12 +475,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 41,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 538,
           y = 347,
@@ -491,12 +490,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 42,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 548,
           y = 579,
@@ -504,12 +505,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 43,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 619,
           y = 653,
@@ -517,12 +520,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 44,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 1273,
           y = 263,
@@ -530,12 +535,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 45,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 1379,
           y = 354,
@@ -543,12 +550,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 46,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 1381,
           y = 585,
@@ -556,12 +565,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 47,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 1285,
           y = 658,
@@ -569,12 +580,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 48,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 847,
           y = 655,
@@ -582,12 +595,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 49,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 1091,
           y = 653,
@@ -595,12 +610,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 50,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 749,
           y = 466,
@@ -608,12 +625,14 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 51,
           name = "enemyspawn",
-          type = "dc_spawn",
+          type = "dc_enemy_spawn",
           shape = "point",
           x = 1180,
           y = 468,
@@ -621,7 +640,9 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["kind"] = "antivirus"
+          }
         },
         {
           id = 52,
@@ -630,6 +651,32 @@ return {
           shape = "point",
           x = 960,
           y = 288,
+          width = 0,
+          height = 0,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 53,
+          name = "upg_gun",
+          type = "dc_upgrade",
+          shape = "rectangle",
+          x = 896,
+          y = 224,
+          width = 128,
+          height = 96,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 54,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = -88,
+          y = 656,
           width = 0,
           height = 0,
           rotation = 0,

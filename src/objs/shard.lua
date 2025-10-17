@@ -69,19 +69,17 @@ function Shard:Collect()
 end
 
 function Shard:update(dt)
-    function Shard:update(dt)
     if self._destroying then return end
-        self._t = self._t + dt
+    self._t = self._t + dt
 
-        -- bobbing vertical
-        local x,y = self.collision.position:toPixels()
-        local off = math.sin(self._t * 2.2) * 5
-        self._drawX, self._drawY = x, y + off
+    -- bobbing vertical
+    local x,y = self.collision.position:toPixels()
+    local off = math.sin(self._t * 2.2) * 5
+    self._drawX, self._drawY = x, y + off
 
-        -- brillo sutil (alpha)
-        local a = 0.85 + 0.15 * math.sin(self._t * 3.0)
-        self.sprite.color = {1, 1, 1, a} -- añadido
-    end
+    -- brillo sutil (alpha)
+    local a = 0.85 + 0.15 * math.sin(self._t * 3.0)
+    self.sprite.color = {1, 1, 1, a} -- añadido
 end
 
 function Shard:draw()

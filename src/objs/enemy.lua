@@ -87,9 +87,7 @@ end
 ---
 -- Dibuja el enemigo
 function enemy:draw()
-    print("yo")
     if self._destroying then return end
-    print("drawing enemy")
     local x,y = self.collision.position:toPixels()
     if self.flash > 0 then
         love.graphics.setShader(Shaders.flash)
@@ -128,12 +126,13 @@ function enemy:update(dt)
         local dx = targetX - enemyX
         local dy = targetY - enemyY
         local distance = math.sqrt(dx*dx + dy*dy)
-        
-        local xSpeed = (dx / distance) * self.speed
-        local ySpeed = (dy / distance) * self.speed
-
-        self.collision.speedX = xSpeed
-        self.collision.speedY = ySpeed
+        if distance <= .1 then
+            self.collision.speedX = 0
+            self.collision.speedY = 0
+        else
+            self.collision.speedX = (dx / distance) * self.speed
+            self.collision.speedY = (dy / distance) * self.speed
+        end
     end
 
     self.sprite:update(dt)

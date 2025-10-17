@@ -42,7 +42,7 @@ player.new = function(spriteName)
     self.maxHealth = 100
     self.collision.link = self
     self.speed = 250
-    self.invulerable = false
+    self.invulnerable = false
 
     self.isDashing = false
     self._dashCooldown = 0
@@ -81,7 +81,7 @@ function player:Dash()
 
     audios.dash:clone():play()
     self.isDashing = true
-    self.invunerable = true
+    self.invulnerable = true
 
     -- no atravesar paredes: ¡mantenemos BOX!
     -- pero ignoramos empuje contra enemigos durante el dash
@@ -102,7 +102,7 @@ function player:Dash()
         -- volver a normal
         if self._destroying then return end
         self.isDashing = false
-        self.invunerable = false
+        self.invulnerable = false
 
         self.speed = (self.speed or 250) / 3
         self.collision.blockFilter = nil -- vuelve a bloquear enemigos normalmente
@@ -132,9 +132,7 @@ function player:update(dt)
 
      -- actualizar hitbox de dash para que siga al jugador
     if self._dashHitbox and self._dashHitbox._alive then
-        local x, y = self.collision.position:toPixels()
-        self._dashHitbox.position = UDim2.fromOffset(x, y)
-        self._dashHitbox.position = UDim2.fromScale(self._dashHitbox.position:toScale())
+        self._dashHitbox.position = self.collision.position
     end
 
     -- cooldown
@@ -144,7 +142,7 @@ function player:update(dt)
 end
 
 function player:Damage(dmg)
-    if self._destroying or self.invunerable then return end
+    if self._destroying or self.invulnerable then return end
     audios.dmged:clone():play()
 
     self.health = self.health - dmg
