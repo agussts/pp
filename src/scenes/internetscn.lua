@@ -1,5 +1,7 @@
 return function()
     local scene = {}
+    local DataCenter = require("src.features.datacenter")
+
     -- Helper minimalista: activa interacción de la pila de basura
     local function setupTrashInteraction(self)
         -- Pos de referencia (desde el bloque central)
@@ -86,7 +88,6 @@ return function()
         self.map = TiledLite.load("assets/maps/test.lua")
         self.map:spawnAll(self)
         self.map.worldLayer = -10
-
         Player = PlayerModule.new("assets/sprites/player-Sheet.png")
         
         local spawn = self.playerspawn
@@ -144,6 +145,7 @@ return function()
         Gun = GunModule.new()
         self.gun = Gun
         setupTrashInteraction(self)
+        DataCenter.attach(self, self.map)
     end
 
     scene.update = function(self, dt)
@@ -157,14 +159,17 @@ return function()
         if self._trashPrompt then self._trashPrompt:update() end
 
         local px,py = Player.collision.position:toPixels()
+        DataCenter.update(self, dt)
         Camera.update(px, py)
     end
 
     scene.draw = function(self)
         self.bgA:drawBackground()
         self.bgB:drawBackground()
+        Camera.attach() DataCenter.draw(self) Camera.detach()
     end
     scene.unload = function (self)
+        DataCenter.detach(self)
         for _,v in pairs(self) do
             if type(v) == "table" and v.Destroy then v:Destroy() elseif type(v) == "table" and v.Disconnect then v:Disconnect() end
             v = nil

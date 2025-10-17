@@ -70,7 +70,7 @@ local function ensureOverlay()
 
     local label = Textlabel.new("")
     label:setParent(box)
-    label.position   = UDim2.fromScale(0.02, 0.02)
+    label.position   = UDim2.fromScale(0.02, 0.32)
     label.size       = UDim2.fromScale(0.96, 0.96)
     label.anchorPoint= {0,0}
     label.textColor  = {1,1,1,1}

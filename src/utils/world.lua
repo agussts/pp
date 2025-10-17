@@ -35,21 +35,4 @@ function world.onShardCollected(id)
     Fire("shard_collected", world.shards.collected, world.shards.needed)
 end
 
--- Devuelve una lista de {pos, sprite, id} de los shards que faltan
-function world.getRemainingShardPositions()
-    local all = {
-        { UDim2.fromScale(0.30, 0.62), "assets/sprites/shard.png", 1 },
-        { UDim2.fromScale(0.55, 0.45), "assets/sprites/shard.png", 2 },
-        { UDim2.fromScale(0.78, 0.70), "assets/sprites/shard.png", 3 },
-    }
-    local remaining = {}
-    for _, def in ipairs(all) do
-        local id = def[3]
-        if not world.shards.collectedIds[id] then
-        table.insert(remaining, def)
-        end
-    end
-    return remaining
-end
-
 return world
