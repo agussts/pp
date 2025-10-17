@@ -33,13 +33,23 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Methods">Methods</a></li>
+<li><a href="#Functions">Functions</a></li>
 </ul>
 
 
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>features.datacenterhelper</strong></li>
+  <li><a href="../modules/connections.html">connections</a></li>
+  <li><a href="../modules/Dialogue.html">Dialogue</a></li>
+  <li><a href="../modules/libs.tiledlite.html">libs.tiledlite</a></li>
+  <li><a href="../modules/MathQuiz.html">MathQuiz</a></li>
+  <li><a href="../modules/ProximityPrompt.html">ProximityPrompt</a></li>
+  <li><a href="../modules/objs.servernode.html">objs.servernode</a></li>
+</ul>
 <h2>Classes</h2>
 <ul class="nowrap">
-  <li><strong>button</strong></li>
+  <li><a href="../classes/button.html">button</a></li>
   <li><a href="../classes/frame.html">frame</a></li>
   <li><a href="../classes/gui.html">gui</a></li>
   <li><a href="../classes/imagelabel.html">imagelabel</a></li>
@@ -61,36 +71,29 @@
   <li><a href="../classes/Shard.html">Shard</a></li>
   <li><a href="../classes/ShardsHUD.html">ShardsHUD</a></li>
 </ul>
-<h2>Modules</h2>
-<ul class="nowrap">
-  <li><a href="../modules/features.datacenterhelper.html">features.datacenterhelper</a></li>
-  <li><a href="../modules/connections.html">connections</a></li>
-  <li><a href="../modules/Dialogue.html">Dialogue</a></li>
-  <li><a href="../modules/libs.tiledlite.html">libs.tiledlite</a></li>
-  <li><a href="../modules/MathQuiz.html">MathQuiz</a></li>
-  <li><a href="../modules/ProximityPrompt.html">ProximityPrompt</a></li>
-  <li><a href="../modules/objs.servernode.html">objs.servernode</a></li>
-</ul>
 
 </div>
 
 <div id="content">
 
-<h1>Class <code>button</code></h1>
-<p>Boton basico de GUI.</p>
-<p>
-Usa componentes de Guis.</p>
-    <h3>See also:</h3>
-    <ul>
-         <a href="../classes/gui.html#">gui</a>
-    </ul>
+<h1>Module <code>features.datacenterhelper</code></h1>
+<p>Adjunta el minijuego a la escena.</p>
+<p> Si hay marcadores en el mapa, los usa.</p>
 
 
-<h2><a href="#Methods">Methods</a></h2>
+<h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#button:new">button:new (callback)</a></td>
-	<td class="summary">Crea un nuevo boton</td>
+	<td class="name" nowrap><a href="#DataCenter.update">DataCenter.update (scene, dt)</a></td>
+	<td class="summary">Update del minijuego.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#DataCenter.draw">DataCenter.draw (scene)</a></td>
+	<td class="summary">Dibuja servidores, enemigos y shard.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#DataCenter.detach">DataCenter.detach (scene)</a></td>
+	<td class="summary">Limpia todo (HUD, servidores, enemigos, shard).</td>
 	</tr>
 </table>
 
@@ -98,29 +101,67 @@ Usa componentes de Guis.</p>
 <br/>
 
 
-    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "button:new"></a>
-    <strong>button:new (callback)</strong>
+    <a name = "DataCenter.update"></a>
+    <strong>DataCenter.update (scene, dt)</strong>
     </dt>
     <dd>
-    Crea un nuevo boton
+    Update del minijuego.  Llamar desde scene.update(dt).
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">callback</span>
-         Funcion a llamar cuando se presiona el boton
+        <li><span class="parameter">scene</span>
+
+        </li>
+        <li><span class="parameter">dt</span>
+
         </li>
     </ul>
 
-    <h3>Returns:</h3>
-    <ol>
 
-        (button) Instancia del boton
-    </ol>
+
+
+
+</dd>
+    <dt>
+    <a name = "DataCenter.draw"></a>
+    <strong>DataCenter.draw (scene)</strong>
+    </dt>
+    <dd>
+    Dibuja servidores, enemigos y shard.  Llamar dentro de Camera.attach().
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">scene</span>
+
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "DataCenter.detach"></a>
+    <strong>DataCenter.detach (scene)</strong>
+    </dt>
+    <dd>
+    Limpia todo (HUD, servidores, enemigos, shard).  Llamar en scene.unload().
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">scene</span>
+
+        </li>
+    </ul>
+
 
 
 

@@ -33,10 +33,20 @@
 
 <h2>Contents</h2>
 <ul>
-<li><a href="#Methods">Methods</a></li>
+<li><a href="#Functions">Functions</a></li>
 </ul>
 
 
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><a href="../modules/features.datacenterhelper.html">features.datacenterhelper</a></li>
+  <li><a href="../modules/connections.html">connections</a></li>
+  <li><a href="../modules/Dialogue.html">Dialogue</a></li>
+  <li><a href="../modules/libs.tiledlite.html">libs.tiledlite</a></li>
+  <li><a href="../modules/MathQuiz.html">MathQuiz</a></li>
+  <li><a href="../modules/ProximityPrompt.html">ProximityPrompt</a></li>
+  <li><strong>objs.servernode</strong></li>
+</ul>
 <h2>Classes</h2>
 <ul class="nowrap">
   <li><a href="../classes/button.html">button</a></li>
@@ -57,45 +67,31 @@
   <li><a href="../classes/timer.html">timer</a></li>
   <li><a href="../classes/enemy.html">enemy</a></li>
   <li><a href="../classes/player.html">player</a></li>
-  <li><strong>ProximityHum</strong></li>
+  <li><a href="../classes/ProximityHum.html">ProximityHum</a></li>
   <li><a href="../classes/Shard.html">Shard</a></li>
   <li><a href="../classes/ShardsHUD.html">ShardsHUD</a></li>
-</ul>
-<h2>Modules</h2>
-<ul class="nowrap">
-  <li><a href="../modules/features.datacenterhelper.html">features.datacenterhelper</a></li>
-  <li><a href="../modules/connections.html">connections</a></li>
-  <li><a href="../modules/Dialogue.html">Dialogue</a></li>
-  <li><a href="../modules/libs.tiledlite.html">libs.tiledlite</a></li>
-  <li><a href="../modules/MathQuiz.html">MathQuiz</a></li>
-  <li><a href="../modules/ProximityPrompt.html">ProximityPrompt</a></li>
-  <li><a href="../modules/objs.servernode.html">objs.servernode</a></li>
 </ul>
 
 </div>
 
 <div id="content">
 
-<h1>Class <code>ProximityHum</code></h1>
-<p>ProximityHum: zumbido/loop con volumen según cercanía (en escala UDim2).</p>
+<h1>Module <code>objs.servernode</code></h1>
+<p>Servidor destructible del Data Center.</p>
 <p>
- Depende de: Timer, UDim2, Player (posición en UDim2), PlayingTimers.
- Uso:
-   local hum = ProximityHum.new(UDim2.fromScale(1.1, 0.4), { sound="assets/sfx/shard_hum.wav", maxDistScale=0.35 })
-   hum:setPos(UDim2.fromScale(1.2, 0.4))
-   hum:setEnabled(false)       -- fade a 0, sigue vivo
-   hum:stopAndDestroy()        -- fade a 0 y destruye al llegar a silencio</p>
+ Romperlo da puntos y notifica a un callback. Se comporta como "box" (bloquea).
+ Props recomendadas en Tiled:
+   - points (number): puntaje al destruir
+   - hp     (number): vida (por defecto 40)
+   - sprite (string): ruta opcional (1x1 frame o sheet simple)
+   - w,h    (número de pixels de frame si usas sprite custom)</p>
 
 
-<h2><a href="#Methods">Methods</a></h2>
+<h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#proximityhum:new">proximityhum:new (pos, sound, maxDistScale, maxVol, smooth)</a></td>
-	<td class="summary">Crea un hum de proximidad.</td>
-	</tr>
-	<tr>
-	<td class="name" nowrap><a href="#proximityhum:stopAndDestroy">proximityhum:stopAndDestroy ()</a></td>
-	<td class="summary">Hace fade a 0 y destruye al llegar a silencio.</td>
+	<td class="name" nowrap><a href="#ServerNode.new">ServerNode.new (pos, hp, points)</a></td>
+	<td class="summary">Crea un servidor destructible.</td>
 	</tr>
 </table>
 
@@ -103,61 +99,39 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "proximityhum:new"></a>
-    <strong>proximityhum:new (pos, sound, maxDistScale, maxVol, smooth)</strong>
+    <a name = "ServerNode.new"></a>
+    <strong>ServerNode.new (pos, hp, points)</strong>
     </dt>
     <dd>
-    Crea un hum de proximidad.
+    Crea un servidor destructible.
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">pos</span>
             <span class="types"><span class="type">UDim2</span></span>
-         posición en escala (centro de la “fuente”)
+         Posición del servidor.
         </li>
-        <li><span class="parameter">sound</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         ruta del sonido (loop)
-        </li>
-        <li><span class="parameter">maxDistScale</span>
+        <li><span class="parameter">hp</span>
             <span class="types"><span class="type">number</span></span>
-         distancia máxima en escala (0.3 = 30% ancho pantalla)
+         Vida del servidor (default 40).
         </li>
-        <li><span class="parameter">maxVol</span>
+        <li><span class="parameter">points</span>
             <span class="types"><span class="type">number</span></span>
-         volumen máximo (0-1)
-        </li>
-        <li><span class="parameter">smooth</span>
-            <span class="types"><span class="type">number</span></span>
-         suavizado (10-20 recomendado)
+         Puntos al destruir (default 20).
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../classes/ProximityHum.html#">ProximityHum</a></span>
-
+           <span class="types"><span class="type">ServerNode</span></span>
+        El servidor creado.
     </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "proximityhum:stopAndDestroy"></a>
-    <strong>proximityhum:stopAndDestroy ()</strong>
-    </dt>
-    <dd>
-    Hace fade a 0 y destruye al llegar a silencio.
-
-
-
 
 
 
