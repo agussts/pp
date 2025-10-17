@@ -9,14 +9,11 @@ return function()
     self.bgB.color = {.2,1,1,0.02}
 
     self.map = TiledLite.load("assets/maps/datacenter.lua", { collisionLayers={"Colliders"} })
-    self.map:spawnAll(self)
+    --self.map:spawnAll(self)
     self.map.worldLayer = -10
 
     self.dc = require("src.features.datacentertiled")
     self.dc.attach(self, self.map)
-
-    -- 2) Deja que TiledLite cree objetos (las factories llenan map._dcMarkers)
-    self.map:spawnAll(self)
 
     -- Player / arma / spawn
     Player = PlayerModule.new("assets/sprites/player-Sheet.png")

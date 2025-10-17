@@ -16,8 +16,6 @@ gun.new = function()
     self.name = "Spam Gun"
     self.fireRate = .1
     self.damage = 3
-    self.ammo = 50
-    self.maxAmmo = 50
 
     gun.__index = basic
 

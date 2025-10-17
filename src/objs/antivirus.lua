@@ -7,7 +7,7 @@ function antivirus.new()
    antivirusSheet.anchor = {.5, .5}
    local self = EnemyModule.new(antivirusSheet, .05, .08)
    self.health = 50
-   self.damage = 50
+   self.damage = 10
    return self
 end
 

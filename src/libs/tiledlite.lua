@@ -161,7 +161,7 @@ function TiledLite.load(luaPath, opts)
 
     -- capas → spritebatches
     self.layers = {}
-    for _, layer in ipairs(map.layers or {}) do
+    for yo1, layer in ipairs(map.layers or {}) do
         if layer.type == "tilelayer" then
             local batches = {}
             for i, ts in ipairs(self.tilesets) do
@@ -286,6 +286,16 @@ end
 --- Fábricas por defecto internas. Puedes sobreescribir con TiledLite.setDefaultFactory().
 local DefaultFactories = {}
 
+DefaultFactories.collision = function(o, scn)
+    print("collision")
+    local c = Collisions.new("box")
+    c.position = UDim2.fromScale(o.sx, o.sy)
+    c.size     = UDim2.fromScale(o.sw, o.sh)
+    c.anchor   = {0, 0}
+    c:AddTag("world")
+    return c
+end
+
 -- UDim2
 DefaultFactories.udim2 = function (o, scn)
     return UDim2.fromScale(o.sx, o.sy)
@@ -301,7 +311,7 @@ DefaultFactories.door = function(o, scn)
     local d = Door.new(to, UDim2.fromScale(o.sx, o.sy), UDim2.fromScale(sizeW, sizeH), {
         spawn = UDim2.fromScale(spawnX, spawnY)
     })
-    d.collision.anchor = {0.5, 0.5}
+    d.collision.anchor = {0, 0}
     return d
 end
 
@@ -354,6 +364,7 @@ end
 --- Recorre capas de objetos y spawnea usando fábricas (defaults + overrides).
 -- @tparam table factories Opcional. Se fusiona con los defaults (override por clave).
 function TiledLite:spawnObjects(factories, scene)
+    print("spawning objects")
     factories = factories or {}
     -- mezcla (override) de defaults con user factories
     local merged = {}
@@ -363,6 +374,7 @@ function TiledLite:spawnObjects(factories, scene)
     for _, L in ipairs(self.layers) do
         if L.kind == "objects" then
             for _, obj in ipairs(L.data.objects or {}) do
+                --print("processing object: ".. obj.name)
                 local t = obj.type or obj.class or ""
                 local f = merged[t]
                 if f then
@@ -376,6 +388,7 @@ function TiledLite:spawnObjects(factories, scene)
                             for k, v in pairs(obj.properties) do obj.props[k] = v end
                         end
                     end
+                    --print("spawning object: ".. obj.name)
                     local inst = f(obj, scene)
                     -- si tiene name en Tiled, asigna a scene[name]
                     if inst and obj.name and scene then

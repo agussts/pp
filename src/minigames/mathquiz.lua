@@ -56,8 +56,8 @@ local function pick(t) return t[r(1,#t)] end
 local PRESET = {
     sumMax = 30,
     subMax = 30,
-    mulA   = {2,9},
-    mulB   = {2,9},
+    mulA   = {2,5},
+    mulB   = {2,6},
     tweakA = {2,5},
 }
 

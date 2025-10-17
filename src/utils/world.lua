@@ -12,7 +12,6 @@ local world = {
         collectedIds = {},
     },
     player = { health = 100 },
-    gun = { ammo = 30 }
 }
 
 

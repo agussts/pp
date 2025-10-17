@@ -13,10 +13,8 @@ local audios = {
 function gun.new()
     local self = setmetatable({}, { __index = gun })
     self.name         = "Basic Gun"
-    self.damage       = 10
-    self.ammo         = World.gun.ammo
-    self.maxAmmo      = 30
-    self.fireRate     = 0.5
+    self.damage       = 15
+    self.fireRate     = 0.2
     self.lastFireTime = 0
     self.speed        = 500
     self.rechargeTime = 2
@@ -55,16 +53,6 @@ end
 -- @param y (number) posicion Y (px) desde donde se dispara
 function gun:Fire(x, y)
     if self.lastFireTime > 0 then return end
-
-    if self.ammo <= 0 then
-        self.lastFireTime = self.rechargeTime
-        self.ammo = self.maxAmmo
-        World.gun.ammo = self.maxAmmo
-        return
-    end
-
-    self.ammo = self.ammo - 1
-    World.gun.ammo = self.ammo
     self._seq = self._seq + 1
     local id = self._seq
 

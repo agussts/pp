@@ -76,7 +76,11 @@ function ServerNode:draw()
 end
 
 function ServerNode:Destroy()
-    if self.collision then self.collision:Destroy() end
+    for i,v in pairs(self) do
+        if type(v) == "table" and v.Destroy then
+            v:Destroy()
+        end
+    end
     self.collision = nil
     self.sprite = nil
 end

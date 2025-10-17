@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-field
 local DC = {}
 DC.__index = DC
 
@@ -24,8 +25,8 @@ return {
     points      = 0,
     heat        = 0,
     heatMul     = 1.0,
-    targetPoints= 100,  -- ajusta a gusto
-    respawnTime = 4.5,  -- default si el pad no define
+    targetPoints= 300,  -- ajusta a gusto
+    respawnTime = 6,  -- default si el pad no define
     shardSpawned= false,
 
     shardObj    = nil,  -- si lo spawneamos
@@ -33,7 +34,7 @@ return {
 end
 
 local function recalcHeatMul(st)
-    st.heatMul = 1.0 + math.min(1.0, st.heat / 100) * 0.5
+    st.heatMul = 1.0 + math.min(1.0, st.heat / 100) * 2.0
 end
 local function addHeat(st, h)
     st.heat = math.max(0, st.heat + (h or 0))
@@ -49,40 +50,66 @@ end
 -- ----------------------
 local function spawnServerAt(self, pad)
     local st = self.st
-    if st.tearingDown then return end
+    if not st or st.tearingDown or pad.live then return end  -- ya hay uno / saliendo
+
+    -- mata un timer previo si existiera
+    if pad.respT and pad.respT.Destroy then pad.respT:Destroy() end
+    pad.respT = nil
+
     local hp      = pad.hp or 40
     local points  = pad.points or 20
     local respawn = pad.respawn or st.respawnTime
 
     local srv = ServerNode.new(pad.pos, hp, points)
+    pad.live = srv
     table.insert(st.servers, srv)
 
-    srv.onDestroyed:Connect(function()
-        -- puntos + heat
+    local onceConn
+    onceConn = srv.onDestroyed:Connect(function()
+        if onceConn and onceConn.Disconnect then onceConn:Disconnect() end
+        pad.live = nil
+
+        -- puntos + heat + HUD
         addPoints(st, points)
         addHeat(st, pad.heat or 10)
+
+
+        if self.hud and self.hud.setPoints then self.hud:setPoints(st.points, st.targetPoints) end
+        if self.hud and self.hud.setHeat   then self.hud:setHeat(st.heat)     end
         Camera.shake(3, .18, "XY")
-        -- spawns enemigos
-        for i=1,pad.enemies do
-                local randomSpawn = math.random(1, #st.spawns)
-            local sp = st.spawns[randomSpawn]
-            print(sp[1], sp[2])
-            if sp then
-                if sp[2] == "antivirus" then
-                    local e = Antivirus.new()
-                    e.collision.position = sp[1]
-                    e:follow(Player.collision.position)
+
+        -- spawns de enemigos (opcionales)
+        if #st.spawns > 0 and (pad.enemies or 0) > 0 then
+            for i=1,pad.enemies do
+                local sp = st.spawns[math.random(1, #st.spawns)]
+                if sp then
+                    local posUDim2, kind = sp[1], sp[2]
+                    local e
+                    if kind == "antivirus" and Antivirus and Antivirus.new then
+                        e = Antivirus.new()
+                    else
+                        e = EnemyModule.new(nil, 0.0625, 0.11)
+                    end
+                    if e and e.collision then e.collision.position = posUDim2 end
+                    if e and e.follow then e:follow(Player.collision.position) end
                     table.insert(st.enemies, e)
                 end
             end
         end
 
-        -- respawn server
-        Timer.after(respawn, function()
-        spawnServerAt(self, pad)
-        end):addToGroup(PlayingTimers)
+        -- respawn con guard de GENERACIÓN (mata cualquier timer viejo)
+        local myGen = self.gen
+        if not st.tearingDown then
+            pad.respT = Timer.after(respawn, function()
+                pad.respT = nil
+                if st.tearingDown then return end
+                if World._dcGen ~= myGen then return end  -- escena nueva => abortar
+                if pad.live then return end
+                spawnServerAt(self, pad)
+            end):addToGroup(PlayingTimers)
+        end
 
-        -- shard al alcanzar meta
+        -- shard si llegaste a la meta
         if (not st.shardSpawned) and st.points >= st.targetPoints then
             st.shardSpawned = true
             local where = st.shardPos or pad.pos
@@ -92,6 +119,9 @@ local function spawnServerAt(self, pad)
 
     return srv
 end
+
+
+
 
 -- ======================
 -- API pública del módulo
@@ -103,6 +133,15 @@ function DC.attach(scene, map)
     self.map   = map
     self.st    = newState()
 
+    -- >>> NUEVO: bump de generación global
+    World._dcGen = (World._dcGen or 0) + 1
+    self.gen = World._dcGen
+
+    self.hud = DCHUD.new()
+    self.hud:setVisible(true)
+    self.hud:setPoints(0, self.st.targetPoints)
+    self.hud:setHeat(0, 1)
+
     local st = self.st
 
     -- ---------- factories por class ----------
@@ -110,22 +149,18 @@ function DC.attach(scene, map)
 
     factory["dc_start"] = function(o, scn)
         local prompt = ProxPrompt.new("Press [%s] to begin")
+        prompt.collision.anchor = {0,0}
         prompt.collision.position = UDim2.fromScale(o.sx, o.sy)
         prompt.collision.size     = UDim2.fromScale(o.sw, o.sh)
         st.startPrompt = prompt
 
-        prompt.Triggered:Once(function()
-            if st.started then return end
-            st.started = true
+        prompt.Triggered:Connect(function()
+            --if st.started then return end
+            st.started = not st.started
 
-            -- abrir entrada, cerrar salida
-            if st.gateIn  then st.gateIn.enabled = false end
-            if st.gateOut then st.gateOut.enabled = true end
-
-            -- levantar servidores
-            for _,pad in ipairs(st.pads) do
-                spawnServerAt(self, pad)
-            end
+            -- abrir y cerrar
+            if st.gateIn  then st.gateIn.enabled = not st.gateIn.enabled end
+            if st.gateOut then st.gateOut.enabled = not st.gateOut.enabled end
         end)
 
         return prompt
@@ -157,10 +192,16 @@ function DC.attach(scene, map)
             enemies = pr.enemies or 3,
             heat    = pr.heat or 10,
             respawn = pr.respawn or nil,
+
+            -- >>> NUEVO
+            live    = nil,   -- ServerNode vivo en este pad
+            respT   = nil,   -- handle del timer de respawn
         })
-        -- pad es lógico; no devolvemos nada con colisión
         return nil
     end
+
+
+
 
     factory["dc_enemy_spawn"] = function(o)
         local kind = o.props and o.props.kind or nil
@@ -179,7 +220,15 @@ function DC.attach(scene, map)
     end
 
     map:spawnObjects(factory, scene)
-
+    for _,pad in ipairs(st.pads) do
+        spawnServerAt(self, pad)
+    end
+    if scene.enemyblocker then
+        scene.enemyblocker.blockFilter = function (_, other)
+            if other:HasTag("enemy") then return true end
+            return false
+        end
+    end
     return self
 end
 
@@ -191,7 +240,9 @@ function DC.update(self, dt)
         st.heat = math.max(0, st.heat - dt * 2)
         recalcHeatMul(st)
     end
-
+    if self.hud then
+        self.hud:setHeat(st.heat, st.heatMul)
+    end
     if st.startPrompt then st.startPrompt:update() end
 
     for _,srv in ipairs(st.servers) do
@@ -225,9 +276,23 @@ function DC.detach(self)
     if not st then return end
     st.tearingDown = true
 
+    -- >>> NUEVO: matar timers/servers por pad
+    for _, pad in ipairs(st.pads or {}) do
+        if pad.respT and pad.respT.Destroy then pad.respT:Destroy() end
+        pad.respT = nil
+        if pad.live and pad.live.Destroy then pad.live:Destroy() end
+        pad.live = nil
+    end
+
+    if self.hud then self.hud:Destroy() end
+    self.hud = nil
+
     if st.startPrompt then st.startPrompt:Destroy() end
+
     if st.gateIn  then st.gateIn:Destroy()  end
+
     if st.gateOut then st.gateOut:Destroy() end
+
     for _,srv in ipairs(st.servers) do if srv.Destroy then srv:Destroy() end end
     -- enemigos y shard no tienen Destroy requerido, pero limpiamos por si acaso
     for _,e in ipairs(st.enemies) do if e.Destroy then e:Destroy() end end

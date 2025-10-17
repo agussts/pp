@@ -16,8 +16,6 @@ gun.new = function()
     self.name = "dev g"
     self.fireRate = .1
     self.damage = 5
-    self.ammo = math.huge
-    self.maxAmmo = math.huge
 
     gun.__index = basic
 

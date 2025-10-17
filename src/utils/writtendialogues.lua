@@ -3,9 +3,10 @@ local dialogues = {}
 dialogues.mvirusFirst = {
     { who="???", text="New face. Looking for work?" },
     { who="YOU", text="I... guess. What kind of work?" },
-    { who="???", text="Find me some Data shards. Three should do. Outside this place." },
+    { who="???", text="Find me three Data shards. Three should do. Outside this place." },
     { who="YOU", text="Where do I start?" },
     { who="???", text="Follow the noise. Bring them back here." },
+    { who="???", text="Have this Access Token. It should help you get into places."},
 }
 
 dialogues.mviruspostFirst = {

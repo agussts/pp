@@ -21,6 +21,7 @@ Guis = require("src.guis.gui")
 
 --UI (no preguntes la diferencia)
 
+DCHUD = require("src.ui.datacenter_hud")
 ShardsHUD = require("src.ui.shards_hud")
 require("src.ui.pausemenu") -- lo mismo que connections.lua
 
@@ -43,7 +44,7 @@ ProximityHum = require("src.objs.proximity_hum")
 ServerNode = require("src.objs.servernode")
 
 
-GunModule = require("src.guns.dev")
+GunModule = require("src.guns.basic")
     
 Camera = require("src.libs.camera")
 Background = require("src.libs.background")

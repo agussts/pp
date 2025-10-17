@@ -9,8 +9,8 @@ return {
   height = 40,
   tilewidth = 32,
   tileheight = 32,
-  nextlayerid = 4,
-  nextobjectid = 55,
+  nextlayerid = 5,
+  nextobjectid = 68,
   properties = {},
   tilesets = {
     {
@@ -328,37 +328,7 @@ return {
           height = 32,
           rotation = 0,
           visible = true,
-          properties = {
-            ["id"] = "hall"
-          }
-        },
-        {
-          id = 30,
-          name = "exit",
-          type = "dc_gate_out",
-          shape = "rectangle",
-          x = 928,
-          y = 768,
-          width = 64,
-          height = 32,
-          rotation = 0,
-          visible = true,
           properties = {}
-        },
-        {
-          id = 31,
-          name = "proxprompt",
-          type = "dc_start",
-          shape = "rectangle",
-          x = 896,
-          y = 672,
-          width = 128,
-          height = 160,
-          rotation = 0,
-          visible = true,
-          properties = {
-            ["text"] = "%s"
-          }
         },
         {
           id = 32,
@@ -679,6 +649,62 @@ return {
           y = 656,
           width = 0,
           height = 0,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 56,
+          name = "door",
+          type = "door",
+          shape = "rectangle",
+          x = 909.333,
+          y = 950.67,
+          width = 108,
+          height = 44,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["spawnx"] = 1.1,
+            ["spawny"] = 6,
+            ["to"] = "internetscn"
+          }
+        },
+        {
+          id = 59,
+          name = "exit",
+          type = "dc_gate_out",
+          shape = "rectangle",
+          x = 928,
+          y = 832,
+          width = 64,
+          height = 32,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 60,
+          name = "proxprompt",
+          type = "dc_start",
+          shape = "rectangle",
+          x = 928,
+          y = 768,
+          width = 64,
+          height = 32,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 66,
+          name = "enemyblocker",
+          type = "collision",
+          shape = "rectangle",
+          x = 927.75,
+          y = 695.5,
+          width = 64.25,
+          height = 8.5,
           rotation = 0,
           visible = true,
           properties = {}
