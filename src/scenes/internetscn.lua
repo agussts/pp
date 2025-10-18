@@ -147,7 +147,8 @@ return function()
         Gun = GunModule.new()
         self.gun = Gun
         setupTrashInteraction(self)
-        --DataCenter.attach(self, self.map)
+        self.cdndoor = Door.new("cdn", UDim2.fromScale(2.3, 2.9), UDim2.fromScale(0.16, 0.22))
+        self.cdndoor.collision.anchor = {.5, .5}
     end
 
     scene.update = function(self, dt)

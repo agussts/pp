@@ -11,11 +11,13 @@ local Level2 = require("src.scenes.level2")
 local internetscn = require("src.scenes.internetscn")
 local darkweb = require("src.scenes.darkweb")
 local datacenter = require("src.scenes.datacenter")
+local cdn = require("src.scenes.cdn")
 Scene.register("testScene", testScene)
 Scene.register("level2", Level2)
 Scene.register("internetscn", internetscn)
 Scene.register("darkweb", darkweb)
 Scene.register("datacenter", datacenter)
+Scene.register("cdn", cdn)
 
 
 if os.getenv("CI_SMOKETEST") == "1" then
