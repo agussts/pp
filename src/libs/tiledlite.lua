@@ -228,6 +228,7 @@ function TiledLite.load(luaPath, opts)
                             c.position = UDim2.fromScale(sx, sy)
                             c.size     = UDim2.fromScale(sw, sh)
                             c.anchor   = {0, 0}
+                            c.anchored = obj.properties.anchored ~= false
                             c:AddTag("world")
                         end
                     end
@@ -327,6 +328,9 @@ DefaultFactories.enemy = function(o, scn)
             e = EnemyModule.new(nil, w, h)
         end
         e.collision.position = UDim2.fromScale(o.sx, o.sy)
+        e.collision.size     = UDim2.fromScale(w, h)
+        e.collision.anchor   = {0, 0}
+        e.sprite.anchor = {0, 0}
         if o.props.health then e.health = tonumber(o.props.health) or e.health end
         if o.props.damage then e.damage = tonumber(o.props.damage) or e.damage end
         if o.props.speed  then e.speed  = tonumber(o.props.speed)  or e.speed  end
@@ -340,6 +344,7 @@ DefaultFactories.shard = function(o, scn)
     local id = o.props and o.props.id
     local sprite = (o.props and o.props.sprite) or "assets/sprites/shard.png"
     local s = Shard.new(UDim2.fromScale(o.sx, o.sy), sprite, id)
+    s.collision.anchor = {0, 0}
     return s
 end
 
@@ -350,8 +355,9 @@ DefaultFactories.prop = function(o, scn)
     local hpx = o.height or 16
     local a = Animation.new(img, wpx, hpx, 1, 1, 1)
     a:Pause()
-    a.anchor = {0.5, 0.5}
+    a.anchor = {0,0}
     local blk = Block.new(a, o.sx, o.sy, (o.sw > 0 and o.sw or 0.01), (o.sh > 0 and o.sh or 0.01))
+    blk.collision.anchor = {0,0}
     blk.collision.enabled = false
     return blk
 end

@@ -14,14 +14,15 @@ return function()
 
     -- jugador
     Player = PlayerModule.new("assets/sprites/player-Sheet.png")
-    Player.collision.position = self.playerspawn or UDim2.fromScale(.15, .75)
     self.player = Player
 
     -- (opcional) pistola
     Gun = GunModule.new()
 
     -- enganchar feature
-    self.cdn = require("src.features.cdntiled").attach(self, self.map)
+    self.cdn = require("src.features.cdn_catwalks").attach(self, self.map)
+        Player.collision.position = self.playerspawn or UDim2.fromScale(.15, .75)
+
   end
 
   scene.update = function(self, dt)
