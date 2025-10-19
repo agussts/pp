@@ -34,12 +34,13 @@
 <h2>Contents</h2>
 <ul>
 <li><a href="#Functions">Functions</a></li>
+<li><a href="#Methods">Methods</a></li>
 </ul>
 
 
 <h2>Classes</h2>
 <ul class="nowrap">
-  <li><a href="../classes/AnimationLabel.html">AnimationLabel</a></li>
+  <li><strong>AnimationLabel</strong></li>
   <li><a href="../classes/button.html">button</a></li>
   <li><a href="../classes/frame.html">frame</a></li>
   <li><a href="../classes/gui.html">gui</a></li>
@@ -47,7 +48,7 @@
   <li><a href="../classes/PrintfLabel.html">PrintfLabel</a></li>
   <li><a href="../classes/textlabel.html">textlabel</a></li>
   <li><a href="../classes/udim2.html">udim2</a></li>
-  <li><strong>basicGun</strong></li>
+  <li><a href="../classes/basicGun.html">basicGun</a></li>
   <li><a href="../classes/devGun.html">devGun</a></li>
   <li><a href="../classes/spamGun.html">spamGun</a></li>
   <li><a href="../classes/animations.html">animations</a></li>
@@ -77,16 +78,26 @@
 
 <div id="content">
 
-<h1>Class <code>basicGun</code></h1>
-<p>Pistola basica, tambien la base de otras pistolas</p>
-<p></p>
+<h1>Class <code>AnimationLabel</code></h1>
+<p>Widget GUI para dibujar una Animation dentro del sistema de GUI.</p>
+<p>
+ Hereda de Guis.new() (igual que Textlabel/PrintfLabel).
+ Soporta: fit ("none" | "contain" | "cover"), scale multiplicador y autoPlay.
+ Se actualiza con el evento global "update".</p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" nowrap><a href="#gun:Fire">gun:Fire (x, y)</a></td>
-	<td class="summary">Dispara la pistola</td>
+	<td class="name" nowrap><a href="#self:setAnimation">self:setAnimation (newAnim, keepPlay)</a></td>
+	<td class="summary">Cambia la animación en caliente (desuscribe y re-suscribe OnFinish)</td>
+	</tr>
+</table>
+<h2><a href="#Methods">Methods</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#animationlabel:new">animationlabel:new (anim[, opt])</a></td>
+	<td class="summary">Crea un nuevo AnimationLabel</td>
 	</tr>
 </table>
 
@@ -98,23 +109,59 @@
 
     <dl class="function">
     <dt>
-    <a name = "gun:Fire"></a>
-    <strong>gun:Fire (x, y)</strong>
+    <a name = "self:setAnimation"></a>
+    <strong>self:setAnimation (newAnim, keepPlay)</strong>
     </dt>
     <dd>
-    Dispara la pistola
+    Cambia la animación en caliente (desuscribe y re-suscribe OnFinish)
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">x</span>
-         (number) posicion X (px) desde donde se dispara
+        <li><span class="parameter">newAnim</span>
+
         </li>
-        <li><span class="parameter">y</span>
-         (number) posicion Y (px) desde donde se dispara
+        <li><span class="parameter">keepPlay</span>
+
         </li>
     </ul>
 
+
+
+
+
+</dd>
+</dl>
+    <h2 class="section-header "><a name="Methods"></a>Methods</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "animationlabel:new"></a>
+    <strong>animationlabel:new (anim[, opt])</strong>
+    </dt>
+    <dd>
+    Crea un nuevo AnimationLabel
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">anim</span>
+            <span class="types"><span class="type">Animation</span></span>
+         Instancia de Animation ya creada (con :update, :draw, :Play, :Pause y .OnFinish opcional)
+        </li>
+        <li><span class="parameter">opt</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
+         { fit="contain"/"cover"/"none", scale=1.0, play=true }
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../classes/AnimationLabel.html#">AnimationLabel</a></span>
+        instancia
+    </ol>
 
 
 
