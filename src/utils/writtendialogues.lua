@@ -17,6 +17,10 @@ dialogues.mviruswaitingshard = {
     { who="???", text="What are you waiting for?"},
 }
 
+dialogues.testshardexittry = {
+    { who="YOU", text="(I should atleast try getting the shard..)"},
+}
+
 dialogues.mvirusgotesttshard = {
     { who="???", text="Wasn't that bad, was it?"},
     { who="YOU", text="I guess not."},

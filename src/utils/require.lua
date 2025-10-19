@@ -18,6 +18,7 @@ Guis = require("src.guis.gui")
     Frame = require("src.guis.frame")
     ImageLabel = require("src.guis.imagelabel")
     PrintfLabel = require("src.guis.printf_label")
+    AnimationLabel = require("src.guis.animationlabel")
 
 --Styles
 
@@ -55,8 +56,8 @@ WrittenDialogues = require("src.utils.writtendialogues")
 --UI (no preguntes la diferencia)
 
 DCHUD = require("src.ui.datacenter_hud")
-ShardsHUD = require("src.ui.shards_hud")
 ShardsIconsHUD = require("src.ui.shards_icons")
+Popup = require("src.ui.popup")
 require("src.ui.pausemenu") -- lo mismo que connections.lua
 
 World = require("src.utils.world")

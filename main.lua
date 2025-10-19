@@ -110,7 +110,6 @@ love.update = function (dt)
     end
     Dialogue.updateAll(dt)
     Transition.update(dt)
-    --MathQuiz.updateAll(dt)
 end
 
 love.draw = function () 

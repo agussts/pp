@@ -59,6 +59,13 @@ function timer.group:getTimePassed()
     return timer.passedTime - self.pausedTime
 end
 
+function timer.group:Destroy()
+    for _,v in pairs(self.timers) do
+        v:Destroy()
+    end
+    self = nil
+end
+
 function timer.addToGroup(timer, group)
     group:addTimer(timer)
 end

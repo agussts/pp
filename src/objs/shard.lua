@@ -52,20 +52,22 @@ end
 function Shard:Collect()
     if self._busy then return end
     self._busy = true
-    audios.pickup:play()
-    MathQuiz.start({
-        rounds = 1,      -- cuántas preguntas
-        timePer = 25,    -- segundos por pregunta
-        onWin = function()
-            World.onShardCollected(self.id)
-            self:Destroy()
-        end,
-        onLose = function()
-            -- opcional: feedback y permitir reintento
-            -- Ej: pequeña vibración, sonido, etc.
-            self._busy = false
-        end
-    })
+    audios.pickup:clone():play()
+    World.onShardCollected(self.id)
+    self:Destroy()
+    -- MathQuiz.start({
+    --     rounds = 1,      -- cuántas preguntas
+    --     timePer = 25,    -- segundos por pregunta
+    --     onWin = function()
+    --         World.onShardCollected(self.id)
+    --         self:Destroy()
+    --     end,
+    --     onLose = function()
+    --         -- opcional: feedback y permitir reintento
+    --         -- Ej: pequeña vibración, sonido, etc.
+    --         self._busy = false
+    --     end
+    -- })
 end
 
 function Shard:update(dt)
@@ -77,9 +79,10 @@ function Shard:update(dt)
     local off = math.sin(self._t * 2.2) * 5
     self._drawX, self._drawY = x, y + off
 
-    -- brillo sutil (alpha)
+    -- brillo sutil (alpha) + multiplicador de aparición si existe
     local a = 0.85 + 0.15 * math.sin(self._t * 3.0)
-    self.sprite.color = {1, 1, 1, a} -- añadido
+    local m = (self._alphaMult or 1)   -- <<— nuevo
+    self.sprite.color = {1, 1, 1, a * m}
 end
 
 function Shard:draw()

@@ -21,13 +21,18 @@ vec4 effect(vec4 color, Image texture, vec2 texCoord, vec2 screenCoord) {
     }
 ]])
 
-Shaders.allWhite = love.graphics.newShader([[
-extern float thresh;
+-- === BLANQUEO PROGRESIVO (mezcla a blanco puro, respetando alpha como máscara) ===
+Shaders.whiten = love.graphics.newShader [[
+extern number u_white; // 0..1
+
 vec4 effect(vec4 color, Image tex, vec2 tc, vec2 sc) {
-  vec4 px = Texel(tex, tc);
-  if (px.a <= thresh) return vec4(0.0);
-  return vec4(1.0, 1.0, 1.0, px.a);
+    vec4 c = Texel(tex, tc) * color;
+    float a = c.a;
+    // mezcla hacia blanco puro ignorando el color original cuando u_white=1.0
+    vec3 rgb = mix(c.rgb, vec3(1.0), clamp(u_white, 0.0, 1.0));
+    return vec4(rgb, a);
 }
-]])
+]];
+
 
 return Shaders

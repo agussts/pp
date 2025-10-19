@@ -7,7 +7,7 @@ local world = {
     },
     shards = {
         active = false,
-        needed = 4,
+        needed = 3,
         collected = 0,
         spawned = false,
         done = false,

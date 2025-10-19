@@ -142,10 +142,9 @@ return function()
         self.trashDumpTrash.worldLayer = -5
 
         -- Si la misión ya estaba activa al entrar a esta escena, prepara todo:
-        --if World.shards.active and not World.shards.done then
+        if World.shards.active and not World.shards.done then
             ShardsIconsHUD.new()
-        --end
-
+        end
         Gun = GunModule.new()
         self.gun = Gun
         setupTrashInteraction(self)

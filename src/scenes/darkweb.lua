@@ -5,6 +5,7 @@ return function ()
         self.bg:setRepeat(false)
         Player = PlayerModule.new("assets/sprites/player-Sheet.png")
         Player.collision.position = UDim2.fromScale(.1, .8)
+        Player.Dash = function () end
         self.player = Player
         local anim = Animation.new("assets/sprites/mvirus-Sheet.png", 41, 41, 3, 3, .1)
         anim:addHole(3, 3)
@@ -36,26 +37,108 @@ return function ()
             if dlg == nil then return end
             dlg.onFinish:Connect(function()
                 World.flags.metmvirus = true
-                self.testShard = Shard.new(UDim2.fromScale(.4, .73), nil, "testShard")
-                Connect("shard_collected", function (id)
-                    if id == "testShard" and not World.flags.gottestShard then
-                        print("got test shard")
-                        World.flags.gottestShard = true
+
+                local pos = UDim2.fromScale(.4, .73)
+
+                -- 1) VFX: three quick pulses using blink.png (27x27, 3x3, 0.04)
+                local function spawnPulse(delay)
+                    Timer.after(delay, function()
+                        local an = Animation.new("assets/sprites/blink.png", 27, 27, 3, 3, 0.04)
+                        an.loop = false
+                        an.anchor = {.5, .5}
+                        local fx = Block.new(an, pos.x.scale, pos.y.scale)
+                        fx.collision.enabled = false
+                        fx.worldLayer = -5.25
+                        self["fx"..delay] = fx
+                        an.OnFinish:Connect(function() if fx then fx:Destroy() end end)
+                    end):addToGroup(PlayingTimers)
+                end
+                spawnPulse(0.00)
+                spawnPulse(0.08)
+                spawnPulse(0.16)
+
+                self.testShard = Shard.new(pos, nil, "testShard")
+
+                self.testShard.collision.enabled = false
+                self.testShard._alphaMult = 0
+
+                self.doorBlock = Collisions.new("box")
+                self.doorBlock.anchored = true
+                self.doorBlock.anchor = {0,.1}
+                self.doorBlock.position = UDim2.fromScale(0, .75)
+                self.doorBlock.size = UDim2.fromScale(.04, .3)
+
+                self.doorPreventer = Collisions.new("hitbox")
+                self.doorPreventer.anchor = {0,.15}
+                self.doorPreventer.position = UDim2.fromScale(0, .75)
+                self.doorPreventer.size = UDim2.fromScale(.05, .35)
+                self.doorPreventer.onHit:Connect(function (other)
+                    if other:HasTag("player") then
+                        Dialogue.start(WrittenDialogues.testshardexittry, 42)
+                        self.pushOut = Collisions.new("box")
+                        self.pushOut.anchored = true
+                        self.pushOut.anchor = {0,.2}
+                        self.pushOut.position = UDim2.fromScale(0, .75)
+                        self.pushOut.size = UDim2.fromScale(.06, .4)
+                        Timer.after(.1, function ()
+                            self.pushOut:Destroy()
+                        end):addToGroup(PlayingTimers)
+                    end
+                end)
+
+                self._testHum = ProximityHum.new(pos, "assets/sfx/shardhum.wav", .5, .8, 10)
+
+                Timer.after(0.22, function()
+                    local dur = 0.50
+                    local t = 0
+                    local tick
+                    tick = Timer.every(0.016, function()
+                        if not self.testShard or self.testShard._destroying then
+                            if tick then tick:Destroy() end
+                            return
+                        end
+                        t = t + 0.016
+                        local k = math.min(1, t / dur)
+                        self.testShard._alphaMult = k
+                        if k >= 1 then
+                            if tick then tick:Destroy() end
+                            self.testShard.collision.enabled = true
+                        end
+                    end)
+                    tick:addToGroup(PlayingTimers)
+                end):addToGroup(PlayingTimers)
+
+                Connect("shard_collected", function(id)
+                    if id == "testShard" then
+                        self.doorBlock:Destroy()
+                        self.doorPreventer:Destroy()
+                        self._testHum:stopAndDestroy()
+                        if not World.flags.gottestShard then
+                            World.flags.gottestShard = true
+                        end
+                        -- Despues de recolectar testshar, Iniciar misión shards
+                        Timer.after(.1, function ()
+                            script = WrittenDialogues.mvirusgotesttshard
+                            local dlg = Dialogue.start(script, 42)
+                            if dlg == nil then return end
+                            dlg.onFinish:Connect(function()
+                                Popup.show{
+                                text   = "Access token acquired.",
+                                icon   = "assets/sprites/accesstoken.png",
+                                tone   = "ok",
+                                corner = "bl" -- bottom-left (no choca con tu Shards HUD)
+                                }
+                                World.startShardsQuest()
+                            end)
+                        end):addToGroup(PlayingTimers)
                     end
                 end)
             end)
+
         elseif World.flags.metmvirus and not World.flags.gottestShard then
             -- Después de dar el shard de prueba pero no haberlo recolectado
             script = WrittenDialogues.mviruswaitingshard
-            Dialogue.start(script, 42)
-        elseif World.flags.gottestShard and not World.shards.active then
-            -- Despues de recolectar testshar, Iniciar misión shards
-            script = WrittenDialogues.mvirusgotesttshard
-            local dlg = Dialogue.start(script, 42)
-            if dlg == nil then return end
-            dlg.onFinish:Connect(function()
-                World.startShardsQuest()
-            end)
+            Dialogue.start(script, 42)            
         elseif World.shards.active and not World.shards.done then
             -- Misión en progreso
             script = WrittenDialogues.mviruspostFirst
