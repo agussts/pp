@@ -145,7 +145,7 @@ local function buildUI(self)
     return b, t, setActive
     end
 
-  local function makeRadio2(titleText, posX, centerY, cfgKey, aText, aValue, bText, bValue)
+  local function makeRadio2(titleText, posX, centerY, cfgKey, aText, aValue, bText, bValue, cText, cValue)
     -- Título centrado
     local title = Textlabel.new(titleText)
     title:setParent(self.box)
@@ -162,20 +162,31 @@ local function buildUI(self)
 
     local aBtn, aLbl, setA = makePill(UDim2.fromScale(posX,  centerY + .08), aText)
     local bBtn, bLbl, setB = makePill(UDim2.fromScale(rightX, centerY + .08), bText)
+    local cBtn, cLbl, setC
+    if cText and cValue then
+      cBtn, cLbl, setC = makePill(UDim2.fromScale(rightX, centerY + .19), cText)
+    end
 
     local function refresh()
         local cur = Config.ConfigTable[cfgKey] or aValue
         setA(cur == aValue)
         setB(cur == bValue)
+        if setC then
+          setC(cur == cValue)
+        end
     end
     refresh()
     aBtn.callback = function() Config.ConfigTable[cfgKey] = aValue; refresh() end
     bBtn.callback = function() Config.ConfigTable[cfgKey] = bValue; refresh() end
+    if cBtn then
+      cBtn.callback = function() Config.ConfigTable[cfgKey] = cValue; refresh() end
+    end
 
     return {
         title = title,
         aBtn=aBtn, aLbl=aLbl,
         bBtn=bBtn, bLbl=bLbl,
+        cBtn=cBtn, cLbl=cLbl,
         refresh=refresh
     }
 end
@@ -197,7 +208,8 @@ end
     LAYOUT.RAD1_Y,
     "MTHEME",
     "NetKids", "netkids",
-    "Tech",    "tech"
+    "Tech",    "tech",
+    "Direct", "direct"
   )
 
   -- Botón Done
@@ -208,7 +220,7 @@ end
     if self.onDone then self.onDone() end
   end)
   self.doneBtn:setParent(self.box)
-  self.doneBtn.position    = UDim2.fromScale(0.5, LAYOUT.DONE_Y)
+  self.doneBtn.position    = UDim2.fromScale(0.45, LAYOUT.DONE_Y)
   self.doneBtn.size        = UDim2.fromScale(0.55, 0.12)
   self.doneBtn.anchorPoint = {0.5, 0.5}
   self.doneBtn.bgColor     = {0.35,0.35,0.35,1}

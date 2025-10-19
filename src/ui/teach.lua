@@ -5,7 +5,7 @@ local seen = {}  -- volatile in-memory (you can mirror to World.flags if you wan
 
 -- Show a popup once per key. Uses Popups.show() and a small delay queue.
 function Teach.once(key, opt)
-  if seen[key] or (World.flags and World.flags[key]) then return end
+  if seen[key] or (World.flags and World.flags[key]) or not Config.SavedConfigs.TEACH then return end
   seen[key] = true
   if World.flags then World.flags[key] = true end
 
@@ -23,7 +23,7 @@ end
 
 -- Convenience: chained hints with short gaps (once per chain key).
 function Teach.chain(key, items, gap)
-  if seen[key] or (World.flags and World.flags[key]) then return end
+  if seen[key] or (World.flags and World.flags[key]) or not Config.SavedConfigs.TEACH then return end
   seen[key] = true
   if World.flags then World.flags[key] = true end
   local delay = 0

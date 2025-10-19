@@ -536,29 +536,6 @@ end
 local function createAccessibilityMenu(parent)
     local menu = {}
 
-    -- === Defaults planos (si faltan claves) ===
-    local FALLBACK_DEFAULTS = {
-        HELP_SIGNS    = true,       -- carteles de ayuda visibles
-        TEACH = true,       -- Teach.lua activo
-        MAUDIENCE = "Kids",     -- "Kids" | "Teens"
-        MTHEME    = "NetKids",  -- "NetKids" | "Tech"
-    }
-
-    -- asegúrate de que existan en Config.ConfigTable (planas)
-    for k, v in pairs(FALLBACK_DEFAULTS) do
-        if Config.ConfigTable[k] == nil then
-            Config.ConfigTable[k] = v
-        end
-    end
-
-    -- defaults globales (si tienes Config.DefaultConfigs, úsalo; si no, usa FALLBACK_DEFAULTS)
-    local DEFAULTS = (Config.DefaultConfigs and {
-        HELP_SIGNS    = (Config.DefaultConfigs.HELP_SIGNS    ~= nil) and Config.DefaultConfigs.HELP_SIGNS    or FALLBACK_DEFAULTS.HELP_SIGNS,
-        TEACH = (Config.DefaultConfigs.TEACH ~= nil) and Config.DefaultConfigs.TEACH_ or FALLBACK_DEFAULTS.TEACH,
-        MAUDIENCE = Config.DefaultConfigs.MAUDIENCE or FALLBACK_DEFAULTS.MAUDIENCE,
-        MTHEME    = Config.DefaultConfigs.MTHEME    or FALLBACK_DEFAULTS.MTHEME,
-    }) or FALLBACK_DEFAULTS
-
     -- snapshot para Revert
     local function takeSnapshot()
         return {
@@ -617,7 +594,11 @@ local function createAccessibilityMenu(parent)
     local teachBtn, teachLbl, teachImg = createCheckBox(UDim2.fromScale(0.2, 0.30), "Teach Helper", "TEACH")
 
     -- ===== Selectores con flechas (como Resolution): Audience / Theme =====
-    local function createArrowSelector(yPos, labelText, values, keyName)
+    local function createArrowSelector(yPos, labelText, val, keyName)
+        local values = {}
+        for i,v in ipairs(val) do
+            values[i] = string.lower(v)
+        end
         local leftLabel = Textlabel.new(labelText)
         leftLabel:setParent(parent)
         leftLabel.position    = UDim2.fromScale(0, yPos)
@@ -635,7 +616,19 @@ local function createAccessibilityMenu(parent)
         table.insert(menu, valueText)
 
         local function refreshValue()
-            valueText.text = tostring(Config.ConfigTable[keyName])
+            if tostring(Config.ConfigTable[keyName]) == "kids" then
+                valueText.text = "Kids"
+            elseif tostring(Config.ConfigTable[keyName]) == "teens" then
+                valueText.text = "Teens"
+            elseif tostring(Config.ConfigTable[keyName]) == "netkids" then
+                valueText.text = "NetKids"
+            elseif tostring(Config.ConfigTable[keyName]) == "tech" then
+                valueText.text = "Tech"
+            elseif tostring(Config.ConfigTable[keyName]) == "direct" then
+                valueText.text = "Direct"
+            else
+                valueText.text = Config.ConfigTable[keyName]
+            end
         end
 
         local leftBtn, leftImg = createImageButton(
@@ -679,7 +672,7 @@ local function createAccessibilityMenu(parent)
     end
 
     local audienceText = createArrowSelector(0.45, "MathQuiz Audience", {"Kids","Teens"}, "MAUDIENCE")
-    local themeText = createArrowSelector(0.58, "MathQuiz Theme",    {"NetKids","Tech"}, "MTHEME")
+    local themeText = createArrowSelector(0.58, "MathQuiz Theme",    {"NetKids","Tech", "Direct"}, "MTHEME")
 
     -- ===== Botones Back / Apply / Revert / Reset =====
     local backBtn, backText = createTextButton(
@@ -698,10 +691,6 @@ local function createAccessibilityMenu(parent)
         "Apply",
         function ()
             Config.saveConfig()
-            HELP_SIGNS    = Config.ConfigTable.HELP_SIGNS
-            TEACH = Config.ConfigTable.TEACH
-            MAUDIENCE = Config.ConfigTable.MAUDIENCE
-            MTHEME    = Config.ConfigTable.MTHEME
             prevAcc = takeSnapshot()
             showMenu("settings")
         end
@@ -722,6 +711,18 @@ local function createAccessibilityMenu(parent)
             teachImg.image = love.graphics.newImage(Config.ConfigTable.HELP_SIGNS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
             audienceText.text = Config.ConfigTable.MAUDIENCE
             themeText.text = Config.ConfigTable.MTHEME
+            if tostring(Config.ConfigTable.MAUDIENCE) == "kids" then
+                audienceText.text = "Kids"
+            elseif tostring(Config.ConfigTable.MAUDIENCE) == "teens" then
+                audienceText.text = "Teens"
+            end
+            if tostring(Config.ConfigTable.MTHEME) == "netkids" then
+                themeText.text = "NetKids"
+            elseif tostring(Config.ConfigTable.MTHEME) == "tech" then
+                themeText.text = "Tech"
+            elseif tostring(Config.ConfigTable.MTHEME) == "direct" then
+                themeText.text = "Direct"
+            end
         end
     )
     table.insert(menu, revertBtn); table.insert(menu, revertText)
@@ -738,8 +739,18 @@ local function createAccessibilityMenu(parent)
             Config.ConfigTable.MTHEME    = Config.DefaultConfigs.MTHEME
             helpImg.image = love.graphics.newImage(Config.ConfigTable.HELP_SIGNS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
             teachImg.image = love.graphics.newImage(Config.ConfigTable.HELP_SIGNS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
-            audienceText.text = Config.ConfigTable.MAUDIENCE
-            themeText.text = Config.ConfigTable.MTHEME
+            if tostring(Config.ConfigTable.MAUDIENCE) == "kids" then
+                audienceText.text = "Kids"
+            elseif tostring(Config.ConfigTable.MAUDIENCE) == "teens" then
+                audienceText.text = "Teens"
+            end
+            if tostring(Config.ConfigTable.MTHEME) == "netkids" then
+                themeText.text = "NetKids"
+            elseif tostring(Config.ConfigTable.MTHEME) == "tech" then
+                themeText.text = "Tech"
+            elseif tostring(Config.ConfigTable.MTHEME) == "direct" then
+                themeText.text = "Direct"
+            end
         end
     )
     table.insert(menu, resetBtn); table.insert(menu, resetText)
@@ -772,7 +783,7 @@ showMenu("")
 -- -------------------------------------------
 
 function PauseMenu()
-    if Gamestate == "dialogue" or Gamestate == "intro" then print("intro") return end
+    if Gamestate == "dialogue" or Gamestate == "intro" then return end
     print(Gamestate)
     if Gamestate == "playing" then
         PlayingTimers:pause()

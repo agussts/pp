@@ -1,7 +1,7 @@
 ---
 -- MathQuiz (8–11) — English, internet-flavored story problems.
 -- API:
---   MathQuiz.start{ rounds=3, timePer=20, onWin=fn, onLose=fn, audience="kids"| "teen", theme="netkids"|"tech" }
+--   MathQuiz.start{ rounds=3, timePer=20, onWin=fn, onLose=fn, audience="kids"| "teens", theme="netkids"|"tech" }
 --
 -- Inputs: digits 0–9, Backspace to delete, Enter to submit.
 -- QoL: 2–3 tries, hints after first miss, Enter to continue between rounds.
@@ -37,7 +37,7 @@ local PRESETS = {
     defaultTime = 25,
     twoStepByRound = { 10, 25, 40, 55 }, -- % chance of 2-step on rounds 1..N
   },
-  teen = {
+  teens = {
     sumMax = 30,
     subMax = 30,
     mulA   = {2,6},
@@ -134,7 +134,7 @@ local THEMES = {
   },
 
   -- neutral, short phrasing
-  tech = {
+  direct = {
     title = "DATA CHECKPOINT",
     pressEnter = "Press Enter to continue",
     answerLbl  = "Answer: %s",
@@ -208,7 +208,85 @@ local THEMES = {
       },
       hint = function(a,b,c) return ("Add then multiply."):format() end
     },
-  }
+  },
+  
+  tech = {
+  title = "NETWORK CHECKPOINT",
+  pressEnter = "Press Enter to continue",
+  answerLbl  = "Answer: %s",
+  timeInfo   = function(t,cur,tot,tr) return ("Time: %.1fs   Round: %d/%d   Tries: %d"):format(t,cur,tot,tr) end,
+  okMsg      = "Nice! Correct.",
+  nopeMsg    = "Hint: %s",
+  failMsg    = function(ans) return ("Correct answer: %d."):format(ans) end,
+  timeUpMsg  = function(ans) return ("Time's up. %d."):format(ans) end,
+
+  -- Un paso con lenguaje de red
+  sumTxt = {
+    function(a,b) return ("You receive %d packets, then %d more. Total packets?"):format(a,b) end,
+    function(a,b) return ("Server A sends %d packets and Server B sends %d. Total?"):format(a,b) end,
+  },
+  subTxt = {
+    function(a,b) return ("Firewall drops %d from your %d packets. How many pass?"):format(b,a) end,
+    function(a,b) return ("Cache stores %d; cleanup removes %d. Packets left?"):format(a,b) end,
+  },
+  mulTxt = {
+    function(a,b) return ("Transmit on %d channels with %d packets each. Total?"):format(a,b) end,
+    function(a,b) return ("%d rows, %d packets per row. Total packets?"):format(a,b) end,
+  },
+  oneHintSum = "Combine the amounts.",
+  oneHintSub = "Start from total; subtract drops.",
+  oneHintMul = function(a,b) return ("Think %d groups of %d (repeated addition)."):format(a,b) end,
+
+  -- Dos pasos con narrativa de red
+  two_clone_minus = {
+    text = {
+      function(n,k,d) return ("%d routers clone %d packets each; firewall blocks %d. How many get through?"):format(n,k,d) end,
+    },
+    hint = function(n,k,d) return ("Do %d×%d, then subtract %d."):format(n,k,d) end
+  },
+  two_double_sum = {
+    text = {
+      function(a,b) return ("You gather %d from node A and %d from node B. Compressor duplicates the total. How many now?"):format(a,b) end,
+    },
+    hint = function(a,b) return ("Add first (%d+%d), then double."):format(a,b) end
+  },
+  two_sum_minus = {
+    text = {
+      function(a,b,c) return ("You buffer %d and %d packets; maintenance removes %d. Packets remaining?"):format(a,b,c) end,
+    },
+    hint = function(c) return ("Add the buffers, then subtract %d."):format(c) end
+  },
+  two_cycles = {
+    text = {
+      function(t,g,h) return ("Run %d send cycles. Each cycle sends %d groups with %d packets each. Total?"):format(t,g,h) end,
+    },
+    hint = function(t,g,h) return ("Find groups (%d×%d), then multiply by %d."):format(g,h,t) end
+  },
+  two_mul_plus = {
+    text = {
+      function(n,k,d) return ("%d clusters with %d packets each, then add %d bonus packets. Total?"):format(n,k,d) end,
+    },
+    hint = function(n,k,d) return ("Multiply clusters, then add the bonus.") end
+  },
+  two_double_minus = {
+    text = {
+      function(a,b) return ("Bandwidth doubles to 2×%d packets, then %d are filtered. Packets left?"):format(a,b) end,
+    },
+    hint = function(a,b) return ("Double first, then subtract.") end
+  },
+  two_triple_add_small = {
+    text = {
+      function(a,c) return ("A booster triples %d packets, then we add %d more. Total?"):format(a,c) end,
+    },
+    hint = function(a,c) return ("Triple then add.") end
+  },
+  two_sum_times_small = {
+    text = {
+      function(a,b,c) return ("Combine %d and %d packets; send this bundle %d times. Total?"):format(a,b,c) end,
+    },
+    hint = function(a,b,c) return ("Add then multiply.") end
+  },
+}
 }
 
 -- ---------- generators ----------
@@ -271,8 +349,9 @@ end
 -- ---------- API ----------
 function MathQuiz.start(opt)
   opt = opt or {}
-  local audience = (opt.audience == "teen") and "teen" or "kids"
-  local theme    = (opt.theme == "tech") and "tech" or "netkids"
+  print(Config.SavedConfigs.MAUDIENCE)
+  local audience = Config.SavedConfigs.MAUDIENCE or (opt.audience == "teens") and "teens" or "kids"
+  local theme    = Config.SavedConfigs.MTHEME or (opt.theme == "tech") and "tech" or "netkids"
   local P        = PRESETS[audience]
   local T        = THEMES[theme]
 

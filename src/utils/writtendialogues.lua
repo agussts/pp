@@ -3,7 +3,7 @@ local dialogues = {}
 dialogues.mvirusFirst = {
     { who="???", text="New face. Looking for work?" },
     { who="YOU", text="I... guess. What kind of work?" },
-    { who="???", text="Find me three Data shards. Three should do. Outside this place." },
+    { who="???", text="Find me some Data shards. Three should do. Outside this place." },
     { who="YOU", text="Where do I start?" },
     { who="???", text="Follow the noise. Bring them back here." },
     { who="YOU", text="Wait wait.. but, how do they look like?" },
@@ -34,10 +34,18 @@ dialogues.mviruspostFirst = {
     { who="???", text="Three shards. Outside. Hurry up." },
 }
 
-dialogues.shardsDone = {
-    { who="???", text="All three? Good. Hand them over." },
-    { who="YOU", text="Here." },
-    { who="???", text="Not bad. Come back when you're ready for real trouble." },
+dialogues.mvirusTurnIn = {
+  { who="???", text="Back already... with all three?" },
+  { who="YOU", text="Yeah, got them." },
+  { who="???", text="Not bad. You move fast." },
+  { who="???", text="Here. Your WEB KEY. Access to the surface web." },
+  { who="???", text="Careful out there. Different rules. Bigger eyes." },
+  { who="YOU", text="Got it." },
+  { who="???", text="When you're ready, head to the entry node. Good luck." },
+}
+
+dialogues.webattemptexit = {
+  { who="YOU", text="I'm too far in now.. no going back." },
 }
 
 dialogues.tut_cdn_sign_basic = {

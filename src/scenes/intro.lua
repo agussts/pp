@@ -14,7 +14,6 @@ return function()
   local HOLD_S       = 1.0
   local FADE_OUT_S   = 1.0
   local GAP_S        = 0.4             -- pausa entre líneas
-  local SKIP_HINT_S  = 2.0            -- fade-in del “Press any key...”
   local TEXT_COLOR   = {1,1,1,1}
   local BG_COLOR     = {0,0,0,1}
   local IGNORE_FIRST_PRESS = true
@@ -23,7 +22,7 @@ return function()
   local LINES = {
     "You are a tiny virus.",
     "You live inside the internet.",
-    "Find three blue green shards.",
+    "Find three green data shards.",
     "Bring them back to the one who asked."
   }
 

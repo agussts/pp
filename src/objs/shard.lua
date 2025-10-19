@@ -55,19 +55,19 @@ function Shard:Collect()
     audios.pickup:clone():play()
     World.onShardCollected(self.id)
     self:Destroy()
-    -- MathQuiz.start({
-    --     rounds = 1,      -- cuántas preguntas
-    --     timePer = 25,    -- segundos por pregunta
-    --     onWin = function()
-    --         World.onShardCollected(self.id)
-    --         self:Destroy()
-    --     end,
-    --     onLose = function()
-    --         -- opcional: feedback y permitir reintento
-    --         -- Ej: pequeña vibración, sonido, etc.
-    --         self._busy = false
-    --     end
-    -- })
+    MathQuiz.start({
+        --rounds = 3,      -- cuántas preguntas
+        --timePer = 25,    -- segundos por pregunta
+        onWin = function()
+            World.onShardCollected(self.id)
+            self:Destroy()
+        end,
+        onLose = function()
+            -- opcional: feedback y permitir reintento
+            -- Ej: pequeña vibración, sonido, etc.
+            self._busy = false
+        end
+    })
 end
 
 function Shard:update(dt)
