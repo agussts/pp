@@ -10,7 +10,7 @@ return {
   tilewidth = 32,
   tileheight = 32,
   nextlayerid = 19,
-  nextobjectid = 309,
+  nextobjectid = 311,
   properties = {},
   tilesets = {
     {
@@ -140,7 +140,7 @@ return {
       id = 14,
       name = "Colliders",
       class = "",
-      visible = false,
+      visible = true,
       opacity = 1,
       offsetx = 0,
       offsety = 0,
@@ -762,6 +762,21 @@ return {
           properties = {
             ["anchored"] = true
           }
+        },
+        {
+          id = 310,
+          name = "",
+          type = "",
+          shape = "rectangle",
+          x = 0,
+          y = -32,
+          width = 1280,
+          height = 32,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["anchored"] = true
+          }
         }
       }
     },
@@ -1352,7 +1367,7 @@ return {
         {
           id = 229,
           name = "shard",
-          type = "cdn_shard",
+          type = "shard",
           shape = "point",
           x = 976,
           y = 48,
@@ -1360,7 +1375,9 @@ return {
           height = 0,
           rotation = 0,
           visible = true,
-          properties = {}
+          properties = {
+            ["id"] = "cdn_shard"
+          }
         },
         {
           id = 230,

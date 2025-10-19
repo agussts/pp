@@ -21,4 +21,13 @@ vec4 effect(vec4 color, Image texture, vec2 texCoord, vec2 screenCoord) {
     }
 ]])
 
+Shaders.allWhite = love.graphics.newShader([[
+extern float thresh;
+vec4 effect(vec4 color, Image tex, vec2 tc, vec2 sc) {
+  vec4 px = Texel(tex, tc);
+  if (px.a <= thresh) return vec4(0.0);
+  return vec4(1.0, 1.0, 1.0, px.a);
+}
+]])
+
 return Shaders

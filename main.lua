@@ -85,6 +85,10 @@ love.update = function (dt)
     for _, rootGui in pairs(Guis.getTopLevelGuis()) do
         rootGui:calculateRenderProperties()
     end
+    
+    if ShardsIconsHUD._singleton then
+        ShardsIconsHUD._singleton:update(dt)
+    end
 
     local sceneTable = Scene.get() or {}
 

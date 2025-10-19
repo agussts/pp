@@ -67,7 +67,9 @@ return function()
                 if not World.shards.collectedIds["trash1"] then
                     self._trashShard = self._trashShard or Shard.new(self._trashPos, "assets/sprites/shard.png", "trash1")
                     self._trashShard.onCollect:Connect(function ()
-                        self._trashHum:stopAndDestroy()
+                        if self._trashHum then
+                            self._trashHum:stopAndDestroy()
+                        end
                     end)
                     table.insert(self.shards, self._trashShard)
                 end
@@ -140,9 +142,9 @@ return function()
         self.trashDumpTrash.worldLayer = -5
 
         -- Si la misión ya estaba activa al entrar a esta escena, prepara todo:
-        if World.shards.active and not World.shards.done then
-            print("spawn shards")
-        end
+        --if World.shards.active and not World.shards.done then
+            ShardsIconsHUD.new()
+        --end
 
         Gun = GunModule.new()
         self.gun = Gun

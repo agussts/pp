@@ -33,27 +33,45 @@ return function ()
             -- Primera vez: mensaje completo
             script = WrittenDialogues.mvirusFirst
             local dlg = Dialogue.start(script, 42)
+            if dlg == nil then return end
             dlg.onFinish:Connect(function()
                 World.flags.metmvirus = true
-                World.startShardsQuest()     -- -> internetscn spawnea shards
-            end)
-        else
-            if World.shards.done then
-                -- “Turn-in” (si ya juntaste los 3)
-                script = WrittenDialogues.shardsDone
-                local dlg = Dialogue.start(script, 42)
-                dlg.onFinish:Connect(function()
-                    -- cerrar misión, dar recompensa, marcar reset/next-step:
-                    World.shards.active = false
-                    World.shards.spawned = false 
+                self.testShard = Shard.new(UDim2.fromScale(.4, .73), nil, "testShard")
+                Connect("shard_collected", function (id)
+                    if id == "testShard" and not World.flags.gottestShard then
+                        print("got test shard")
+                        World.flags.gottestShard = true
+                    end
                 end)
-            else
-                -- Recordatorio corto si ya aceptaste pero no terminaste
-                script = WrittenDialogues.mviruspostFirst
-                Dialogue.start(script, 42)
-            end
+            end)
+        elseif World.flags.metmvirus and not World.flags.gottestShard then
+            -- Después de dar el shard de prueba pero no haberlo recolectado
+            script = WrittenDialogues.mviruswaitingshard
+            Dialogue.start(script, 42)
+        elseif World.flags.gottestShard and not World.shards.active then
+            -- Despues de recolectar testshar, Iniciar misión shards
+            script = WrittenDialogues.mvirusgotesttshard
+            local dlg = Dialogue.start(script, 42)
+            if dlg == nil then return end
+            dlg.onFinish:Connect(function()
+                World.startShardsQuest()
+            end)
+        elseif World.shards.active and not World.shards.done then
+            -- Misión en progreso
+            script = WrittenDialogues.mviruspostFirst
+            Dialogue.start(script, 42)
+        elseif World.shards.done then
+            -- “Turn-in” (si ya juntaste los 3)
+            script = WrittenDialogues.shardsDone
+            local dlg = Dialogue.start(script, 42)
+            if dlg == nil then return end
+            dlg.onFinish:Connect(function()
+                -- cerrar misión, dar recompensa, marcar reset/next-step:
+                World.shards.active = false
+                World.shards.spawned = false 
+            end)    
         end
-  end
+    end
 
     scene.update = function (self, dt)
         local w, h = love.graphics.getDimensions()

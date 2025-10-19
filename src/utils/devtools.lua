@@ -6,6 +6,7 @@ local DevTools = {
     enabled       = true,
     hitboxesOn    = true, -- TEMPORAL: CAMBIAR A false DESPUES
     overlayOn     = false, 
+    noclipOn    = false,
     _overlayGui   = nil,
     _keyConn      = nil,
     _tickTimer    = nil,
@@ -81,8 +82,13 @@ end
 
 local function toggleNoclip()
     print("[Dev] Noclip toggled.")
-    Player.collision.blockFilter = function ()
-        return false
+    DevTools.noclipOn = not DevTools.noclipOn
+    if DevTools.noclipOn then
+        Player.collision.blockFilter = function ()
+            return false
+        end
+    else 
+        Player.collision.blockFilter = nil
     end
 end
 

@@ -3,10 +3,7 @@ return function()
   local scene = {}
 
   scene.load = function(self, payload)
-    self.bgA = Background.new("assets/sprites/xthingy.png", 32*3, 18*3, 1,1)
-    self.bgB = Background.new("assets/sprites/xthingy.png", 32*3, 18*3, 1,1)
-    self.bgA.color = {1,.2,1,0.04}
-    self.bgB.color = {.2,1,1,0.02}
+    love.graphics.setBackgroundColor(34/255, 32/255, 52/255)
 
     -- mapa desde Tiled con las clases "cdn_*"
     self.map = TiledLite.load("assets/maps/cdn.lua", { collisionLayers={"Colliders"} })
@@ -21,15 +18,15 @@ return function()
 
     -- enganchar feature
     self.cdn = require("src.features.cdn_catwalks").attach(self, self.map)
-        Player.collision.position = self.playerspawn or UDim2.fromScale(.15, .75)
+    if World.shards.collectedIds["cdn_shard"] then
+      self.shard:Destroy()
+    end
 
+    Player.collision.position = self.playerspawn or UDim2.fromScale(.15, .75)
+    Player.Dash = function (...) end
   end
 
   scene.update = function(self, dt)
-    self.bgA:setScroll(self.bgA.scrollX + 30*dt, self.bgA.scrollY - 15*dt)
-    self.bgB:setScroll(self.bgB.scrollX - 15*dt, self.bgB.scrollY + 30*dt)
-    self.bgA.color[4] = 0.03 + 0.01 * math.sin(PlayingTimers:getTimePassed() * 2)
-    self.bgB.color[4] = 0.03 - 0.01 * math.sin(PlayingTimers:getTimePassed() * 2)
 
     local px,py = Player.collision.position:toPixels()
     Camera.update(px, py)
@@ -38,8 +35,6 @@ return function()
   end
 
   scene.draw = function(self)
-    self.bgA:drawBackground()
-    self.bgB:drawBackground()
 
     Camera.attach()
       -- dibuja tiles del mapa si quieres aquí
@@ -48,6 +43,7 @@ return function()
   end
 
   scene.unload = function(self)
+    love.graphics.setBackgroundColor(0,0,0)
     if self.cdn and self.cdn.detach then self.cdn:detach() end
     self.map = nil
   end

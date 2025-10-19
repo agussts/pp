@@ -1,11 +1,13 @@
 local world = {
     flags = {
         metmvirus = false,
+        gottestShard = false,
+        gotmission = false,
         trashCleared = false,
     },
     shards = {
         active = false,
-        needed = 3,
+        needed = 4,
         collected = 0,
         spawned = false,
         done = false,
@@ -25,13 +27,12 @@ function world.startShardsQuest()
 end
 
 function world.onShardCollected(id)
-    if not world.shards.active then return end
     if id then
         world.shards.collectedIds[id] = true
     end
     world.shards.collected = math.min(world.shards.collected + 1, world.shards.needed)
     world.shards.done = world.shards.active and (world.shards.collected >= world.shards.needed)
-    Fire("shard_collected", world.shards.collected, world.shards.needed)
+    Fire("shard_collected", id, world.shards.collected, world.shards.needed)
 end
 
 return world

@@ -54,7 +54,7 @@ function Shard:Collect()
     self._busy = true
     audios.pickup:play()
     MathQuiz.start({
-        rounds = 3,      -- cuántas preguntas
+        rounds = 1,      -- cuántas preguntas
         timePer = 25,    -- segundos por pregunta
         onWin = function()
             World.onShardCollected(self.id)

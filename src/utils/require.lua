@@ -19,12 +19,6 @@ Guis = require("src.guis.gui")
     ImageLabel = require("src.guis.imagelabel")
     PrintfLabel = require("src.guis.printf_label")
 
---UI (no preguntes la diferencia)
-
-DCHUD = require("src.ui.datacenter_hud")
-ShardsHUD = require("src.ui.shards_hud")
-require("src.ui.pausemenu") -- lo mismo que connections.lua
-
 --Styles
 
     Border = require("src.guis.styles.border")
@@ -57,6 +51,13 @@ TiledLite = require("src.libs.tiledlite")
 Shaders = require("src.libs.shaders")
 Dialogue = require("src.libs.dialogue")
 WrittenDialogues = require("src.utils.writtendialogues")
+
+--UI (no preguntes la diferencia)
+
+DCHUD = require("src.ui.datacenter_hud")
+ShardsHUD = require("src.ui.shards_hud")
+ShardsIconsHUD = require("src.ui.shards_icons")
+require("src.ui.pausemenu") -- lo mismo que connections.lua
 
 World = require("src.utils.world")
 

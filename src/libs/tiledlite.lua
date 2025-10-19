@@ -340,7 +340,7 @@ end
 
 -- shard (props: id, sprite). Respeta quest activa.
 DefaultFactories.shard = function(o, scn)
-    if not (World.shards.active and not World.shards.done) then return nil end
+    --if not (World.shards.active and not World.shards.done) then return nil end
     local id = o.props and o.props.id
     local sprite = (o.props and o.props.sprite) or "assets/sprites/shard.png"
     local s = Shard.new(UDim2.fromScale(o.sx, o.sy), sprite, id)

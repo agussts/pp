@@ -13,8 +13,6 @@ local function newState()
     -- runtime
     paths = {},         -- {k, col}
     spawns = {},        -- {pos, kind}
-    shardPos = nil,
-    upgPos   = nil,
     displayPos = nil,
 
     -- math
@@ -199,9 +197,6 @@ function CDN.attach(scene, map)
     table.insert(st.spawns, {UDim2.fromScale(o.sx, o.sy), (o.props and o.props.kind) or "antivirus"})
     return nil
   end
-
-  F["cdn_shard"] = function(o) st.shardPos = UDim2.fromScale(o.sx,o.sy) end
-  F["cdn_upgrade"] = function(o) st.upgPos = UDim2.fromScale(o.sx,o.sy) end
 
   -- Spawnear todo
   map:spawnObjects(F, scene)

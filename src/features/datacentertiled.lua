@@ -110,7 +110,7 @@ local function spawnServerAt(self, pad)
         end
 
         -- shard si llegaste a la meta
-        if (not st.shardSpawned) and st.points >= st.targetPoints then
+        if (not st.shardSpawned) and st.points >= st.targetPoints and not World.shards.collectedIds["dc_shard"] then
             st.shardSpawned = true
             local where = st.shardPos or pad.pos
             st.shardObj = Shard.new(where, "assets/sprites/shard.png", "dc_shard")

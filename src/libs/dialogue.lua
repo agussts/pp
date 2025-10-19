@@ -7,6 +7,7 @@
 local Dialogue = {}
 local allDialogues = {}
 Dialogue.__index = Dialogue
+local _inDialogue = false
 
 --- Entra al estado de diálogo.
 -- Pausa los timers de juego y activa los timers de UI.
@@ -83,6 +84,8 @@ end
 -- })
 function Dialogue.start(script, cps)
     assert(type(script)=="table" and #script>0, "Dialogue.start: script inválido")
+    if _inDialogue then return end
+    _inDialogue = true
     local self = setmetatable({}, Dialogue)
     self.script = script
     self.idx = 1
@@ -159,6 +162,7 @@ end
 --- Termina el diálogo y limpia la UI.
 function Dialogue:finish()
     if not self._active then return end
+    _inDialogue = false
     self._active = false
     if self._connection then Disconnect("keyPressed", self._connection) end
     if self.root then self.root:Destroy() end
