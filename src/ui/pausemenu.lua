@@ -1,5 +1,5 @@
 -- Estados del juego
-Gamestates = { "playing", "paused" , "dialogue" }
+Gamestates = { "playing", "paused" , "dialogue" , "intro" }
 Gamestate = "playing"
 
 -- Estados del menu de pausa
@@ -198,6 +198,18 @@ local function createSettingsMenu(parent)
     table.insert(menu, keybindsBtn)
     table.insert(menu, keybindsText)
 
+    local accBtn, accText = createTextButton(
+        parent,
+        UDim2.fromScale(0.5, 0.27),
+        UDim2.fromScale(0.8, 0.1),
+        "Accessibility",
+        function ()
+            showMenu("accessibility")
+        end
+    )
+    table.insert(menu, accBtn)
+    table.insert(menu, accText)
+
     -- Logica para Checkbox
     local function createCheckBox(pos, text, name)
         local btn
@@ -228,12 +240,12 @@ local function createSettingsMenu(parent)
         return btn, label, btnImg
     end
 
-    local borderlessCb, borderlessLabel, borderlessImg = createCheckBox(UDim2.fromScale(0.2, 0.25), "Borderless", "BORDERLESS")
+    local borderlessCb, borderlessLabel, borderlessImg = createCheckBox(UDim2.fromScale(0.2, 0.35), "Borderless", "BORDERLESS")
     table.insert(menu, borderlessCb)
     table.insert(menu, borderlessLabel)
     table.insert(menu, borderlessImg)
 
-    local vsyncCb, vsyncLabel, vsyncImg = createCheckBox(UDim2.fromScale(0.2, 0.4), "VSync", "VSYNC")
+    local vsyncCb, vsyncLabel, vsyncImg = createCheckBox(UDim2.fromScale(0.2, 0.47), "VSync", "VSYNC")
     table.insert(menu, vsyncCb)
     table.insert(menu, vsyncLabel)
     table.insert(menu, vsyncImg)
@@ -242,14 +254,14 @@ local function createSettingsMenu(parent)
 
     local resolutionText = Textlabel.new("Resolution: " .. Config.Resolutions[Config.ConfigTable.RESOLUTION].width .. "x" .. Config.Resolutions[Config.ConfigTable.RESOLUTION].height)
     resolutionText:setParent(parent)
-    resolutionText.position = UDim2.fromScale(0.2, 0.55)
+    resolutionText.position = UDim2.fromScale(0.2, 0.57)
     resolutionText.size = UDim2.fromScale(0.6, 0.1)
     resolutionText.textColor = {1, 1, 1, 1}
     table.insert(menu, resolutionText)
 
     local resLeft, resLeftImg = createImageButton(
         parent,
-        UDim2.fromScale(0.15, 0.6),
+        UDim2.fromScale(0.15, 0.62),
         UDim2.fromScale(0.075, 0.075),
         "assets/sprites/arrow_left.png",
         function ()
@@ -265,7 +277,7 @@ local function createSettingsMenu(parent)
 
     local resRight, resRightImg = createImageButton(
         parent,
-        UDim2.fromScale(0.85, 0.6),
+        UDim2.fromScale(0.85, 0.62),
         UDim2.fromScale(0.075, 0.075),
         "assets/sprites/arrow_right.png",
         function ()
@@ -520,19 +532,248 @@ local function createKeybindsMenu(parent)
 
     return menu
 end
+
+local function createAccessibilityMenu(parent)
+    local menu = {}
+
+    -- === Defaults planos (si faltan claves) ===
+    local FALLBACK_DEFAULTS = {
+        HELP_SIGNS    = true,       -- carteles de ayuda visibles
+        TEACH = true,       -- Teach.lua activo
+        MAUDIENCE = "Kids",     -- "Kids" | "Teens"
+        MTHEME    = "NetKids",  -- "NetKids" | "Tech"
+    }
+
+    -- asegúrate de que existan en Config.ConfigTable (planas)
+    for k, v in pairs(FALLBACK_DEFAULTS) do
+        if Config.ConfigTable[k] == nil then
+            Config.ConfigTable[k] = v
+        end
+    end
+
+    -- defaults globales (si tienes Config.DefaultConfigs, úsalo; si no, usa FALLBACK_DEFAULTS)
+    local DEFAULTS = (Config.DefaultConfigs and {
+        HELP_SIGNS    = (Config.DefaultConfigs.HELP_SIGNS    ~= nil) and Config.DefaultConfigs.HELP_SIGNS    or FALLBACK_DEFAULTS.HELP_SIGNS,
+        TEACH = (Config.DefaultConfigs.TEACH ~= nil) and Config.DefaultConfigs.TEACH_ or FALLBACK_DEFAULTS.TEACH,
+        MAUDIENCE = Config.DefaultConfigs.MAUDIENCE or FALLBACK_DEFAULTS.MAUDIENCE,
+        MTHEME    = Config.DefaultConfigs.MTHEME    or FALLBACK_DEFAULTS.MTHEME,
+    }) or FALLBACK_DEFAULTS
+
+    -- snapshot para Revert
+    local function takeSnapshot()
+        return {
+            HELP_SIGNS    = Config.ConfigTable.HELP_SIGNS,
+            TEACH = Config.ConfigTable.TEACH,
+            MAUDIENCE = Config.ConfigTable.MAUDIENCE,
+            MTHEME    = Config.ConfigTable.MTHEME,
+        }
+    end
+    local prevAcc = takeSnapshot()
+
+    -- ===== Título =====
+    local titleText = Textlabel.new("Accessibility")
+    titleText:setParent(parent)
+    titleText.position  = UDim2.fromScale(0, 0)
+    titleText.size      = UDim2.fromScale(1, 0.1)
+    titleText.textColor = {1, 1, 1, 1}
+    table.insert(menu, titleText)
+
+    -- ===== CheckBox helper (mismo estilo que Settings) =====
+    local function createCheckBox(pos, text, keyName)
+        local btn, btnImg
+
+        btn = Button.new(function ()
+            local newVal = not Config.ConfigTable[keyName]
+            Config.ConfigTable[keyName] = newVal
+            local newImage = newVal and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png"
+            btnImg.image = love.graphics.newImage(newImage)
+        end)
+        btn:setParent(parent)
+        btn.bgColor   = {0, 0, 0, 0}
+        btn.position  = pos
+        btn.size      = UDim2.fromScale(0.15, 0.1)
+
+        btnImg = ImageLabel.new(Config.ConfigTable[keyName] and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+        btnImg:setParent(parent)
+        btnImg.position    = btn.position
+        btnImg.size        = btn.size * 1.5
+        btnImg.anchorPoint = {0, 0.35}
+        btnImg.zIndex      = 5
+
+        local label = Textlabel.new(text)
+        label:setParent(btn)
+        label.position    = UDim2.fromScale(1.2, 0)
+        label.size        = UDim2.fromScale(2, 1)
+        label.anchorPoint = {0, 0}
+
+        table.insert(menu, btn)
+        table.insert(menu, label)
+        table.insert(menu, btnImg)
+        return btn, label, btnImg
+    end
+
+    -- ===== Checkboxes: Help Signs / Teach =====
+    local helpBtn, helpLbl, helpImg = createCheckBox(UDim2.fromScale(0.2, 0.18), "Help Signs", "HELP_SIGNS")
+    local teachBtn, teachLbl, teachImg = createCheckBox(UDim2.fromScale(0.2, 0.30), "Teach Helper", "TEACH")
+
+    -- ===== Selectores con flechas (como Resolution): Audience / Theme =====
+    local function createArrowSelector(yPos, labelText, values, keyName)
+        local leftLabel = Textlabel.new(labelText)
+        leftLabel:setParent(parent)
+        leftLabel.position    = UDim2.fromScale(0, yPos)
+        leftLabel.size        = UDim2.fromScale(0.3, 0.1)
+        leftLabel.anchorPoint = {0, 0}
+        leftLabel.textColor   = {1,1,1,1}
+        table.insert(menu, leftLabel)
+
+        local valueText = Textlabel.new("")
+        valueText:setParent(parent)
+        valueText.position    = UDim2.fromScale(0.6, yPos)
+        valueText.size        = UDim2.fromScale(0.2, 0.1)
+        valueText.anchorPoint = {0.5, 0}
+        valueText.textColor   = {1,1,1,1}
+        table.insert(menu, valueText)
+
+        local function refreshValue()
+            valueText.text = tostring(Config.ConfigTable[keyName])
+        end
+
+        local leftBtn, leftImg = createImageButton(
+            parent,
+            UDim2.fromScale(0.40, yPos + 0.05),
+            UDim2.fromScale(0.075, 0.075),
+            "assets/sprites/arrow_left.png",
+            function ()
+                local cur = Config.ConfigTable[keyName]
+                local idx = 1
+                for i,v in ipairs(values) do if v==cur then idx=i break end end
+                idx = idx - 1
+                if idx < 1 then idx = #values end
+                Config.ConfigTable[keyName] = values[idx]
+                refreshValue()
+            end
+        )
+        table.insert(menu, leftBtn)
+        table.insert(menu, leftImg)
+
+        local rightBtn, rightImg = createImageButton(
+            parent,
+            UDim2.fromScale(0.80, yPos + 0.05),
+            UDim2.fromScale(0.075, 0.075),
+            "assets/sprites/arrow_right.png",
+            function ()
+                local cur = Config.ConfigTable[keyName]
+                local idx = 1
+                for i,v in ipairs(values) do if v==cur then idx=i break end end
+                idx = idx + 1
+                if idx > #values then idx = 1 end
+                Config.ConfigTable[keyName] = values[idx]
+                refreshValue()
+            end
+        )
+        table.insert(menu, rightBtn)
+        table.insert(menu, rightImg)
+
+        refreshValue()
+        return valueText
+    end
+
+    local audienceText = createArrowSelector(0.45, "MathQuiz Audience", {"Kids","Teens"}, "MAUDIENCE")
+    local themeText = createArrowSelector(0.58, "MathQuiz Theme",    {"NetKids","Tech"}, "MTHEME")
+
+    -- ===== Botones Back / Apply / Revert / Reset =====
+    local backBtn, backText = createTextButton(
+        parent,
+        UDim2.fromScale(.2, 0.925),
+        UDim2.fromScale(0.55, 0.1),
+        "Back",
+        function () showMenu("settings") end
+    )
+    table.insert(menu, backBtn); table.insert(menu, backText)
+
+    local applyBtn, applyText = createTextButton(
+        parent,
+        UDim2.fromScale(0.8, 0.925),
+        UDim2.fromScale(0.55, 0.1),
+        "Apply",
+        function ()
+            Config.saveConfig()
+            HELP_SIGNS    = Config.ConfigTable.HELP_SIGNS
+            TEACH = Config.ConfigTable.TEACH
+            MAUDIENCE = Config.ConfigTable.MAUDIENCE
+            MTHEME    = Config.ConfigTable.MTHEME
+            prevAcc = takeSnapshot()
+            showMenu("settings")
+        end
+    )
+    table.insert(menu, applyBtn); table.insert(menu, applyText)
+
+    local revertBtn, revertText = createTextButton(
+        parent,
+        UDim2.fromScale(0.2, .8),
+        UDim2.fromScale(0.55, 0.1),
+        "Revert Settings",
+        function ()
+            Config.ConfigTable.HELP_SIGNS    = prevAcc.HELP_SIGNS
+            Config.ConfigTable.TEACH = prevAcc.TEACH
+            Config.ConfigTable.MAUDIENCE = prevAcc.MAUDIENCE
+            Config.ConfigTable.MTHEME    = prevAcc.MTHEME
+            helpImg.image = love.graphics.newImage(Config.ConfigTable.HELP_SIGNS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            teachImg.image = love.graphics.newImage(Config.ConfigTable.HELP_SIGNS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            audienceText.text = Config.ConfigTable.MAUDIENCE
+            themeText.text = Config.ConfigTable.MTHEME
+        end
+    )
+    table.insert(menu, revertBtn); table.insert(menu, revertText)
+
+    local resetBtn, resetText = createTextButton(
+        parent,
+        UDim2.fromScale(0.8, .8),
+        UDim2.fromScale(0.55, 0.1),
+        "Reset to Default",
+        function ()
+            Config.ConfigTable.HELP_SIGNS    = Config.DefaultConfigs.HELP_SIGNS
+            Config.ConfigTable.TEACH = Config.DefaultConfigs.TEACH
+            Config.ConfigTable.MAUDIENCE = Config.DefaultConfigs.MAUDIENCE
+            Config.ConfigTable.MTHEME    = Config.DefaultConfigs.MTHEME
+            helpImg.image = love.graphics.newImage(Config.ConfigTable.HELP_SIGNS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            teachImg.image = love.graphics.newImage(Config.ConfigTable.HELP_SIGNS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            audienceText.text = Config.ConfigTable.MAUDIENCE
+            themeText.text = Config.ConfigTable.MTHEME
+        end
+    )
+    table.insert(menu, resetBtn); table.insert(menu, resetText)
+
+    return menu
+end
+
+
+
 -- Inicialización de los menus
 menus.menu = createMainMenu(listThing)
 menus.settings = createSettingsMenu(listThing)
 menus.keybinds = createKeybindsMenu(otherList)
+menus.accessibility = createAccessibilityMenu(listThing)
 showMenu("")
+
+-- function PauseMenu_Open(substate)
+--     if Gamestate == "dialogue" then return end
+--     if Gamestate ~= "paused" then
+--         if PlayingTimers and PlayingTimers.pause then PlayingTimers:pause() end
+--         if PauseMenuTimers and PauseMenuTimers.continue then PauseMenuTimers:continue() end
+--         Gamestate = "paused"
+--         pauseMenuContainer.visible = true
+--     end
+--     showMenu(substate or "menu")
+-- end
 
 -- -------------------------------------------
 -- -- Funciones Públicas
 -- -------------------------------------------
 
 function PauseMenu()
-    if Gamestate == "dialogue" then return end
-    
+    if Gamestate == "dialogue" or Gamestate == "intro" then print("intro") return end
+    print(Gamestate)
     if Gamestate == "playing" then
         PlayingTimers:pause()
         PauseMenuTimers:continue()

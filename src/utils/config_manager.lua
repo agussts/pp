@@ -24,7 +24,13 @@ ConfigManager.DefaultConfigs = {
     PDOWN = "s",
     PDASH = "space",
     PBACK = "escape",
-    PINTR = "e"
+    PINTR = "e",
+    HELP_SIGNS = true,
+    TEACH = true,
+    MAUDIENCE = "kids",
+    MTHEME = "netkids",
+    
+    SEEN_ACC = false,
 }
 
 local function tableClone(original)

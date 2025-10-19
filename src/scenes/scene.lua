@@ -49,10 +49,9 @@ function Scene.load(name, payload)
     current.__name = name
 
     -- Pasada de lifecycle
+    Gamestate = "playing"
     safeCall(current.load, current, payload)
     safeCall(current.start, current, payload)
-
-    Gamestate = "playing"
     isLoading = false
 end
 

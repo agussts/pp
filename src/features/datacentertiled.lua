@@ -200,6 +200,39 @@ function DC.attach(scene, map)
         return prompt
     end
 
+    -- Cartel / Letrero que abre un diálogo de ayuda
+    factory["dc_sign"] = function(o)
+        -- Props opcionales desde Tiled:
+        --   script   = clave en WrittenDialogues (string). Ej: "tut_cdn_sign_basic"
+        --   label    = texto del prompt. Por defecto "Press [%s] to read"
+        local scriptKey = (o.props and o.props.script) or "tut_dc_sign_basic"
+        local label     = (o.props and o.props.label)  or "Press [%s] to read"
+
+        local prompt = ProxPrompt.new(label)
+        prompt.collision.position = UDim2.fromScale(o.sx, o.sy)
+        prompt.collision.size     = UDim2.fromScale(o.sw, o.sh)
+        prompt.collision.anchor   = {0,0}
+
+        prompt.Triggered:Connect(function()
+        -- Evita abrir si ya estás en diálogo, si tu sistema lo necesita
+        if Dialogue and WrittenDialogues and WrittenDialogues[scriptKey] then
+            Dialogue.start(WrittenDialogues[scriptKey], 42)
+        end
+        end)
+
+        return prompt
+    end
+
+    factory["dc_signpost"] = function (o)
+        local anim = Animation.new("assets/sprites/sign.png", 44, 44, 1, 1, 1)
+        anim.anchor = {.5,.5}
+        anim:Pause()
+        local signBlock = Block.new(anim, o.sx, o.sy)
+        signBlock.collision.anchor = {0,0}
+        signBlock.collision.enabled = false
+        return signBlock
+    end
+
     factory["dc_gate_in"] = function(o)
         local anim = Animation.new("assets/sprites/gateforward-Sheet.png", 44, 32, 2, 2, .05)
         anim.loop = false

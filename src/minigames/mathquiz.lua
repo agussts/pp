@@ -29,8 +29,8 @@ local function pick(t) return t[RNG.random(1, #t)] end
 -- ---------- presets ----------
 local PRESETS = {
   kids = {
-    sumMax = 20,  -- sums up to ~20
-    subMax = 20,  -- no negatives
+    sumMax = 15,  -- sums up to ~20
+    subMax = 10,  -- no negatives
     mulA   = {2,5},
     mulB   = {2,5},
     tries  = 3,
@@ -84,7 +84,7 @@ local THEMES = {
         function(n,k,d) return ("You upload %d folders with %d videos in each. An app deletes %d videos. How many are left?"):format(n,k,d) end,
         function(n,k,d) return ("%d devices copy %d photos each, then %d photos are removed. How many remain?"):format(n,k,d) end,
       },
-      hint = function(n,k,d) return ("Do %d×%d first, then subtract %d."):format(n,k,d) end
+      hint = function(n,k,d) return ("Do %dx%d first, then subtract %d."):format(n,k,d) end
     },
     two_double_sum = {
       text = {
@@ -105,13 +105,13 @@ local THEMES = {
         function(t,g,h) return ("You run %d sends. Each send has %d groups with %d pictures each. How many pictures total?"):format(t,g,h) end,
         function(t,g,h) return ("There are %d rounds. In each round you send %d packs of %d files. What's the total files?"):format(t,g,h) end,
       },
-      hint = function(t,g,h) return ("Find groups (%d×%d), then multiply by %d."):format(g,h,t) end
+      hint = function(t,g,h) return ("Find groups (%dx%d), then multiply by %d."):format(g,h,t) end
     },
     two_mul_plus = {
       text = {
         function(n,k,d) return ("%d folders hold %d files each. You then add %d bonus files. How many files now?"):format(n,k,d) end,
       },
-      hint = function(n,k,d) return ("Multiply %d×%d, then add %d."):format(n,k,d) end
+      hint = function(n,k,d) return ("Multiply %dx%d, then add %d."):format(n,k,d) end
     },
     two_double_minus = {
       text = {
@@ -123,7 +123,7 @@ local THEMES = {
       text = {
         function(a,c) return ("You save three sets of %d files and then add %d more. What's the total?"):format(a,c) end,
       },
-      hint = function(a,c) return ("Compute 3×%d, then add %d."):format(a,c) end
+      hint = function(a,c) return ("Compute 3x%d, then add %d."):format(a,c) end
     },
     two_sum_times_small = {
       text = {
@@ -153,7 +153,7 @@ local THEMES = {
       function(a,b) return ("%d cached; %d cleared. Left?"):format(a,b) end,
     },
     mulTxt = {
-      function(a,b) return ("%d rows × %d each. Total?"):format(a,b) end,
+      function(a,b) return ("%d rows x %d each. Total?"):format(a,b) end,
       function(a,b) return ("%d groups of %d. Total?"):format(a,b) end,
     },
     oneHintSum = "Add.",
@@ -162,49 +162,49 @@ local THEMES = {
 
     two_clone_minus = {
       text = {
-        function(n,k,d) return ("%d×%d, then −%d. Total?"):format(n,k,d) end,
+        function(n,k,d) return ("%dx%d, then -%d. Total?"):format(n,k,d) end,
       },
       hint = function(n,k,d) return ("Multiply then subtract."):format() end
     },
     two_double_sum = {
       text = {
-        function(a,b) return ("(%d+%d)×2. Total?"):format(a,b) end,
+        function(a,b) return ("(%d+%d)x2. Total?"):format(a,b) end,
       },
       hint = function(a,b) return ("Add then double."):format() end
     },
     two_sum_minus = {
       text = {
-        function(a,b,c) return ("(%d+%d)−%d. Total?"):format(a,b,c) end,
+        function(a,b,c) return ("(%d+%d)-%d. Total?"):format(a,b,c) end,
       },
       hint = function(c) return ("Add then subtract %d."):format(c) end
     },
     two_cycles = {
       text = {
-        function(t,g,h) return ("%d×(%d×%d). Total?"):format(t,g,h) end,
+        function(t,g,h) return ("%dx(%dx%d). Total?"):format(t,g,h) end,
       },
       hint = function(t,g,h) return ("Multiply groups then by rounds."):format() end
     },
     two_mul_plus = {
       text = {
-        function(n,k,d) return ("(%d×%d)+%d. Total?"):format(n,k,d) end,
+        function(n,k,d) return ("(%dx%d)+%d. Total?"):format(n,k,d) end,
       },
       hint = function(n,k,d) return ("Multiply then add."):format() end
     },
     two_double_minus = {
       text = {
-        function(a,b) return ("(2×%d)−%d. Total?"):format(a,b) end,
+        function(a,b) return ("(2x%d)-%d. Total?"):format(a,b) end,
       },
       hint = function(a,b) return ("Double then subtract."):format() end
     },
     two_triple_add_small = {
       text = {
-        function(a,c) return ("(3×%d)+%d. Total?"):format(a,c) end,
+        function(a,c) return ("(3x%d)+%d. Total?"):format(a,c) end,
       },
       hint = function(a,c) return ("Triple then add."):format() end
     },
     two_sum_times_small = {
       text = {
-        function(a,b,c) return ("(%d+%d)×%d. Total?"):format(a,b,c) end,
+        function(a,b,c) return ("(%d+%d)x%d. Total?"):format(a,b,c) end,
       },
       hint = function(a,b,c) return ("Add then multiply."):format() end
     },

@@ -1,7 +1,9 @@
 -- src/scenes/intro.lua
 -- Intro tipo “cold open”: textos que faden in/out sobre negro.
 -- Usa: Frame/PrintfLabel opcional, pero aquí dibujamos directo para minimizar dependencias.
--- Depende de: Timer, Scene, Transition, Fonts (opcional), Connect/Disconnect.
+-- Depende de: Timer, Scene, Transition, Wizard, Fonts (opcional), Connect/Disconnect.
+
+local Wizard = require("src/ui/accessibility_wizard")
 
 return function()
   local scene = {}
@@ -15,12 +17,13 @@ return function()
   local SKIP_HINT_S  = 2.0            -- fade-in del “Press any key...”
   local TEXT_COLOR   = {1,1,1,1}
   local BG_COLOR     = {0,0,0,1}
+  local IGNORE_FIRST_PRESS = true
 
   -- Ajusta el contenido a tu gusto (breve, claro, evocativo)
   local LINES = {
     "You are a tiny virus.",
     "You live inside the internet.",
-    "Find three blue data shards.",
+    "Find three blue green shards.",
     "Bring them back to the one who asked."
   }
 
@@ -51,12 +54,27 @@ return function()
     clearTimers()
     if kconn then kconn:Disconnect()
     kconn = nil end
-    -- Transición a la escena principal
-    if Transition and Transition.play then
-      Transition.play(function() Scene.load(NEXT_SCENE) end)
+    if Config.ConfigTable.SEEN_ACC ~= true then
+      Config.ConfigTable.SEEN_ACC = true
+
+      Wizard.setOnDone(function ()
+        Transition.play(function ()
+          Scene.load(NEXT_SCENE)
+          Gamestate = "playing"
+        end)
+      end)
+      Wizard.show()
     else
-      Scene.load(NEXT_SCENE)
+      Transition.play(function ()
+          Scene.load(NEXT_SCENE)
+          Gamestate = "playing"
+        end)
     end
+    -- if Transition and Transition.play then
+    --   Transition.play(function() Scene.load(NEXT_SCENE) end)
+    -- else
+    --   Scene.load(NEXT_SCENE)
+    -- end
   end
 
   local function showNextLine()
@@ -116,25 +134,21 @@ return function()
   end
 
   function scene.load(self)
+    Gamestate = "intro"
     running = true
+    if Config.ConfigTable.SEEN_ACC ~= true then
+      Wizard.ensure()
+    end
     -- tecla para omitir
     kconn = Connect("keyPressed", function()
+      if IGNORE_FIRST_PRESS then
+         IGNORE_FIRST_PRESS = false
+         scene._skipAlpha = 1
+         return 
+        end
       if not running or skipping then return end
       finish()
     end)
-
-    -- pista “Press any key to skip” (con pequeño fade-in)
-    -- no bloquea la secuencia
-    local s = 0
-    tickSkip = Timer.every(1/60, function()
-      s = math.min(1, s + (1/60)/SKIP_HINT_S)
-      -- solo guardamos s en upvalue, lo dibujamos en draw
-      -- (guardamos en scene para no crear globals)
-      scene._skipAlpha = s
-      if s >= 1 then if tickSkip and tickSkip.Destroy then tickSkip:Destroy() end
-      tickSkip = nil end
-    end)
-    tickSkip:addToGroup(PlayingTimers)
 
     -- arrancar
     showNextLine()

@@ -10,7 +10,7 @@ return {
   tilewidth = 32,
   tileheight = 32,
   nextlayerid = 5,
-  nextobjectid = 68,
+  nextobjectid = 70,
   properties = {},
   tilesets = {
     {
@@ -641,19 +641,6 @@ return {
           properties = {}
         },
         {
-          id = 54,
-          name = "",
-          type = "",
-          shape = "rectangle",
-          x = -88,
-          y = 656,
-          width = 0,
-          height = 0,
-          rotation = 0,
-          visible = true,
-          properties = {}
-        },
-        {
           id = 56,
           name = "door",
           type = "door",
@@ -705,6 +692,34 @@ return {
           y = 695.5,
           width = 64.25,
           height = 8.5,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 68,
+          name = "sign",
+          type = "dc_sign",
+          shape = "rectangle",
+          x = 963.333,
+          y = 705.333,
+          width = 57.3333,
+          height = 37.3333,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["script"] = "tut_dc_sign_basic"
+          }
+        },
+        {
+          id = 69,
+          name = "signpost",
+          type = "dc_signpost",
+          shape = "point",
+          x = 1024,
+          y = 736,
+          width = 0,
+          height = 0,
           rotation = 0,
           visible = true,
           properties = {}
