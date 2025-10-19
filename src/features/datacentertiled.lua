@@ -35,6 +35,10 @@ end
 
 local function recalcHeatMul(st)
     st.heatMul = 1.0 + math.min(1.0, st.heat / 100) * 2.0
+    if not st._hintHeat40 and st.heat >= 40 then
+        st._hintHeat40 = true
+        Teach.once("tut_dc_heat40", { text = "Heat x Points = Big score!", hold = 2.2 })
+    end
 end
 local function addHeat(st, h)
     st.heat = math.max(0, st.heat + (h or 0))
@@ -67,6 +71,7 @@ local function spawnServerAt(self, pad)
     local onceConn
     onceConn = srv.onDestroyed:Connect(function()
         if onceConn and onceConn.Disconnect then onceConn:Disconnect() end
+        Teach.once("tut_dc_first_break", { text = "Nice! Servers respawn—keep going!", hold = 2.2, inPosScale={0.85,0.18}, holdTime = 3 })
         pad.live = nil
 
         -- puntos + heat + HUD
@@ -120,9 +125,6 @@ local function spawnServerAt(self, pad)
     return srv
 end
 
-
-
-
 -- ======================
 -- API pública del módulo
 -- ======================
@@ -133,7 +135,6 @@ function DC.attach(scene, map)
     self.map   = map
     self.st    = newState()
 
-    -- >>> NUEVO: bump de generación global
     World._dcGen = (World._dcGen or 0) + 1
     self.gen = World._dcGen
 
@@ -155,29 +156,67 @@ function DC.attach(scene, map)
         st.startPrompt = prompt
 
         prompt.Triggered:Connect(function()
+            if not World.shards.active then
+                Popup.show{
+                    text = "You need an access token.",
+                    tone = "warn",
+                    corner = "bl"
+                }
+                return
+            end
             --if st.started then return end
             st.started = not st.started
+            Popup.show{
+                    text = "Toggled gate with token.",
+                    icon = "assets/sprites/accesstoken.png",
+                    tone = "info",
+                    corner = "bl"
+                }
+                Teach.chain("tut_dc_after_start", {
+                { text = "Break a server to score!", hold = 1.3, inPosScale={0.85,0.28}, holdTime = 3 },
+                { text = "Heat rises while you fight." , hold = 1.3, inPosScale={0.85,0.18}, holdTime = 3 },
+                { text = "More heat equals more points!"   , hold = 3.3, inPosScale={0.85,0.28}, holdTime = 3 },
+                })
 
+            prompt.collision.enabled = false
             -- abrir y cerrar
-            if st.gateIn  then st.gateIn.enabled = not st.gateIn.enabled end
-            if st.gateOut then st.gateOut.enabled = not st.gateOut.enabled end
+            if st.gateIn then
+                st.gateIn.sprite:Play()
+                st.gateIn.sprite.OnFinish:Once(function ()
+                    prompt.collision.enabled = true
+                    st.gateIn.sprite.reversed = not st.gateIn.sprite.reversed
+                    st.gateIn.collision.enabled = not st.gateIn.collision.enabled
+                end)
+            end
+            if st.gateOut then
+                st.gateOut.sprite:Play()
+                st.gateOut.sprite.OnFinish:Once(function ()
+                    st.gateOut.sprite.reversed = not st.gateOut.sprite.reversed
+                    st.gateOut.collision.enabled = not st.gateOut.collision.enabled
+                end)
+            end
         end)
 
         return prompt
     end
 
     factory["dc_gate_in"] = function(o)
-        local g = Collisions.new("box")
-        g.position = UDim2.fromScale(o.sx, o.sy)
-        g.size     = UDim2.fromScale(o.sw, o.sh)
+        local anim = Animation.new("assets/sprites/gateforward-Sheet.png", 44, 32, 2, 2, .05)
+        anim.loop = false
+        anim:Pause()
+        local g = Block.new(anim, o.sx, o.sy, o.sw, o.sh)
         st.gateIn = g
         return g
     end
 
     factory["dc_gate_out"] = function(o)
-        local g = Collisions.new("box", false)
-        g.position = UDim2.fromScale(o.sx, o.sy)
-        g.size     = UDim2.fromScale(o.sw, o.sh)
+        local anim = Animation.new("assets/sprites/gateforward-Sheet.png", 44, 32, 2, 2, .05)
+        anim.loop = false
+        anim.reversed = true
+        anim:Pause()
+        anim:GoToFrame(4)
+        local g = Block.new(anim, o.sx, o.sy, o.sw, o.sh)
+        g.collision.enabled = false
         st.gateOut = g
         return g
     end

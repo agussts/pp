@@ -58,6 +58,7 @@ WrittenDialogues = require("src.utils.writtendialogues")
 DCHUD = require("src.ui.datacenter_hud")
 ShardsIconsHUD = require("src.ui.shards_icons")
 Popup = require("src.ui.popup")
+Teach = require("src.ui.teach")
 require("src.ui.pausemenu") -- lo mismo que connections.lua
 
 World = require("src.utils.world")

@@ -12,6 +12,8 @@ local internetscn = require("src.scenes.internetscn")
 local darkweb = require("src.scenes.darkweb")
 local datacenter = require("src.scenes.datacenter")
 local cdn = require("src.scenes.cdn")
+local intro = require("src.scenes.intro")
+Scene.register("intro", intro)
 Scene.register("testScene", testScene)
 Scene.register("level2", Level2)
 Scene.register("internetscn", internetscn)
@@ -28,7 +30,7 @@ end
 love.load = function ()
     --Ajustes antes de empezar renderizacion
     love.graphics.setDefaultFilter("nearest", "nearest", 1)
-    Scene.load("internetscn")
+    Scene.load("intro")
     DevTools.init()
 end
 

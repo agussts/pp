@@ -103,6 +103,7 @@ return function ()
                         if k >= 1 then
                             if tick then tick:Destroy() end
                             self.testShard.collision.enabled = true
+                            Camera.shake(1.5, 0.12, "XY")
                         end
                     end)
                     tick:addToGroup(PlayingTimers)

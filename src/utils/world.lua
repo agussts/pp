@@ -1,12 +1,11 @@
 local world = {
     flags = {
-        metmvirus = false,
-        gottestShard = false,
-        gotmission = false,
+        metmvirus = true,
+        gottestShard = true,
         trashCleared = false,
     },
     shards = {
-        active = false,
+        active = true,
         needed = 3,
         collected = 0,
         spawned = false,

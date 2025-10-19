@@ -55,12 +55,28 @@ local function xyForCorner(corner)
   end
 end
 
-local function ensureSingleton()
-  if _singleton then return _singleton end
+local function ensureTG(self)
+  if not self._tg then
+    self._tg = Timer.group.new()
+  end
+  return self._tg
+end
+
+
+local function ensureSingleton(holdTime)
+  if _singleton then 
+    _singleton.root.visible = true
+    _singleton.box.visible = true
+    _singleton.box:applyStyle(Border, { thicknessPx=2, color={1,1,1,0.7}, insetPx=0, zOffset=1 })
+    _singleton.icon.visible = true
+    _singleton.text.visible = true
+    return _singleton 
+  end
   local self = setmetatable({}, Popups)
   self.queue = {}
   self.showing = false
   self._tg = Timer.group.new()
+  self.holdTime = holdTime
 
   self.root = Frame.new()
   self.root:setPersistent(true)
@@ -75,17 +91,19 @@ local function ensureSingleton()
   self.box.position = UDim2.fromScale(0.5,0.5)
   self.box.anchorPoint = {0.5,0.5}
   self.box.bgColor = {0,0,0,0.85}
+  self.box.visible = true
   if Border and self.box.applyStyle then
     self.box:applyStyle(Border, { thicknessPx=2, color={1,1,1,0.7}, insetPx=0, zOffset=1 })
   end
 
-  self.icon = ImageLabel.new("assets/sprites/blink.png")
+  self.icon = ImageLabel.new("assets/sprites/blank.png")
   self.icon:setParent(self.box)
   self.icon.visible = false
   self.icon.size = UDim2.fromScale(0.22, 0.80)
   self.icon.position = UDim2.fromScale(0.14, 0.5)
   self.icon.anchorPoint = {0.5, 0.5}
   self.icon.zIndex = 501
+  self.icon.visible = true
 
   self.text = PrintfLabel.new("")
   self.text:setParent(self.box)
@@ -94,6 +112,7 @@ local function ensureSingleton()
   self.text.size     = UDim2.fromScale(0.60, 0.78)
   self.text.anchorPoint = {0, 0.5}
   self.text.textColor = {1,1,1,1}
+  self.text.visible = true
   if Fonts and Fonts.VT323small then self.text.font = Fonts.VT323small end
   self.text.zIndex = 502
 
@@ -150,13 +169,13 @@ local function animateIn(self, onDone)
     self.box.bgColor = colerp(self._bgFrom, self._bgTo, t)
     if t >= 1 then tick:Destroy(); if onDone then onDone() end end
   end)
-  tick:addToGroup(self._tg)
+  tick:addToGroup(ensureTG(self))
 end
 
 local function holdBrief(self, onDone)
-  Timer.after(HOLD_S, function()
+  Timer.after(self.holdTime, function()
     if onDone then onDone() end
-  end):addToGroup(self._tg)
+  end):addToGroup(ensureTG(self))
 end
 
 local function animateBobUp(self, onDone)
@@ -170,7 +189,7 @@ local function animateBobUp(self, onDone)
     self.root.position = UDim2.fromScale(self._inPos[1], y)
     if t >= 1 then tick:Destroy(); if onDone then onDone() end end
   end)
-  tick:addToGroup(self._tg)
+  tick:addToGroup(ensureTG(self))
 end
 
 local function animateBobDown(self, onDone)
@@ -184,7 +203,7 @@ local function animateBobDown(self, onDone)
     self.root.position = UDim2.fromScale(self._inPos[1], y)
     if t >= 1 then tick:Destroy(); if onDone then onDone() end end
   end)
-  tick:addToGroup(self._tg)
+  tick:addToGroup(ensureTG(self))
 end
 
 local function animateFadeOut(self, onDone)
@@ -208,41 +227,42 @@ local function animateFadeOut(self, onDone)
       if onDone then onDone() end
     end
   end)
-  tick:addToGroup(self._tg)
+  tick:addToGroup(ensureTG(self))
 end
 
 function Popups.destroy()
+  if not Popups._inst then return end
   local self = Popups._inst
-  if not self then return end
-  print("DESTROYING")
+
   if self._tg then self._tg:Destroy() end
   self._tg = nil
 
-  for i,v in pairs(self) do 
-    if type(v) == "table" and v.Destroy then v:Destroy() end
-  end
-
-  self.queue = {}
+  if self.root and self.root.Destroy then self.root:Destroy() end
+  self.root = nil
+  self.queue = nil
   self.showing = false
+
   Popups._inst = nil
 end
 
 function Popups._onPopupFinished(self)
   self.showing = false
-  if #self.queue > 0 then
-    local nextOpt = table.remove(self.queue, 1)
-    Popups.show(nextOpt)
-  else
-    Popups.destroy()
+  for i,v in pairs(self) do
+    if type(v) == "table" and v.setParent then
+      v:clearStyles()
+      v.visible = false
+    end
+  end
+  if #self.queue > 0 then 
+    Popups.show(table.remove(self.queue,1)) 
   end
 end
 
 -- API
 function Popups.show(opt)
-  if Popups._inst then Popups.destroy() end
-  local self = ensureSingleton()
-  Popups._inst = self
   opt = opt or {}
+  local self = ensureSingleton(opt.holdTime or HOLD_S)
+
   if self.showing then
     table.insert(self.queue, opt)
     return
@@ -253,15 +273,20 @@ function Popups.show(opt)
 
   animateIn(self, function()
     holdBrief(self, function()
-      --animateBobUp(self, function()
-       -- animateBobDown(self, function()
-          animateFadeOut(self, function()
-            Popups._onPopupFinished(self)
-          end)
-       -- end)
-     -- end)
+      animateFadeOut(self, function()
+        -- FINALIZAR sin destruir la instancia
+        self.showing = false
+        self.root.visible = false
+
+        -- if #self.queue > 0 then
+        --   local nextOpt = table.remove(self.queue, 1)
+        --   Popups.show(nextOpt)         -- muestra el siguiente
+        -- end
+        Popups._onPopupFinished(self)
+      end)
     end)
   end)
 end
+
 
 return Popups

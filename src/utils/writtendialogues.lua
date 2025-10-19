@@ -40,6 +40,14 @@ dialogues.shardsDone = {
     { who="???", text="Not bad. Come back when you're ready for real trouble." },
 }
 
+dialogues.tut_cdn_sign_basic = {
+  { who="TEACH", text="Stand on a plate with a number." },
+  { who="TEACH", text="Choose an operator (x +, -) and make a new value." },
+  { who="TEACH", text="Paths open when the gate number divides your value." },
+  { who="TEACH", text="If you get stuck, use Reset to try again." },
+}
+
+
 
 dialogues.unused = {
     {who = "???", text = "tgffghfgh"},

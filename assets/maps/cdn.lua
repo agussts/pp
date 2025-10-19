@@ -10,7 +10,7 @@ return {
   tilewidth = 32,
   tileheight = 32,
   nextlayerid = 19,
-  nextobjectid = 311,
+  nextobjectid = 316,
   properties = {},
   tilesets = {
     {
@@ -1414,6 +1414,51 @@ return {
           y = 608,
           width = 128,
           height = 32,
+          rotation = 0,
+          visible = true,
+          properties = {}
+        },
+        {
+          id = 311,
+          name = "exit",
+          type = "door",
+          shape = "rectangle",
+          x = 1008,
+          y = 0,
+          width = 16,
+          height = 96,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["spawnx"] = 2.18,
+            ["spawny"] = 2.9,
+            ["to"] = "internetscn"
+          }
+        },
+        {
+          id = 314,
+          name = "sign",
+          type = "cdn_sign",
+          shape = "rectangle",
+          x = 720,
+          y = 608,
+          width = 32,
+          height = 32,
+          rotation = 0,
+          visible = true,
+          properties = {
+            ["script"] = "tut_cdn_sign_basic"
+          }
+        },
+        {
+          id = 315,
+          name = "signpost",
+          type = "cdn_signpost",
+          shape = "point",
+          x = 752,
+          y = 608,
+          width = 0,
+          height = 0,
           rotation = 0,
           visible = true,
           properties = {}

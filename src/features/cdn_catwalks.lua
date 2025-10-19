@@ -1,4 +1,4 @@
--- src/features/cdn.lua
+-- src/features/cdn_catwalks.lua
 local CDN = {}
 CDN.__index = CDN
 
@@ -11,7 +11,7 @@ local function newState()
     gateOut = nil,
 
     -- runtime
-    paths = {},         -- {k, col}
+    paths = {},         -- {k, col, sx,sy,sw,sh, ax,ay}
     spawns = {},        -- {pos, kind}
     displayPos = nil,
 
@@ -23,6 +23,13 @@ local function newState()
     hudRoot = nil,
     hudLbl  = nil,
     hintLbl = nil,
+
+    -- visuals
+    visOpenCol  = {0.15, 0.95, 0.35, 0.1},   -- verde (abierto)
+    visClosedCol= {1.00, 0.20, 0.20, 0.2},   -- rojo  (cerrado)
+    visBorder   = {1,1,1,0.35},               -- borde sutil
+    visBorderPx = 2,
+    showVis     = true,
   }
 end
 
@@ -33,10 +40,31 @@ local function applyOp(op, a, b)
   else return a end
 end
 
+-- set -> sorted array
+local function sortedKeys(set)
+  local t = {}
+  for k,_ in pairs(set) do table.insert(t, k) end
+  table.sort(t, function(a,b)
+    local na, nb = tonumber(a), tonumber(b)
+    if na and nb then return na < nb else return tostring(a) < tostring(b) end
+  end)
+  return t
+end
+
+local function computeOpenSet(st)
+  local openSet = {}
+  for _,p in ipairs(st.paths) do
+    if p.k ~= 0 and (st.V % p.k) == 0 then
+      openSet[tostring(p.k)] = true
+    end
+  end
+  return openSet
+end
+
 local function updateHUD(st)
   if not st.hudLbl then return end
-  local divs = {}
-  table.sort(divs)
+  local openSet = computeOpenSet(st)
+  local divs = sortedKeys(openSet)
   local openTxt = (#divs > 0) and table.concat(divs, ",") or "—"
   local v = st.V
   if v > 1e8 then v = "BIG" end
@@ -53,7 +81,7 @@ end
 
 local function recomputePaths(st)
   for _,p in ipairs(st.paths) do
-    local open = (st.V % p.k) == 0
+    local open = (p.k ~= 0) and ((st.V % p.k) == 0)
     p.col.enabled = not open  -- collider bloquea cuando NO está abierto
   end
   updateHUD(st)
@@ -67,23 +95,18 @@ local function buildHUD(st)
 
   st.hudLbl = Textlabel.new("")
   st.hudLbl:setParent(st.hudRoot)
-  st.hudLbl.size = UDim2.fromScale(0.7, 0.06)
+  st.hudLbl.size = UDim2.fromScale(0.8, 0.06)
   st.hudLbl.anchorPoint = {0,0}
-
-  if st.displayPos then
-    st.hudLbl.position = st.displayPos
-  else
-    st.hudLbl.position = UDim2.fromScale(0.02, 0.02)
-  end
+  st.hudLbl.position = st.displayPos or UDim2.fromScale(0.02, 0.02)
   st.hudLbl.textColor = {1,1,1,1}
   if Fonts and Fonts.VT323 then st.hudLbl.font = Fonts.VT323 end
 
   st.hintLbl = Textlabel.new("")
   st.hintLbl:setParent(st.hudRoot)
   st.hintLbl.position = UDim2.fromScale(0.02, 0.08)
-  st.hintLbl.size = UDim2.fromScale(0.7, 0.05)
+  st.hintLbl.size     = UDim2.fromScale(0.8, 0.05)
   st.hintLbl.anchorPoint = {0,0}
-  st.hintLbl.textColor = {1,0.9,0.5,1}
+  st.hintLbl.textColor= {1,0.9,0.5,1}
   if Fonts and Fonts.VT323 then st.hintLbl.font = Fonts.VT323 end
 
   updateHUD(st)
@@ -105,30 +128,80 @@ function CDN.attach(scene, map)
     prompt.collision.position = UDim2.fromScale(o.sx, o.sy)
     prompt.collision.size     = UDim2.fromScale(o.sw, o.sh)
     prompt.collision.anchor   = {0,0}
-    prompt.Triggered:Once(function()
-      if st.started then return end
-      st.started = true
-      if st.gateIn  then st.gateIn.enabled  = false end
-      if st.gateOut then st.gateOut.enabled = true  end
+    prompt.Triggered:Connect(function()
+      st.started = not st.started
+      Teach.chain("tut_cdn_intro", {
+        { text="Stand on a number plate.", hold=2.0, inPosScale={0.15,0.18} },
+        { text="Make an answer divisible by the gate.", hold=2.5, inPosScale={0.20,0.28} },
+        { text="Matching paths open together!", hold=2.2, inPosScale={0.22,0.38} },
+      })
+      if st.gateIn then
+        st.gateIn.collision.enabled = not st.gateIn.collision.enabled
+        local enabled = st.gateIn.collision.enabled
+        if enabled then st.gateIn.sprite:GoToFrame(1) else st.gateIn.sprite:GoToFrame(2) end
+      end
+      if st.gateOut then
+        st.gateOut.collision.enabled = not st.gateOut.collision.enabled
+        local enabled = st.gateOut.collision.enabled
+        if enabled then st.gateOut.sprite:GoToFrame(1) else st.gateOut.sprite:GoToFrame(2) end
+      end
       setHint(st, "Elige operador y números. Abre caminos con múltiplos.", 3)
       recomputePaths(st)
     end)
     return prompt
   end
 
+  -- Cartel / Letrero que abre un diálogo de ayuda
+  F["cdn_sign"] = function(o)
+    -- Props opcionales desde Tiled:
+    --   script   = clave en WrittenDialogues (string). Ej: "tut_cdn_sign_basic"
+    --   label    = texto del prompt. Por defecto "Press [%s] to read"
+    local scriptKey = (o.props and o.props.script) or "tut_cdn_sign_basic"
+    local label     = (o.props and o.props.label)  or "Press [%s] to read"
+
+    local prompt = ProxPrompt.new(label)
+    prompt.collision.position = UDim2.fromScale(o.sx, o.sy)
+    prompt.collision.size     = UDim2.fromScale(o.sw, o.sh)
+    prompt.collision.anchor   = {0,0}
+
+    prompt.Triggered:Connect(function()
+      -- Evita abrir si ya estás en diálogo, si tu sistema lo necesita
+      if Dialogue and WrittenDialogues and WrittenDialogues[scriptKey] then
+        Dialogue.start(WrittenDialogues[scriptKey], 42)
+      end
+    end)
+
+    return prompt
+  end
+
+  F["cdn_signpost"] = function (o)
+    local anim = Animation.new("assets/sprites/sign.png", 44, 44, 1, 1, 1)
+    anim.anchor = {.5,.5}
+    anim:Pause()
+    local signBlock = Block.new(anim, o.sx, o.sy)
+    signBlock.collision.anchor = {0,0}
+    signBlock.collision.enabled = false
+    return signBlock
+  end
+
+
   F["cdn_gate_in"] = function(o)
-    local g = Collisions.new("box")
-    g.position = UDim2.fromScale(o.sx, o.sy)
-    g.size     = UDim2.fromScale(o.sw, o.sh)
+    local anim = Animation.new("assets/sprites/spikes-Sheet.png", 44, 22, 2, 1, .05)
+    anim.loop = false
+    anim:Pause()
+    local g = Block.new(anim, o.sx, o.sy, o.sw, o.sh)
     st.gateIn = g
     return g
   end
 
   F["cdn_gate_out"] = function(o)
-    local g = Collisions.new("box")
-    g.position = UDim2.fromScale(o.sx, o.sy)
-    g.size     = UDim2.fromScale(o.sw, o.sh)
-    g.enabled  = false
+    local anim = Animation.new("assets/sprites/spikes-Sheet.png", 44, 22, 2, 1, .05)
+    anim.loop = false
+    anim.reversed = true
+    anim:Pause()
+    anim:GoToFrame(2)
+    local g = Block.new(anim, o.sx, o.sy, o.sw, o.sh)
+    g.collision.enabled = false
     st.gateOut = g
     return g
   end
@@ -139,13 +212,22 @@ function CDN.attach(scene, map)
     col.position = UDim2.fromScale(o.sx, o.sy)
     col.size     = UDim2.fromScale(o.sw, o.sh)
     col:AddTag("cdn_path")
-    table.insert(st.paths, {k=k, col=col})
+    -- NO tocamos anchor del collider; solo lo leemos (si existe) para dibujar bien
+    local ax, ay = 0.5, 0.5
+    if col.anchor then ax, ay = col.anchor[1] or 0.5, col.anchor[2] or 0.5 end
+
+    table.insert(st.paths, {
+      k   = k,
+      col = col,
+      sx  = o.sx, sy = o.sy, sw = o.sw, sh = o.sh,
+      ax  = ax, ay = ay
+    })
     return col
   end
 
   F["cdn_plate_op"] = function(o)
     local op = (o.props and o.props.op) or "mul"
-    local prompt = ProxPrompt.new("Set op → "..op.. " [%s]")
+    local prompt = ProxPrompt.new("Set op → "..op.." [%s]")
     prompt.collision.position = UDim2.fromScale(o.sx, o.sy)
     prompt.collision.size     = UDim2.fromScale(o.sw, o.sh)
     prompt.collision.anchor   = {0,0}
@@ -160,7 +242,7 @@ function CDN.attach(scene, map)
 
   F["cdn_plate_num"] = function(o)
     local val = (o.props and tonumber(o.props.val)) or 2
-    local prompt = ProxPrompt.new("Apply "..val.. " [%s]")
+    local prompt = ProxPrompt.new("Apply "..val.." [%s]")
     prompt.collision.position = UDim2.fromScale(o.sx, o.sy)
     prompt.collision.size     = UDim2.fromScale(o.sw, o.sh)
     prompt.collision.anchor   = {0,0}
@@ -203,17 +285,41 @@ function CDN.attach(scene, map)
 
   -- HUD al final (posición ya resuelta)
   buildHUD(st)
-  recomputePaths(st) -- por si V=1 ya abre algo
+  recomputePaths(st) -- por si V ya abre algo
   return self
 end
 
 function CDN.update(self, dt)
-  -- (si quieres efectos/sonidos por caminos abiertos, puedes hacerlo aquí)
+  -- (Si quieres efectos/sonidos por caminos abiertos, hazlo aquí)
 end
 
 function CDN.draw(self)
-  -- visual opcional: contornear caminos abiertos/cerrados
-  -- (dejado vacío para no contaminar tu draw stack)
+  -- Visual de caminos: rectángulos rojo/verde según bloqueado/abierto
+  local st = self.st
+  if not st or not st.showVis then return end
+
+  local w, h = love.graphics.getDimensions()
+  local prevR,prevG,prevB,prevA = love.graphics.getColor()
+
+  for _,p in ipairs(st.paths) do
+    local open = (p.k ~= 0) and ((st.V % p.k) == 0)
+    local col  = open and st.visOpenCol or st.visClosedCol
+
+    local px = (p.sx - (p.ax or 0.5) * p.sw) * w
+    local py = (p.sy - (p.ay or 0.5) * p.sh) * h
+    local pw = (p.sw) * w
+    local ph = (p.sh) * h
+
+    love.graphics.setColor(col)
+    love.graphics.rectangle("fill", px, py, pw, ph)
+
+    -- borde sutil
+    love.graphics.setColor(st.visBorder)
+    love.graphics.setLineWidth(st.visBorderPx)
+    love.graphics.rectangle("line", px, py, pw, ph)
+  end
+
+  love.graphics.setColor(prevR, prevG, prevB, prevA)
 end
 
 function CDN.detach(self)
