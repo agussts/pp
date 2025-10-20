@@ -129,6 +129,14 @@ function CDN.attach(scene, map)
     prompt.collision.size     = UDim2.fromScale(o.sw, o.sh)
     prompt.collision.anchor   = {0,0}
     prompt.Triggered:Connect(function()
+      if not World.shards.active then
+            Popup.show{
+                text = "You need an access token.",
+                tone = "warn",
+                corner = "bl"
+            }
+            return
+        end
       st.started = not st.started
       Teach.chain("tut_cdn_intro", {
         { text="Stand on a number plate.", hold=2.0, inPosScale={0.15,0.18} },
@@ -263,7 +271,7 @@ function CDN.attach(scene, map)
     prompt.collision.anchor   = {0,0}
     prompt.Triggered:Connect(function()
       if not st.started then return end
-      st.V, st.op = 2, "mul"
+      st.V, st.op = 2, "add"
       setHint(st, "Reinicio", 1)
       recomputePaths(st)
     end)

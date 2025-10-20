@@ -156,6 +156,21 @@ local function createMainMenu(parent)
     table.insert(menu, settingsBtn)
     table.insert(menu, settingsText)
 
+    local resetBtn, resetText = createTextButton(
+        parent,
+        UDim2.fromScale(0.5, 0.6),
+        UDim2.fromScale(0.8, 0.1),
+        "Reset",
+        function ()
+            PauseMenu()
+            if Player then
+                Player:Damage(99999)
+            end
+        end
+    )
+    table.insert(menu, resetBtn)
+    table.insert(menu, resetText)
+
     local quitBtn, quitText = createTextButton(
         parent,
         UDim2.fromScale(0.5, 0.9),

@@ -6,7 +6,7 @@ return function()
     love.graphics.setBackgroundColor(34/255, 32/255, 52/255)
 
     -- mapa desde Tiled con las clases "cdn_*"
-    self.map = TiledLite.load("assets/maps/cdn.lua", { collisionLayers={"Colliders"} })
+    self.map = TiledLite.load("assets/maps/cdn.lua")
     self.map.worldLayer = -10
 
     -- jugador

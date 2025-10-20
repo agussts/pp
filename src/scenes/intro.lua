@@ -20,7 +20,7 @@ return function()
 
   -- Ajusta el contenido a tu gusto (breve, claro, evocativo)
   local LINES = {
-    "You are a tiny virus.",
+    "You are a tiny computer virus.",
     "You live inside the internet.",
     "Find three green data shards.",
     "Bring them back to the one who asked."

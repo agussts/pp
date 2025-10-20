@@ -1,16 +1,16 @@
 local world = {
     flags = {
-        metmvirus = true,
-        gottestShard = true,
-        trashCleared = true,
+        metmvirus = false,
+        gottestShard = false,
+        trashCleared = false,
         webKey = false,
     },
     shards = {
-        active = true,
+        active = false,
         needed = 3,
-        collected = 3,
-        spawned = true,
-        done = true,
+        collected = 0,
+        spawned = false,
+        done = false,
         collectedIds = {},
     },
     player = { health = 100 },
@@ -27,6 +27,7 @@ function world.startShardsQuest()
 end
 
 function world.onShardCollected(id)
+    if world.shards.collectedIds[id] == true then return end
     if id then
         world.shards.collectedIds[id] = true
     end

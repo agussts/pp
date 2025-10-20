@@ -91,7 +91,14 @@ return function()
         self.map:spawnAll(self)
         self.map.worldLayer = -10
         Player = PlayerModule.new("assets/sprites/player-Sheet.png")
-        
+        Timer.after(2, function ()
+            Teach.chain("movementguide", {
+                { text = "Move with W A S D. Try moving!" },
+                { text = "Press Space to DASH. Quick burst!" },
+                { text = "Aim with the mouse. Left click to shoot." },
+                { text = "Change keys later: Esc > Settings." },
+            })
+        end)
         local spawn = self.playerspawn
         if payload ~= nil then
             spawn = payload.spawn
@@ -115,6 +122,36 @@ return function()
 
         self.darkwebDoor = Door.new("darkweb", UDim2.fromScale(.64, .97), UDim2.fromScale(0.1, 0.2))
         self.darkwebDoor.collision.anchor = {.5, .5}
+
+        local windowAnim = Animation.new("assets/sprites/windowthing.png", 106, 83, 1, 1, 1)
+        windowAnim.anchor = {.5, .5}
+        windowAnim:Pause()
+        self.webWindow = Block.new(windowAnim, 2.5, 5, .1, .1)
+        self.webWindow.collision.enabled = false
+        self.webWindow.worldLayer = -10
+
+        local doorAnim = Animation.new("assets/sprites/webdoor-Sheet.png", 76, 76, 3, 3, .35)
+        doorAnim.anchor = {.5, .5}
+        doorAnim:addHole(3,3)
+        self.web = Block.new(doorAnim, 2.5, 5, .12, .23)
+        self.web.collision.anchor = {.5, .5}
+        self.web.collision.enabled = not World.flags.webKey
+        local db = false
+        self.web.collision.onHit:Connect(function (other)
+            if other:HasTag("player") and not db then
+                db = true
+                Popup.show{
+                    text = "You need a Web key.",
+                    tone = "warn",
+                    corner = "bl"
+                }
+                Timer.after(.8, function () db = false end)
+            end
+        end)
+        self.web.worldLayer = -5
+
+        self.webDoor = Door.new("webpassage", UDim2.fromScale(2.5, 5), UDim2.fromScale(0.1, 0.2))
+        self.webDoor.collision.anchor = {.5, .5}
         
         self.datacenterDoor = Door.new("datacenter", UDim2.fromScale(1, 6), UDim2.fromScale(0.1, 0.2))
         self.datacenterDoor.collision.anchor = {.5, .5}
@@ -159,6 +196,7 @@ return function()
         self.bgA.color[4] = 0.035 + 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
         self.bgB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
         self.darkwebWindow.collision.position = UDim2.new(self.darkwebWindow.collision.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100 + .97, 0)
+        self.webWindow.collision.position = UDim2.new(self.webWindow.collision.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100 + 5, 0)
 
         if self._trashPrompt then self._trashPrompt:update() end
 
