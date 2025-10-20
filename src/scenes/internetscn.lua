@@ -1,7 +1,9 @@
 return function()
     local scene = {}
     --local DataCenter = require("src.features.datacenterhelper")
-
+    local audios = {
+        trashClear = love.audio.newSource("assets/sfx/trashclear.wav", "static")
+    }
     -- Helper minimalista: activa interacción de la pila de basura
     local function setupTrashInteraction(self)
         -- Pos de referencia (desde el bloque central)
@@ -61,6 +63,7 @@ return function()
             -- Marcar limpio, ocultar y soltar shard
             World.flags.trashCleared = true
             Camera.shake(5, 1, "XY")
+            audios.trashClear:clone():play()
             Timer.after(1, function()
                 self.shards = self.shards or {}
                 self.trashDumpTrash.sprite:Play()
@@ -156,6 +159,12 @@ return function()
         self.datacenterDoor = Door.new("datacenter", UDim2.fromScale(1, 6), UDim2.fromScale(0.1, 0.2))
         self.datacenterDoor.collision.anchor = {.5, .5}
 
+        local anim = Animation.new("assets/sprites/datacenterdoor.png", 72, 72, 1, 1, 1)
+        anim.anchor = {.5, .5}
+        anim:Pause()
+        self.dcSprite = Block.new(anim, 1, 6, .1, .2)
+        self.dcSprite.collision.enabled = false
+
         local anim = Animation.new("assets/sprites/trashdumpbarsf.png", 180, 180, 1, 1, 1)
         anim.anchor = {.5, .5}
         anim:Pause()
@@ -185,8 +194,17 @@ return function()
         Gun = GunModule.new()
         self.gun = Gun
         setupTrashInteraction(self)
-        self.cdndoor = Door.new("cdn", UDim2.fromScale(2.3, 2.9), UDim2.fromScale(0.16, 0.22))
+
+        self.cdndoor = Door.new("cdn", UDim2.fromScale(2.25, 2.8), UDim2.fromScale(0.16, 0.22))
         self.cdndoor.collision.anchor = {.5, .5}
+
+        local anim = Animation.new("assets/sprites/cdndoor.png", 76, 76, 1, 1, 1)
+        anim.anchor = {.5, .5}
+        anim:Pause()
+        self.cdndoorsprite = Block.new(anim, 2.25, 2.8, 0.16, 0.22)
+        self.cdndoorsprite.collision.enabled = false
+
+        Music.play("internetscn")
     end
 
     scene.update = function(self, dt)
@@ -197,6 +215,7 @@ return function()
         self.bgB.color[4] = 0.035 - 0.015 * math.sin(PlayingTimers:getTimePassed() * 2)
         self.darkwebWindow.collision.position = UDim2.new(self.darkwebWindow.collision.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100 + .97, 0)
         self.webWindow.collision.position = UDim2.new(self.webWindow.collision.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 5) / 100 + 5, 0)
+        self.cdndoorsprite.collision.position = UDim2.new(self.cdndoorsprite.collision.position.x.scale, 0, math.sin(PlayingTimers:getTimePassed() * 3) / 100 + 2.8, 0)
 
         if self._trashPrompt then self._trashPrompt:update() end
 

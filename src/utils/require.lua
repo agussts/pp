@@ -62,6 +62,7 @@ Teach = require("src.ui.teach")
 require("src.ui.pausemenu") -- lo mismo que connections.lua
 
 World = require("src.utils.world")
+Music = require("src.libs.music")
 
 -- Minigames
 

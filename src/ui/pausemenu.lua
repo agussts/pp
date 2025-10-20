@@ -176,7 +176,11 @@ local function createMainMenu(parent)
         UDim2.fromScale(0.5, 0.9),
         UDim2.fromScale(0.8, 0.1),
         "Quit",
-        love.event.quit
+        function ()
+            Music.stop(0)
+            love.audio.setVolume(0)
+            love.event.quit()
+        end
     )
     table.insert(menu, quitBtn)
     table.insert(menu, quitText)

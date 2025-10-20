@@ -138,19 +138,21 @@ return function()
     if Config.ConfigTable.SEEN_ACC ~= true then
       Wizard.ensure()
     end
-    -- tecla para omitir
-    kconn = Connect("keyPressed", function()
-      if IGNORE_FIRST_PRESS then
-         IGNORE_FIRST_PRESS = false
-         scene._skipAlpha = 1
-         return 
-        end
-      if not running or skipping then return end
-      finish()
-    end)
+    Timer.after(2, function ()
+      -- tecla para omitir
+      kconn = Connect("keyPressed", function()
+        if IGNORE_FIRST_PRESS then
+          IGNORE_FIRST_PRESS = false
+          scene._skipAlpha = 1
+          return 
+          end
+        if not running or skipping then return end
+        finish()
+      end)
 
-    -- arrancar
-    showNextLine()
+      -- arrancar
+      showNextLine()
+    end)
   end
 
   function scene.update(self, dt)

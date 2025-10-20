@@ -32,6 +32,22 @@ local LAYOUT = {
 local CB_MARK   = "assets/sprites/cbmark.png"
 local CB_UNMARK = "assets/sprites/cbunmark.png"
 
+-- helper: registra y devuelve el nodo para encadenarlo
+local function keep(self, node)
+  table.insert(self._nodes, node)
+  return node
+end
+
+-- helper: visibilidad de todo el árbol
+local function _setTreeVisible(self, flag)
+  if self.root then self.root.visible = flag end
+  if self._nodes then
+    for _,n in ipairs(self._nodes) do
+      if n then n.visible = flag end
+    end
+  end
+end
+
 -- ---------- helpers de estilo ----------
 local function pillColors(active)
   if active then
@@ -43,16 +59,16 @@ end
 
 -- ---------- construcción de UI ----------
 local function buildUI(self)
-  -- Raíz oscurecida
-  self.root = Frame.new()
+  self._nodes = {}
+
+  self.root = keep(self, Frame.new())
   self.root:setPersistent(true)
+  self.root.zIndex  = LAYOUT.Z_ROOT
   self.root.size    = UDim2.fromScale(1,1)
-  self.root.bgColor = {0,0,0,0.70}
-  self.root.zIndex  = Z_ROOT
-  self.root.visible = false
+  self.root.bgColor = {0,0,0,0.65}
 
   -- Panel
-  self.box = Frame.new()
+  self.box = keep(self, Frame.new())
   self.box:setParent(self.root)
   self.box.size        = UDim2.fromScale(0.72, 0.72)
   self.box.position    = UDim2.fromScale(0.5, 0.5)
@@ -64,7 +80,7 @@ local function buildUI(self)
   end
 
   -- Título
-  self.title = Textlabel.new("Accessibility")
+  self.title = keep(self, Textlabel.new("Accessibility"))
   self.title:setParent(self.box)
   self.title.position = UDim2.fromScale(0.5, 0.12)
   self.title.size     = UDim2.fromScale(0.9, 0.12)
@@ -76,21 +92,21 @@ local function buildUI(self)
   -- ---------- Checkboxes ----------
   local function makeCheckbox(pos, text, cfgKey)
     -- pos: UDim2 con x/y (scale) = punto medio vertical de la fila
-    local cbImg = ImageLabel.new(
+    local cbImg = keep(self, ImageLabel.new(
         (Config.ConfigTable[cfgKey] and CB_MARK) or CB_UNMARK
-    )
+    ))
     cbImg:setParent(self.box)
     cbImg.position    = pos
     cbImg.size        = UDim2.fromScale(.075, .1) * LAYOUT.CB_SIZE
     cbImg.anchorPoint = {0, 0.35}
     cbImg.zIndex      = Z_CTRL
 
-    local btn = Button.new(function()
+    local btn = keep(self, Button.new(function()
         Config.ConfigTable[cfgKey] = not Config.ConfigTable[cfgKey]
         cbImg.image = love.graphics.newImage(
         Config.ConfigTable[cfgKey] and CB_MARK or CB_UNMARK
         )
-    end)
+    end))
     btn:setParent(self.box)
     btn.bgColor     = {0,0,0,0}
     btn.position    = pos
@@ -98,7 +114,7 @@ local function buildUI(self)
     btn.anchorPoint = {0, 0}
     btn.zIndex      = Z_CTRL
 
-    local lbl = Textlabel.new(text)
+    local lbl = keep(self, Textlabel.new(text))
     lbl:setParent(self.box)
     lbl.position    = UDim2.fromScale(pos.x.scale + .1, pos.y.scale)
     lbl.size        = UDim2.fromScale(0.72, 0.12)
@@ -119,7 +135,7 @@ local function buildUI(self)
 
   -- ---------- Radios (dos “pills”) ----------
   local function makePill(pos, text)
-    local b = Button.new(function() end)
+    local b = keep(self, Button.new(function() end))
     b:setParent(self.box)
     b.position    = pos
     b.size        = UDim2.fromScale(LAYOUT.PILL_W, LAYOUT.PILL_H)
@@ -127,7 +143,7 @@ local function buildUI(self)
     b.bgColor     = {0.26,0.26,0.26,1}
     b.zIndex      = Z_CTRL
 
-    local t = Textlabel.new(text)
+    local t = keep(self, Textlabel.new(text))
     t:setParent(b)
     t.position    = UDim2.fromScale(0.5, 0.5)
     t.size        = UDim2.fromScale(1,1)
@@ -147,7 +163,7 @@ local function buildUI(self)
 
   local function makeRadio2(titleText, posX, centerY, cfgKey, aText, aValue, bText, bValue, cText, cValue)
     -- Título centrado
-    local title = Textlabel.new(titleText)
+    local title = keep(self, Textlabel.new(titleText))
     title:setParent(self.box)
     title.position    = UDim2.fromScale(posX, centerY)
     title.size        = UDim2.fromScale(0.9, 0.10)
@@ -213,12 +229,12 @@ end
   )
 
   -- Botón Done
-  self.doneBtn = Button.new(function()
+  self.doneBtn = keep(self, Button.new(function()
     if Config.applyAccessibility then Config.applyAccessibility() end
     if Config.saveConfig then Config.saveConfig() end
     self.root.visible = false
     if self.onDone then self.onDone() end
-  end)
+  end))
   self.doneBtn:setParent(self.box)
   self.doneBtn.position    = UDim2.fromScale(0.45, LAYOUT.DONE_Y)
   self.doneBtn.size        = UDim2.fromScale(0.55, 0.12)
@@ -226,7 +242,7 @@ end
   self.doneBtn.bgColor     = {0.35,0.35,0.35,1}
   self.doneBtn.zIndex      = Z_DONE
 
-  local doneLbl = Textlabel.new("Done")
+  local doneLbl = keep(self, Textlabel.new("Done"))
   doneLbl:setParent(self.doneBtn)
   doneLbl.position    = UDim2.fromScale(0.5, 0.5)
   doneLbl.size        = UDim2.fromScale(1,1)
@@ -234,6 +250,8 @@ end
   doneLbl.textColor   = {1,1,1,1}
   doneLbl.zIndex      = Z_DONE + 1
   if Fonts and Fonts.VT323 then doneLbl.font = Fonts.VT323 end
+
+  _setTreeVisible(self, false)
 end
 
 -- refresca estado visual desde Config
@@ -273,6 +291,7 @@ end
 
 function Wizard.show()
   local self = Wizard.ensure()
+  _setTreeVisible(self, true)
   -- Traer arriba por si otro overlay subió su zIndex
   self.root.zIndex = Z_ROOT
   self.box.zIndex  = Z_PANEL
@@ -281,15 +300,16 @@ function Wizard.show()
 end
 
 function Wizard.hide()
-  if Wizard._inst and Wizard._inst.root then
-    Wizard._inst.root.visible = false
-  end
+  local self = Wizard._inst
+  if not self then return end
+  _setTreeVisible(self, false)
 end
 
 function Wizard.destroy()
-  if Wizard._inst and Wizard._inst.root then
-    Wizard._inst.root:Destroy()
-  end
+  local self = Wizard._inst
+  if not self then return end
+  if self.root and self.root.Destroy then self.root:Destroy() end
+  Wizard._inst = nil
 end
 
 function Wizard.setOnDone(cb)

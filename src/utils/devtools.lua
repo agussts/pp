@@ -4,7 +4,7 @@
 
 local DevTools = {
     enabled       = true,
-    hitboxesOn    = true, -- TEMPORAL: CAMBIAR A false DESPUES
+    hitboxesOn    = false, 
     overlayOn     = false, 
     noclipOn    = false,
     _overlayGui   = nil,

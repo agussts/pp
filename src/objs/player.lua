@@ -40,6 +40,11 @@ player.new = function(spriteName)
     self.collision:AddTag("player")
     self.health = World.player.health or 100
     self.maxHealth = 100
+    self.hpHud = require("src.ui.health_hud").new()
+    self.regenEvery = Timer.every(8, function ()
+        if self.health + 10 > self.maxHealth then self.health = self.maxHealth return end
+        self.health = self.health + 10
+    end)
     self.collision.link = self
     self.speed = 250
     self.invulnerable = false
@@ -120,6 +125,7 @@ end
 
 function player:update(dt)
     self.sprite:update(dt)
+    self.hpHud:update(dt)
     self.collision.speedX = 0
     self.collision.speedY = 0
     for i, v in pairs(player.controlsMovement) do

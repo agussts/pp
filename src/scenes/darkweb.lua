@@ -23,9 +23,34 @@ return function ()
         self.talkMvirus.collision.position = self.mvirus.collision.position
         self.talkMvirus.collision.size = UDim2.fromScale(.2, .35)
 
+        self.topBlocker = Collisions.new("box")
+        self.topBlocker.anchor = {0,1}
+        self.topBlocker.position = UDim2.fromScale(0,0)
+        self.topBlocker.size = UDim2.fromScale(1,.1)
+        self.topBlocker.anchored = true
+
+        self.bottomBlocker = Collisions.new("box")
+        self.bottomBlocker.anchor = {0,0}
+        self.bottomBlocker.position = UDim2.fromScale(0,1)
+        self.bottomBlocker.size = UDim2.fromScale(1,.1)
+        self.bottomBlocker.anchored = true
+
+        self.leftBlocker = Collisions.new("box")
+        self.leftBlocker.anchor = {1,0}
+        self.leftBlocker.position = UDim2.fromScale(0,0)
+        self.leftBlocker.size = UDim2.fromScale(.1, 1)
+        self.leftBlocker.anchored = true
+
+        self.rightBlocker = Collisions.new("box")
+        self.rightBlocker.anchor = {0,0}
+        self.rightBlocker.position = UDim2.fromScale(1,0)
+        self.rightBlocker.size = UDim2.fromScale(.1,1)
+        self.rightBlocker.anchored = true
+
         self._talkConn = self.talkMvirus.Triggered:Connect(function ()
             self:startMVirusDial()
         end)
+        Music.play("darkweb")
     end
 
     function scene:startMVirusDial()

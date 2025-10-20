@@ -21,9 +21,18 @@ return function()
     if World.shards.collectedIds["cdn_shard"] then
       self.shard:Destroy()
     end
-
+    local anim = Animation.new("assets/sprites/exitleft.png", 22, 44, 1, 1,1)
+    anim:Pause()
+    self.leftexit = Block.new(anim, 0.4, 1.5, .1, .1) 
+    self.leftexit.collision.enabled = false
+    local anim = Animation.new("assets/sprites/exitright.png", 22, 44, 1, 1,1)
+    anim:Pause()
+    self.rightexit = Block.new(anim, 1.58, -0.06, .1, .1)
+    self.rightexit.collision.enabled = false
     Player.collision.position = self.playerspawn or UDim2.fromScale(.15, .75)
     Player.Dash = function (...) end
+
+    Music.play("cdn")
   end
 
   scene.update = function(self, dt)

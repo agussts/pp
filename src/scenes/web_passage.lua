@@ -207,6 +207,8 @@ return function ()
     spawnObjects(self)
     spawnExpandingGlow(self)
     self._restoreSpeed = Player.speed
+
+    Music.stop()
   end
 
   function scene.update(self, dt)

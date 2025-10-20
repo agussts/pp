@@ -2,6 +2,13 @@
 local CDN = {}
 CDN.__index = CDN
 
+local audios = {
+    gateOpen = love.audio.newSource("assets/sfx/gateopen.wav", "static"),
+    set = love.audio.newSource("assets/sfx/set.wav", "static"),
+    numChange = love.audio.newSource("assets/sfx/numchange.wav", "static"),
+    opChange = love.audio.newSource("assets/sfx/opchange.wav", "static"),
+}
+
 local function newState()
   return {
     started = false,
@@ -138,6 +145,7 @@ function CDN.attach(scene, map)
             return
         end
       st.started = not st.started
+      audios.gateOpen:clone():play()
       Teach.chain("tut_cdn_intro", {
         { text="Stand on a number plate.", hold=2.0, inPosScale={0.15,0.18} },
         { text="Make an answer divisible by the gate.", hold=2.5, inPosScale={0.20,0.28} },
@@ -241,6 +249,7 @@ function CDN.attach(scene, map)
     prompt.collision.anchor   = {0,0}
     prompt.Triggered:Connect(function()
       if not st.started then return end
+      audios.opChange:clone():play()
       st.op = op
       setHint(st, "Operador: "..op, 1.5)
       updateHUD(st)
@@ -256,6 +265,7 @@ function CDN.attach(scene, map)
     prompt.collision.anchor   = {0,0}
     prompt.Triggered:Connect(function()
       if not st.started then return end
+      audios.numChange:clone():play()
       st.V = applyOp(st.op, st.V, val)
       if st.V < 1 then st.V = 1 end
       setHint(st, ("V ← %d"):format(st.V), 1.2)
@@ -271,6 +281,7 @@ function CDN.attach(scene, map)
     prompt.collision.anchor   = {0,0}
     prompt.Triggered:Connect(function()
       if not st.started then return end
+      audios.set:clone():play()
       st.V, st.op = 2, "add"
       setHint(st, "Reinicio", 1)
       recomputePaths(st)

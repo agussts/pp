@@ -21,8 +21,14 @@ return function()
     Player.collision.position = spawn
     self.player = Player
 
+    local anim = Animation.new("assets/sprites/exitfront.png", 44, 22, 1, 1, 1)
+    anim:Pause()
+    self.exitSign = Block.new(anim, 1.45, 2.6, .1, .1)
+    self.exitSign.collision.enabled = false
+
     Gun = GunModule.new()
     self.gun = Gun
+    Music.stop()
   end
 
   scene.update = function(self, dt)

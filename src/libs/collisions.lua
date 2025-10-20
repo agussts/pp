@@ -10,7 +10,7 @@ local types = {
     "box",
     "hitbox"
 }
-local defaultVisualized = true -- TEMPORAL: CAMBIAR A false DESPUES
+local defaultVisualized = false 
 
 --- Crea una nueva colisión
 --@param type El tipo de colision, puede ser "box" o "hitbox"

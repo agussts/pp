@@ -2,6 +2,10 @@
 local DC = {}
 DC.__index = DC
 
+local audios = {
+    gateOpen = love.audio.newSource("assets/sfx/gateopen.wav", "static")
+}
+
 -- ----------------------
 -- estado runtime simple
 -- ----------------------
@@ -30,6 +34,7 @@ return {
     shardSpawned= false,
 
     shardObj    = nil,  -- si lo spawneamos
+    brokeFirstServer = false,
 }
 end
 
@@ -72,6 +77,10 @@ local function spawnServerAt(self, pad)
     onceConn = srv.onDestroyed:Connect(function()
         if onceConn and onceConn.Disconnect then onceConn:Disconnect() end
         Teach.once("tut_dc_first_break", { text = "Nice! Servers respawn—keep going!", hold = 2.2, inPosScale={0.85,0.18}, holdTime = 3 })
+        if not st.brokeFirstServer then
+            Music.play("datacenter")
+        end
+        st.brokeFirstServer = true
         pad.live = nil
 
         -- puntos + heat + HUD
@@ -166,6 +175,7 @@ function DC.attach(scene, map)
             end
             --if st.started then return end
             st.started = not st.started
+            audios.gateOpen:clone():play()
             Popup.show{
                     text = "Toggled gate with token.",
                     icon = "assets/sprites/accesstoken.png",

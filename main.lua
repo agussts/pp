@@ -6,6 +6,13 @@ PlayingTimers = Timer.group.new()
 PauseMenuTimers = Timer.group.new()
 PauseMenuTimers:pause()
 
+--REGISTRA MUSICA
+Music.register("internetscn", { path="assets/music/internetscn.mp3" })
+Music.register("darkweb",     { path="assets/music/darkweb.mp3"})
+Music.register("datacenter",  { path="assets/music/datacenter.mp3"})
+Music.register("cdn",         { path="assets/music/cdn.mp3"})
+
+--REGISTRA ESCENAS
 local testScene = require("src.scenes.testscene")
 local internetscn = require("src.scenes.internetscn")
 local darkweb = require("src.scenes.darkweb")
@@ -20,7 +27,6 @@ Scene.register("internetscn", internetscn)
 Scene.register("darkweb", darkweb)
 Scene.register("datacenter", datacenter)
 Scene.register("cdn", cdn)
-
 
 if os.getenv("CI_SMOKETEST") == "1" then
   print("CI smoketest OK, LÖVE "..(love.getVersion()))
