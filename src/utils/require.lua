@@ -5,6 +5,10 @@ Config = require("src.utils.config_manager")
 Signal = require("src.libs.signal")
 require("src.libs.connections") -- no necesita variable para identificar, ya que es global
 Timer = require("src.libs.timer")
+PlayingTimers = Timer.group.new()
+PauseMenuTimers = Timer.group.new()
+PauseMenuTimers:pause()
+
 Collisions = require("src.libs.collisions")
 UDim2 = require("src.guis.udim2")
 Animation = require("src.libs.animation")
@@ -59,10 +63,12 @@ DCHUD = require("src.ui.datacenter_hud")
 ShardsIconsHUD = require("src.ui.shards_icons")
 Popup = require("src.ui.popup")
 Teach = require("src.ui.teach")
+SpeedrunHUD = require("src.ui.speedrun_timer")
 require("src.ui.pausemenu") -- lo mismo que connections.lua
 
 World = require("src.utils.world")
 Music = require("src.libs.music")
+Cosmetics = require("src.features.cosmetics")
 
 -- Minigames
 

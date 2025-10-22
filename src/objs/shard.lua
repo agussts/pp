@@ -53,8 +53,6 @@ function Shard:Collect()
     if self._busy then return end
     self._busy = true
     audios.pickup:clone():play()
-    World.onShardCollected(self.id)
-    self:Destroy()
     MathQuiz.start({
         --rounds = 3,      -- cuántas preguntas
         --timePer = 25,    -- segundos por pregunta

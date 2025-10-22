@@ -47,6 +47,21 @@ return function ()
         tick:Destroy()
         -- corte abrupto a negro y “END OF DEMO”
         Timer.after(0.10, function()
+          Fire("end_of_demo")
+
+          --green mode
+          local best = Config.ConfigTable.SPEEDRUN_BEST_TIME
+          local th   = 1000 --CHANGE
+          if type(best)=="number" and best > 0 and best <= th then
+            if not Config.ConfigTable.GREEN_EGG_UNLOCKED then
+              Config.ConfigTable.GREEN_EGG_UNLOCKED = true
+              if Config.saveConfig then Config.saveConfig() end
+              if Popup and Popup.show then
+                Popup.show({ text="Unlocked 'Green mode'", hold=3.0})
+              end
+            end
+          end
+
           st._white.bgColor = {0,0,0,1}
 
           local lbl = Textlabel.new("END OF DEMO")

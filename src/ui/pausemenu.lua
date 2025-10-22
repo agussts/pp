@@ -12,13 +12,14 @@ pauseMenuContainer:setPersistent(true)
 pauseMenuContainer.size = UDim2.fromScale(1, 1)
 pauseMenuContainer.bgColor = {0, 0, 0, 0.65}
 pauseMenuContainer.visible = false
-pauseMenuContainer.zIndex = 500
+pauseMenuContainer.zIndex = 350
 
 local listThing = Frame.new()
 listThing.size = UDim2.fromScale(0.4, 1)
 listThing.position = UDim2.fromScale(0.5, 0.5)
 listThing.anchorPoint = {0.5, 0.5}
 listThing.bgColor = {1, 1, 1, 0}
+listThing.zIndex = 1
 listThing:setParent(pauseMenuContainer)
 
 local otherList = Frame.new()
@@ -26,6 +27,7 @@ otherList.size = UDim2.fromScale(1, 1)
 otherList.position = UDim2.fromScale(0.5, 0.5)
 otherList.anchorPoint = {0.5, 0.5}
 otherList.bgColor = {1, 1, 1, 0}
+otherList.zIndex = 1
 otherList:setParent(pauseMenuContainer)
 
 
@@ -230,7 +232,7 @@ local function createSettingsMenu(parent)
     table.insert(menu, accText)
 
     -- Logica para Checkbox
-    local function createCheckBox(pos, text, name)
+    local function createCheckBox(pos, text, name, func)
         local btn
         local btnImg
         btn = Button.new(function ()
@@ -268,6 +270,19 @@ local function createSettingsMenu(parent)
     table.insert(menu, vsyncCb)
     table.insert(menu, vsyncLabel)
     table.insert(menu, vsyncImg)
+
+    local speedrunCb, speedrunLbl, speedrunImg = createCheckBox(UDim2.fromScale(1, 0.35), "Speedrun Timer", "SPEEDRUN_HUD")
+    table.insert(menu, speedrunCb)
+    table.insert(menu, speedrunLbl)
+    table.insert(menu, speedrunImg)
+
+    local greenCb, greenLbl, greenImg
+    if Config.ConfigTable.GREEN_UNLOCKED then
+        greenCb, greenLbl, greenImg = createCheckBox(UDim2.fromScale(1, 0.47), "Green mode",  "GREEN")
+        table.insert(menu, greenCb)
+        table.insert(menu, greenLbl)
+        table.insert(menu, greenImg)
+    end
 
     --Logica para la Resolucion
 
@@ -367,6 +382,8 @@ local function createSettingsMenu(parent)
         function ()
             Config.saveConfig()
             Config.updateWindow()
+            SpeedrunHUD.applyVisibilityFromConfig()
+            Cosmetics.applyGreenMode(Config.ConfigTable.GREEN == true)
             prevConfig = deepCopy(Config.ConfigTable)
             showMenu("menu")
         end
@@ -383,6 +400,10 @@ local function createSettingsMenu(parent)
             sliderBtn.position.x.scale = prevConfig.VOLUME
             borderlessImg.image = love.graphics.newImage(prevConfig.BORDERLESS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
             vsyncImg.image = love.graphics.newImage(prevConfig.VSYNC and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            speedrunImg.image = love.graphics.newImage(prevConfig.SPEEDRUN_HUD and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            if greenImg then
+                greenImg.image = love.graphics.newImage(prevConfig.GREEN and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            end
             resolutionText.text = "Resolution: " .. Config.Resolutions[prevConfig.RESOLUTION].width .. "x" .. Config.Resolutions[prevConfig.RESOLUTION].height
             Config.ConfigTable = deepCopy(prevConfig)
         end
@@ -399,6 +420,10 @@ local function createSettingsMenu(parent)
             sliderBtn.position.x.scale = Config.DefaultConfigs.VOLUME
             borderlessImg.image = love.graphics.newImage(Config.DefaultConfigs.BORDERLESS and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
             vsyncImg.image = love.graphics.newImage(Config.DefaultConfigs.VSYNC and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            speedrunImg.image = love.graphics.newImage(Config.DefaultConfigs.SPEEDRUN_HUD and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            if greenImg then
+                greenImg.image = love.graphics.newImage(Config.DefaultConfigs.GREEN and "assets/sprites/cbmark.png" or "assets/sprites/cbunmark.png")
+            end
             resolutionText.text = "Resolution: " .. Config.Resolutions[Config.DefaultConfigs.RESOLUTION].width .. "x" .. Config.Resolutions[Config.DefaultConfigs.RESOLUTION].height
             Config.ConfigTable = deepCopy(Config.DefaultConfigs)
         end
@@ -811,7 +836,6 @@ function PauseMenu()
         pauseMenuContainer.visible = true
         showMenu("menu")
     elseif Gamestate == "paused" then
-        print("resuming")
         Gamestate = "playing"
         showMenu("")
         PlayingTimers:continue()

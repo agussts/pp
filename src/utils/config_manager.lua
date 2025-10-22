@@ -29,8 +29,12 @@ ConfigManager.DefaultConfigs = {
     TEACH = true,
     MAUDIENCE = "kids",
     MTHEME = "netkids",
+    GREEN = false,
     
     SEEN_ACC = false,
+    SPEEDRUN_HUD = false,
+    SPEEDRUN_BEST_TIME = nil,
+    GREEN_UNLOCKED = false,
 }
 
 local function tableClone(original)

@@ -60,6 +60,7 @@ return function()
         Transition.play(function ()
           Scene.load(NEXT_SCENE)
           Gamestate = "playing"
+          Fire("speedrun_start")
         end)
       end)
       Wizard.show()
@@ -67,6 +68,7 @@ return function()
       Transition.play(function ()
           Scene.load(NEXT_SCENE)
           Gamestate = "playing"
+          Fire("speedrun_start")
         end)
     end
     -- if Transition and Transition.play then

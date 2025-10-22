@@ -61,6 +61,19 @@ function gun:Fire(x, y)
     anim.anchor = {0.5, 0.5}
 
     local bullet = Block.new(anim, 0, 0, 0.02, 0.03)
+    local prevDraw = bullet.draw
+    function bullet:draw(...)
+        local green = Config.SavedConfigs.GREEN
+
+        if green and Shaders and Shaders.rehueGreen then
+            love.graphics.setShader(Shaders.rehueGreen)
+            Shaders.rehueGreen:send("u_enabled", 1.0)
+            prevDraw(self, ...)
+            love.graphics.setShader()
+        else
+            prevDraw(self, ...)
+        end
+    end
     self.bullets[id] = bullet
 
     local collider = bullet.collision

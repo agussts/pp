@@ -569,8 +569,10 @@ function MathQuiz:_finish(success)
   if self.root then self.root:Destroy() end
   exitMiniState()
   if success then
+    print("win")
     if self.onWin then self.onWin() end
   else
+    print("lose")
     if self.onLose then self.onLose() end
   end
 end

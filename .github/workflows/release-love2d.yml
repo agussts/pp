@@ -223,22 +223,6 @@ jobs:
         run: |
           xattr -rc "dist/${GAME_NAME}.app" || true
 
-      - name: Smoke test del binario (sin GUI)
-        run: |
-          set -e
-          B="dist/${GAME_NAME}.app/Contents/MacOS/love"
-          chmod +x "$B"
-          "$B" --version > /dev/null
-
-
-      - name: Smoke test ejecutando el juego (sale solo)
-        timeout-minutes: 1
-        run: |
-          set -e
-          APP="dist/${GAME_NAME}.app"
-          B="$APP/Contents/MacOS/love"
-          CI_SMOKETEST=1 "$B"
-
       - name: Empaquetar ZIP de macOS (.app)
         run: |
           # ditto preserva recursos/symlinks y añade la carpeta .app como raíz

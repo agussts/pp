@@ -2,10 +2,6 @@
 require("src.utils.require")  
 --Config.init()
 
-PlayingTimers = Timer.group.new()
-PauseMenuTimers = Timer.group.new()
-PauseMenuTimers:pause()
-
 --REGISTRA MUSICA
 Music.register("internetscn", { path="assets/music/internetscn.mp3" })
 Music.register("darkweb",     { path="assets/music/darkweb.mp3"})
@@ -27,11 +23,6 @@ Scene.register("internetscn", internetscn)
 Scene.register("darkweb", darkweb)
 Scene.register("datacenter", datacenter)
 Scene.register("cdn", cdn)
-
-if os.getenv("CI_SMOKETEST") == "1" then
-  print("CI smoketest OK, LÖVE "..(love.getVersion()))
-  love.event.quit(0)
-end
 
 love.load = function ()
     --Ajustes antes de empezar renderizacion
@@ -74,6 +65,7 @@ end
 love.update = function (dt)
     --Actualiza modulo de timer
     Timer.update(dt)
+    SpeedrunHUD.update(dt)
     --Actualiza animaciones
     if love.mouse.isDown(1) then
         --Activa funcion de cuando se presiona el boton

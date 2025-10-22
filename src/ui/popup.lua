@@ -26,6 +26,8 @@ local T_BOB_UP  = 0.14    -- subir
 local T_BOB_DN  = 0.18    -- bajar
 local T_FADE    = 0.22    -- desvanecer/slide-out
 local HOLD_S    = 1    -- pausa breve antes del bob (sensación de lectura)
+local CLEAR_ICON_DESTROYS = false
+
 
 -- Amplitud del bob (en escala)
 local BOB_DY = 0.03
@@ -62,6 +64,40 @@ local function ensureTG(self)
   return self._tg
 end
 
+
+local function safeSetImage(imgLabel, path)
+  if imgLabel.setImage then
+    imgLabel:setImage(path)
+  else
+    imgLabel.image = love.graphics.newImage(path)
+  end
+end
+
+-- Crea/actualiza icono si hay path; lo oculta o destruye si no hay.
+local function setIcon(self, path)
+  if path and path ~= "" then
+    if not self.icon then
+      self.icon = ImageLabel.new(path)
+      self.icon:setParent(self.box)              -- usa tu contenedor del popup
+      self.icon.anchorPoint = {0, 0}
+      self.icon.position    = UDim2.fromScale(0.05, 0.18)
+      self.icon.size        = UDim2.fromScale(0.14, 0.64)
+      self.icon.zIndex      = (self.box.zIndex or 0) + 2
+    else
+      safeSetImage(self.icon, path)
+      self.icon.visible = true
+    end
+  else
+    if self.icon then
+      if CLEAR_ICON_DESTROYS then
+        self.icon:Destroy()
+        self.icon = nil
+      else
+        self.icon.visible = false
+      end
+    end
+  end
+end
 
 local function ensureSingleton(holdTime)
   if _singleton then 
@@ -141,8 +177,8 @@ end
 
 local function configure(self, opt)
   self.text.text = tostring(opt.text or "")
+  setIcon(self, opt.icon)
   if opt.icon then
-    self.icon.image = love.graphics.newImage(opt.icon)
     self.icon.visible = true
     self.text.position = UDim2.fromScale(0.36, 0.5)
     self.text.size     = UDim2.fromScale(0.60, 0.78)

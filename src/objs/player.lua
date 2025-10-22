@@ -172,10 +172,19 @@ end
 function player:draw()
     if self._destroying then return end
     local x,y = self.collision.position:toPixels()
-    if self.flash > 0 then
+
+    -- flag: green mode encendido?
+    local green = Config.SavedConfigs.GREEN
+
+    -- prioriza flash de daño; si no hay flash, aplica rehueGreen si toca
+    if self.flash > 0 and Shaders and Shaders.flash then
         love.graphics.setShader(Shaders.flash)
         Shaders.flash:send("u_flash", self.flash)
+    elseif green and Shaders and Shaders.rehueGreen then
+        love.graphics.setShader(Shaders.rehueGreen)
+        Shaders.rehueGreen:send("u_enabled", 1.0)
     end
+
     self.sprite:draw(x, y)
     love.graphics.setShader()
 end

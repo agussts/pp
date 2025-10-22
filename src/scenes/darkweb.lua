@@ -135,6 +135,7 @@ return function ()
                 end):addToGroup(PlayingTimers)
 
                 Connect("shard_collected", function(id)
+                    print("collected")
                     if id == "testShard" then
                         self.doorBlock:Destroy()
                         self.doorPreventer:Destroy()
@@ -169,27 +170,29 @@ return function ()
             -- Misión en progreso
             script = WrittenDialogues.mviruspostFirst
             Dialogue.start(script, 42)
-        elseif World.shards.done then
-        -- Reemplaza tu script/branch existente por esto:
-        local script = WrittenDialogues.mvirusTurnIn
-        local dlg = Dialogue.start(script, 42)
-        if dlg == nil then return end
-        dlg.onFinish:Connect(function()
-            -- Marca entrega y da la WEB KEY
-            World.shards.active  = false
-            World.shards.spawned = false
-            if not World.flags.webKey then
-                World.flags.webKey = true
-                if Popup and Popup.show then
-                    Popup.show({
-                        text = "Web key acquiered",
-                        icon    = "assets/sprites/webkey.png", -- opcional
-                        hold    = 2.0,
-                    })
+        elseif World.shards.done and not World.flags.webKey then
+            -- Reemplaza tu script/branch existente por esto:
+            local script = WrittenDialogues.mvirusTurnIn
+            local dlg = Dialogue.start(script, 42)
+            if dlg == nil then return end
+            dlg.onFinish:Connect(function()
+                -- Marca entrega y da la WEB KEY
+                World.shards.active  = false
+                World.shards.spawned = false
+                if not World.flags.webKey then
+                    World.flags.webKey = true
+                    if Popup and Popup.show then
+                        Popup.show({
+                            text = "Web key acquiered",
+                            icon    = "assets/sprites/webkey.png", -- opcional
+                            hold    = 2.0,
+                        })
+                    end
                 end
-            end
-        end)
-    end
+            end)
+        elseif World.flags.webKey then
+            Dialogue.start(WrittenDialogues.mvirusAfterTurnIn, 42)
+        end
     end
 
     scene.update = function (self, dt)

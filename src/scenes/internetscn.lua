@@ -148,7 +148,7 @@ return function()
                     tone = "warn",
                     corner = "bl"
                 }
-                Timer.after(.8, function () db = false end)
+                Timer.after(2, function () db = false end)
             end
         end)
         self.web.worldLayer = -5

@@ -44,15 +44,20 @@ dialogues.mvirusTurnIn = {
   { who="???", text="When you're ready, head to the entry node. Good luck." },
 }
 
+dialogues.mvirusAfterTurnIn = {
+  { who="???", text="You've got the Web Key. The gate's open. Don't overthink it, just go." }
+}
+
 dialogues.webattemptexit = {
   { who="YOU", text="I'm too far in now.. no going back." },
 }
 
 dialogues.tut_cdn_sign_basic = {
-  { who="SIGN", text="Stand on a plate with a number." },
-  { who="SIGN", text="Choose an operator (x +, -) and make a new value." },
-  { who="SIGN", text="Paths open when the gate number divides your value." },
-  { who="SIGN", text="If you get stuck, use Reset to try again." },
+  { who="SIGN", text="Stand on a NUMBER plate (plates with colored numbers) to set V (your value)." },
+  { who="SIGN", text="Step on +, x, or - plates to change V using a number plate." },
+  { who="SIGN", text="Paths open when V is DIVISIBLE of the number along the path." },
+  { who="SIGN", text="Example: Gate 3 opens when V = 3, 6, 9, 12, 15..." },
+  { who="SIGN", text="To reset go back to the beginning" },
 }
 
 dialogues.tut_dc_sign_basic = {
