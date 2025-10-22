@@ -96,10 +96,6 @@ local function popupResult(runSec, bestSec)
   if not (Popup and Popup.show) then return end
   Popup.show({
     text  = ("Run: %s\nBest: %s"):format(fmtTime(runSec), bestSec and fmtTime(bestSec) or "--:--.--"),
-    hold  = 3.0,
-    pos   = UDim2.fromScale(0.5, 0.10),
-    align = "center",
-    icon  = nil
   })
 end
 
@@ -122,11 +118,11 @@ local function onFinish()
   _running = false
   local run = _elapsed or 0
   local best = getBest()
+  popupResult(run, best)
   if (not best) or (run < best) then
     setBest(run)
     best = run
   end
-  popupResult(run, best)
   SpeedrunTimer._refreshHUD()
 end
 

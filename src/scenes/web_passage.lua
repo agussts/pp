@@ -51,10 +51,10 @@ return function ()
 
           --green mode
           local best = Config.ConfigTable.SPEEDRUN_BEST_TIME
-          local th   = 1000 --CHANGE
+          local th   = 120 
           if type(best)=="number" and best > 0 and best <= th then
-            if not Config.ConfigTable.GREEN_EGG_UNLOCKED then
-              Config.ConfigTable.GREEN_EGG_UNLOCKED = true
+            if not Config.ConfigTable.GREEN_UNLOCKED then
+              Config.ConfigTable.GREEN_UNLOCKED = true
               if Config.saveConfig then Config.saveConfig() end
               if Popup and Popup.show then
                 Popup.show({ text="Unlocked 'Green mode'", hold=3.0})

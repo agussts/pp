@@ -26,7 +26,8 @@ local T_BOB_UP  = 0.14    -- subir
 local T_BOB_DN  = 0.18    -- bajar
 local T_FADE    = 0.22    -- desvanecer/slide-out
 local HOLD_S    = 1    -- pausa breve antes del bob (sensación de lectura)
-local CLEAR_ICON_DESTROYS = false
+local BLANK_PATH = "assets/sprites/blank.png"
+local BLANK_TEX  = love.graphics.newImage(BLANK_PATH)
 
 
 -- Amplitud del bob (en escala)
@@ -64,40 +65,42 @@ local function ensureTG(self)
   return self._tg
 end
 
-
-local function safeSetImage(imgLabel, path)
-  if imgLabel.setImage then
-    imgLabel:setImage(path)
-  else
-    imgLabel.image = love.graphics.newImage(path)
-  end
-end
-
 -- Crea/actualiza icono si hay path; lo oculta o destruye si no hay.
-local function setIcon(self, path)
-  if path and path ~= "" then
-    if not self.icon then
-      self.icon = ImageLabel.new(path)
-      self.icon:setParent(self.box)              -- usa tu contenedor del popup
-      self.icon.anchorPoint = {0, 0}
-      self.icon.position    = UDim2.fromScale(0.05, 0.18)
-      self.icon.size        = UDim2.fromScale(0.14, 0.64)
-      self.icon.zIndex      = (self.box.zIndex or 0) + 2
-    else
-      safeSetImage(self.icon, path)
-      self.icon.visible = true
-    end
+-- Borra o asigna el icono de forma segura (evita “fantasmas”)
+local function setIcon(self, iconPath)
+  -- crea el ImageLabel si no existe
+  if not self.icon then
+    self.icon = ImageLabel.new(BLANK_PATH)  -- inicializa con blank
+    self.icon:setParent(self.box)
+    self.icon.anchorPoint = {0, 0.5}
+    self.icon.position    = UDim2.fromScale(0.08, 0.5)
+    self.icon.size        = UDim2.fromScale(0.22, 0.76)
+    self.icon.zIndex      = (self.text and (self.text.zIndex or 1) or 1)
+  end
+
+  local hasIcon = (iconPath ~= nil and iconPath ~= "")
+  if hasIcon then
+    -- icono real
+    self.icon.image = love.graphics.newImage(iconPath)
+    self.icon.visible = true
   else
-    if self.icon then
-      if CLEAR_ICON_DESTROYS then
-        self.icon:Destroy()
-        self.icon = nil
-      else
-        self.icon.visible = false
-      end
-    end
+    -- icono “vacío”: 1px transparente
+    self.icon.image = BLANK_TEX
+    self.icon.visible = true   -- visible da igual: es transparente
+  end
+  return hasIcon
+end
+
+
+-- Ajusta el rect del texto según haya icono visible o no (evita solapados)
+local function layoutTextForIcon(self, hasIcon)
+  local leftPad = hasIcon and 0.36 or 0.06
+  if self.text then
+    self.text.position = UDim2.fromScale(leftPad, 0.5)
+    self.text.size     = UDim2.fromScale(1 - leftPad - 0.06, 0.78)
   end
 end
+
 
 local function ensureSingleton(holdTime)
   if _singleton then 
@@ -177,20 +180,14 @@ end
 
 local function configure(self, opt)
   self.text.text = tostring(opt.text or "")
-  setIcon(self, opt.icon)
-  if opt.icon then
-    self.icon.visible = true
-    self.text.position = UDim2.fromScale(0.36, 0.5)
-    self.text.size     = UDim2.fromScale(0.60, 0.78)
-  else
-    self.icon.visible = false
-    self.text.position = UDim2.fromScale(0.06, 0.5)
-    self.text.size     = UDim2.fromScale(0.88, 0.78)
-  end
+  local hasIcon = setIcon(self, opt.icon)
+  layoutTextForIcon(self, hasIcon)
   applyTone(self, opt.tone)
   setCorner(self, opt.corner or "bl")
   self._duration = tonumber(opt.duration) or (T_IN + HOLD_S + T_BOB_UP + T_BOB_DN + T_FADE)
 end
+
+
 
 -- ========== Animación (enter → bob up → bob down → fade out) ==========
 local function animateIn(self, onDone)
